@@ -16,6 +16,7 @@ import TokoSetting from './pages/TokoSetting';
 import Users from './pages/admin/Users';
 import Products from './pages/admin/Products';
 import AuditLogs from './pages/admin/AuditLogs';
+import Catalog from './pages/Catalog';
 
 const App = () => {
     return (
@@ -24,6 +25,7 @@ const App = () => {
                 <Routes>
                     <Route element={<MainLayout />}>
                         <Route index element={<Home />} />
+                        <Route path="catalog" element={<Catalog />} />
                         <Route element={<ProtectedRoute />}>
                             <Route path="transactions" element={<Transactions />} />
                             <Route path="cart" element={<Cart />} />
