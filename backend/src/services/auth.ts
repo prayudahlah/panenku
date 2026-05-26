@@ -35,6 +35,10 @@ export async function login(input: LoginInput): Promise<ServiceResult<UserRespon
     const valid = await bcrypt.compare(input.password, user.passwordHash);
     if (!valid) return { error: 'Email atau password salah', status: 401 };
 
+    if (user.status !== 'active') {
+        return { error: 'Akun kamu telah dinonaktifkan', status: 403 };
+    }
+
     return {
         data: {
             id: user.id,
