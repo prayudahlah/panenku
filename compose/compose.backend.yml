@@ -1,0 +1,17 @@
+services:
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile.dev
+    container_name: panenku-backend
+    env_file: ../.env.distributed
+    ports: ["0.0.0.0:${BACKEND_PORT}:3000"]
+    dns:
+      - 100.100.100.100
+    develop:
+      watch:
+        - action: sync
+          path: ../backend/src
+          target: /app/src
+        - action: rebuild
+          path: ../backend/package.json
