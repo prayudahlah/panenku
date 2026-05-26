@@ -1,9 +1,10 @@
 import { NavLink, Outlet, Link } from 'react-router-dom';
-import { Users, Wheat, ArrowLeft } from 'lucide-react';
+import { Users, Wheat, ScrollText, ArrowLeft } from 'lucide-react';
 
 const sidebarItems = [
     { label: 'Users', icon: Users, path: '/admin/users' },
     { label: 'Products', icon: Wheat, path: '/admin/products' },
+    { label: 'Audit Logs', icon: ScrollText, path: '/admin/audit' },
 ];
 
 export default function AdminLayout() {

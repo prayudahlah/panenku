@@ -1,4 +1,6 @@
 export { authRoutes } from './auth';
-export { sellerRoutes } from './seller';
+export { sellerRoutes } from './sellers';
 export { referenceRoutes } from './reference';
-export { adminRoutes } from './admin';
+export { userRoutes } from './users';
+export { productRoutes } from './products';
+export { auditRoutes } from './audit';

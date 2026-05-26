@@ -1,4 +1,5 @@
 import { adminRepo } from '../repositories';
+import { auditService } from '../services';
 
 type ServiceResult<T> = { data?: T; error?: string; status?: number };
 
@@ -7,12 +8,24 @@ export async function listUsers(): Promise<ServiceResult<any[]>> {
     return { data };
 }
 
-export async function updateUserStatus(userId: number, status: string): Promise<ServiceResult<any>> {
+export async function updateUserStatus(userId: number, status: string, adminId?: number): Promise<ServiceResult<any>> {
     const user = await adminRepo.findById(userId);
     if (!user) return { error: 'User tidak ditemukan', status: 404 };
     if (user.role === 'admin') return { error: 'Tidak dapat mengubah status admin', status: 403 };
 
+    const oldStatus = user.status;
+
     const updated = await adminRepo.updateUserStatus(userId, status);
+
+    auditService.log({
+        userId: adminId,
+        action: status === 'active' ? 'user.activated' : 'user.suspended',
+        entityType: 'user',
+        entityId: userId,
+        oldData: { status: oldStatus },
+        newData: { status },
+    });
+
     return { data: updated };
 }
 

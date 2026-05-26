@@ -15,6 +15,7 @@ import ProductList from './pages/ProductList';
 import TokoSetting from './pages/TokoSetting';
 import Users from './pages/admin/Users';
 import Products from './pages/admin/Products';
+import AuditLogs from './pages/admin/AuditLogs';
 
 const App = () => {
     return (
@@ -38,6 +39,7 @@ const App = () => {
                                 <Route index element={<Navigate to="users" replace />} />
                                 <Route path="users" element={<Users />} />
                                 <Route path="products" element={<Products />} />
+                                <Route path="audit" element={<AuditLogs />} />
                             </Route>
                         </Route>
                     </Route>
