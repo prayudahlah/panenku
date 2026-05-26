@@ -1,21 +1,54 @@
-import { Elysia } from 'elysia';
+import { RegisterRequest, LoginRequest } from '../dtos/auth';
+import { authService } from '../services';
 
-export const register = (app: Elysia) =>
-  app.post('/register', async ({ body, session }) => {
-    return { message: 'Register endpoint placeholder' };
-  });
+export const authController = (app: any) =>
+    app
+        .post('/register', async ({ body, session, set }: any) => {
+            const result = await authService.register(body);
+            if (result.error) {
+                set.status = result.status || 400;
+                return { success: false, message: result.error };
+            }
 
-export const login = (app: Elysia) =>
-  app.post('/login', async ({ body, session }) => {
-    return { message: 'Login endpoint placeholder' };
-  });
+            session.set('userId', result.data!.id);
+            session.set('email', result.data!.email);
+            session.set('role', result.data!.role);
 
-export const logout = (app: Elysia) =>
-  app.post('/logout', async ({ session }) => {
-    return { message: 'Logout endpoint placeholder' };
-  });
+            set.status = 201;
+            return { success: true, message: 'Registrasi berhasil', data: result.data };
+        }, { body: RegisterRequest })
 
-export const me = (app: Elysia) =>
-  app.get('/me', async ({ session }) => {
-    return { message: 'Me endpoint placeholder' };
-  });
+        .post('/login', async ({ body, session, set }: any) => {
+            const result = await authService.login(body);
+            if (result.error) {
+                set.status = result.status || 400;
+                return { success: false, message: result.error };
+            }
+
+            session.set('userId', result.data!.id);
+            session.set('email', result.data!.email);
+            session.set('role', result.data!.role);
+
+            return { success: true, message: 'Login berhasil', data: result.data };
+        }, { body: LoginRequest })
+
+        .post('/logout', async ({ session }: any) => {
+            session.destroy();
+            return { success: true, message: 'Logout berhasil' };
+        })
+
+        .get('/me', async ({ session, set }: any) => {
+            const userId = session.get('userId');
+            if (!userId) {
+                set.status = 401;
+                return { success: false, message: 'Belum login' };
+            }
+
+            const result = await authService.me(userId);
+            if (result.error) {
+                set.status = result.status || 400;
+                return { success: false, message: result.error };
+            }
+
+            return { success: true, data: result.data };
+        });

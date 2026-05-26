@@ -22,7 +22,7 @@ const Home = () => {
                             Langsung dari Tanah ke<br />Tangan Anda
                         </h1>
                         <p className="text-md max-w-2xl">
-                            Transparansi penuh yang menghubungkan pembeli industri dengan petani lokal.
+                            Transparansi penuh yang menghubungkan pembeli industri dengan petani lokal
                         </p>
                     </div>
                 </div>

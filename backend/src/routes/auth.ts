@@ -1,11 +1,4 @@
-import { Elysia } from 'elysia';
-import { login, register, logout, me } from '../controllers/auth';
+import { authController } from '../controllers';
 
-export const authRoutes = (app: Elysia) =>
-  app.group('/auth', (group) =>
-    group
-      .use(register)
-      .use(login)
-      .use(logout)
-      .use(me)
-  );
+export const authRoutes = (app: any) =>
+    app.group('/auth', (group: any) => group.use(authController));
