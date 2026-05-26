@@ -1,0 +1,8 @@
+CREATE SCHEMA IF NOT EXISTS util;
+
+CREATE TABLE IF NOT EXISTS util.sessions (
+    id         TEXT PRIMARY KEY,
+    data       TEXT NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
