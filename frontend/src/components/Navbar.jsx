@@ -1,5 +1,6 @@
-import { NavLink } from 'react-router-dom';
-import { Bell, ShoppingCart } from 'lucide-react';
+import { useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { Bell, ShoppingCart, Search } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import UserDropdown from './UserDropdown';
 
@@ -10,18 +11,39 @@ const navItems = [
 
 export default function Navbar() {
     const { user } = useAuth();
+    const [searchQuery, setSearchQuery] = useState('');
+    const navigate = useNavigate();
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            navigate(`/catalog?q=${encodeURIComponent(searchQuery.trim())}`);
+        }
+    };
 
     return (
         <nav className="bg-white shadow-md">
             <div className="max-w-[80%] mx-auto px-4">
-                <div className="flex justify-between h-16">
-                    <div className="shrink-0 flex items-center">
+                <div className="flex justify-between h-16 items-center">
+                    <div className="shrink-0 flex">
                         <NavLink to="/" className="text-primary-green font-bold text-2xl">
                             Panenku
                         </NavLink>
                     </div>
 
-                    <div className='flex items-center space-x-4'>
+                    <div className="flex flex-1 justify-center px-8 mx-8">
+                        <form onSubmit={handleSearch} className="w-full relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Cari produk..."
+                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-green text-sm"
+                            />
+                        </form>
+                    </div>
+
+                    <div className="flex items-center space-x-4">
                         <div className="flex space-x-4 items-center">
                             {user && navItems.map((item) => (
                                 <NavLink
@@ -34,7 +56,7 @@ export default function Navbar() {
                             ))}
                         </div>
 
-                        {user && <div className='h-8 w-0.5 bg-neutral-stone-dim' />}
+                        {user && <div className="h-8 w-0.5 bg-neutral-stone-dim" />}
 
                         <div className="flex space-x-2 items-center">
                             {user ? (
@@ -42,14 +64,14 @@ export default function Navbar() {
                             ) : (
                                 <>
                                     <NavLink
-                                        to='/login'
+                                        to="/login"
                                         className="px-3 py-1.5 rounded-xl text-sm font-bold text-primary-green border-primary-green border-2 hover:mb-1"
                                     >
                                         Masuk
                                     </NavLink>
 
                                     <NavLink
-                                        to='/register'
+                                        to="/register"
                                         className="px-3 py-1.5 rounded-xl text-sm font-bold text-white bg-primary-green border-primary-green border-2 hover:mb-1"
                                     >
                                         Daftar
