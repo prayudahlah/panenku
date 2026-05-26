@@ -1,10 +1,17 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import MainLayout from './layouts/MainLayout';
+import Home from './pages/Home';
+
 const App = () => {
-  return (
-    <div>
-      <h1>Panenku</h1>
-      <p>Sistem Manajemen Panen</p>
-    </div>
-  );
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route element={<MainLayout />}>
+                    <Route index element={<Home />} />
+                </Route>
+            </Routes>
+        </BrowserRouter>
+    );
 };
 
 export default App;
