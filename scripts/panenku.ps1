@@ -2,17 +2,19 @@ param(
     [Parameter(Position=0)][string]$Mode,
     [Parameter(Position=1)][string]$Action = "up",
     [Parameter(Position=2)][string]$Service = "",
-    [switch]$Build
+    [switch]$Build,
+    [switch]$Volumes
 )
 
 $ComposeDir = Join-Path $PSScriptRoot ".." "compose"
 $BuildFlag = if ($Build) { "--build" } else { "" }
+$VolumesFlag = if ($Volumes) { "-v" } else { "" }
 
 function Show-Usage {
     Write-Host @"
 Usage:
-  .\panenku.ps1 dev [up|down|logs] [-Build]
-  .\panenku.ps1 distributed <db|be|fe|proxy> [up|down|logs] [-Build]
+  .\panenku.ps1 dev [up|down|down -v|ps|logs] [-Build]
+  .\panenku.ps1 distributed <db|be|fe|proxy> [up|down|down -v|ps|logs] [-Build]
 "@
     exit 1
 }
@@ -56,7 +58,12 @@ switch ($Action) {
         Invoke-Expression $cmd
     }
     "down" {
-        $cmd = "docker compose -f $ComposeFile --env-file $EnvFile down"
+        $cmd = "docker compose -f $ComposeFile --env-file $EnvFile down $VolumesFlag"
+        Write-Host "→ $cmd"
+        Invoke-Expression $cmd
+    }
+    "ps" {
+        $cmd = "docker compose -f $ComposeFile --env-file $EnvFile ps"
         Write-Host "→ $cmd"
         Invoke-Expression $cmd
     }
