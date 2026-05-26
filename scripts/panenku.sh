@@ -6,17 +6,20 @@ ENV_FILE=""
 
 usage() {
     echo "Usage:"
-    echo "  $0 dev [up|down|logs] [--build]"
-    echo "  $0 distributed <db|be|fe|proxy> [up|down|logs] [--build]"
+    echo "  $0 dev [up|down|down -v|ps|logs] [--build]"
+    echo "  $0 distributed <db|be|fe|proxy> [up|down|down -v|ps|logs] [--build]"
     exit 1
 }
 
 needs_build=false
+needs_volumes=false
 args=()
 
 for arg in "$@"; do
     if [ "$arg" = "--build" ]; then
         needs_build=true
+    elif [ "$arg" = "-v" ] || [ "$arg" = "--volumes" ]; then
+        needs_volumes=true
     else
         args+=("$arg")
     fi
@@ -29,6 +32,9 @@ ACTION="${2:-up}"
 
 build_flag=""
 $needs_build && build_flag="--build"
+
+volumes_flag=""
+$needs_volumes && volumes_flag="-v"
 
 watch_flag=""
 case "$MODE" in
@@ -74,7 +80,12 @@ case "$ACTION" in
         eval "$cmd"
         ;;
     down)
-        cmd="docker compose -f $COMPOSE_FILE --env-file $ENV_FILE down"
+        cmd="docker compose -f $COMPOSE_FILE --env-file $ENV_FILE down $volumes_flag"
+        echo "→ $cmd"
+        eval "$cmd"
+        ;;
+    ps)
+        cmd="docker compose -f $COMPOSE_FILE --env-file $ENV_FILE ps"
         echo "→ $cmd"
         eval "$cmd"
         ;;
