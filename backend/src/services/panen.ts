@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { panen } from '../db/schema/panen';
+import { products } from '../db/schema';
 
 export async function getAllPanen(userId: number) {
   return [];
