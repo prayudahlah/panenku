@@ -25,6 +25,14 @@ export const seller = {
   getMyProfile: () => fetchApi('/seller/profiles/me'),
 };
 
+export const admin = {
+  listUsers: () => fetchApi('/admin/users'),
+  updateUserStatus: (id, status) => fetchApi(`/admin/users/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  listSellers: () => fetchApi('/admin/sellers'),
+  listProducts: (sellerId) => fetchApi(`/admin/products?sellerId=${sellerId}`),
+  takedownProduct: (id) => fetchApi(`/admin/products/${id}/takedown`, { method: 'PATCH' }),
+};
+
 export const panenApi = {
   list: (params) => fetchApi(`/panen?${new URLSearchParams(params)}`),
   create: (data) => fetchApi('/panen', { method: 'POST', body: JSON.stringify(data) }),
