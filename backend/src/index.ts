@@ -1,4 +1,5 @@
 import { Elysia } from 'elysia';
+import { swagger } from '@elysiajs/swagger';
 import { betterSession, createDrizzleSessionAdapter } from 'elysia-better-session';
 import { db } from './db';
 import { sessions } from './db/schema/session';
@@ -7,6 +8,17 @@ import { panenRoutes } from './routes/panen';
 import { laporanRoutes } from './routes/laporan';
 
 const app = new Elysia()
+  .use(swagger({
+    path: '/api/v1/docs',
+    scalarConfig: {
+      spec: {
+        url: '/api/v1/docs/json',
+      },
+    },
+    documentation: {
+      info: { title: 'Panenku API', version: '1.0.0' },
+    },
+  }))
   .use(
     betterSession({
       adapter: createDrizzleSessionAdapter({
