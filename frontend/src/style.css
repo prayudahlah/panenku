@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@layer base {
+  h1 { font-size: 2em; font-weight: bold; }
+  h2 { font-size: 1.5em; font-weight: bold; }
+  h3 { font-size: 1.17em; font-weight: bold; }
+  h4 { font-size: 1em; font-weight: bold; }
+  h5 { font-size: 0.83em; font-weight: bold; }
+  h6 { font-size: 0.67em; font-weight: bold; }
+}
+
+@theme {
+  /* Primary Green */
+  --color-primary-green: #154212;
+  --color-primary-green-100: #BCF0AE;
+  --color-primary-green-500: #2D5A27;
+  --color-primary-green-800: #154212;
+
+  /* Secondary Brown */
+  --color-secondary-brown: #934B19;
+  --color-secondary-brown-100: #FFDBC9;
+  --color-secondary-brown-500: #FFA26A;
+  --color-secondary-brown-800: #934B19;
+
+  /* Forest Green */
+  --color-forest-green: #24401E;
+  --color-forest-green-100: #CAECBC;
+  --color-forest-green-500: #3B5733;
+  --color-forest-green-800: #24401E;
+
+  /* Neutral Stone */
+  --color-neutral-stone: #FAF5F0;
+  --color-neutral-stone-base: #FAF5F5;
+  --color-neutral-stone-container: #EEEEE9;
+  --color-neutral-stone-dim: #DADAD5;
+}
