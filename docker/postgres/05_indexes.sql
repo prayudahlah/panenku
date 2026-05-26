@@ -25,3 +25,9 @@ CREATE INDEX IF NOT EXISTS idx_cart_items_cart ON transaction.cart_items(cart_id
 
 CREATE INDEX IF NOT EXISTS idx_checkouts_buyer ON transaction.checkouts(buyer_id);
 CREATE INDEX IF NOT EXISTS idx_checkouts_status ON transaction.checkouts(checkout_status_id);
+
+-- Audit
+CREATE INDEX IF NOT EXISTS idx_audit_action ON audit.audit_logs(action);
+CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit.audit_logs(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_audit_user ON audit.audit_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_created ON audit.audit_logs(created_at);
