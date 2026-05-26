@@ -12,8 +12,8 @@ export default defineConfig({
         host: '0.0.0.0',
         port: parseInt(process.env.FRONTEND_PORT || '5173'),
         proxy: {
-            '/api': {
-                target: process.env.VITE_API_URL || 'http://localhost:3000',
+            '/api/v1': {
+                target: 'http://localhost:3000',
                 changeOrigin: true,
             },
         },

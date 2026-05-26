@@ -16,3 +16,8 @@ export async function create(data: typeof users.$inferInsert) {
     const result = await db.insert(users).values(data).returning();
     return result[0];
 }
+
+export async function updateRole(id: number, role: string) {
+    const result = await db.update(users).set({ role }).where(eq(users.id, id)).returning();
+    return result[0];
+}
