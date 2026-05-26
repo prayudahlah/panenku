@@ -1,9 +1,8 @@
 import { Elysia } from 'elysia';
 import { swagger } from '@elysiajs/swagger';
-import { betterSession, createDrizzleSessionAdapter } from 'elysia-better-session';
-import { db } from './db';
-import { sessions } from './db/schema';
-import { authRoutes } from './routes';
+import { betterSession } from 'elysia-better-session';
+import { upsertSessionAdapter } from './utils/session-adapter';
+import { authRoutes, sellerRoutes, referenceRoutes } from './routes';
 
 const app = new Elysia()
     .use(swagger({
@@ -19,15 +18,7 @@ const app = new Elysia()
     }))
     .use(
         betterSession({
-            adapter: createDrizzleSessionAdapter({
-                db,
-                table: sessions,
-                columns: {
-                    id: (t) => t.id,
-                    expiresAt: (t) => t.expiresAt,
-                    data: (t) => t.data,
-                },
-            }),
+            adapter: upsertSessionAdapter,
             ttl: 1000 * 60 * 60 * 24,
             cookie: {
                 name: 'panenku_session',
@@ -38,7 +29,7 @@ const app = new Elysia()
             initialData: () => ({ userId: null, email: null, role: null }),
         })
     )
-    .group('/api', (api) => api.use(authRoutes))
+    .group('/api/v1', (api) => api.use(authRoutes).use(referenceRoutes).use(sellerRoutes))
     .listen(process.env.BACKEND_PORT || 3000);
 
-console.log(`🚀 Panenku API running on port ${app.server?.port}`);
+console.log(`Panenku API running on port ${app.server?.port}`);

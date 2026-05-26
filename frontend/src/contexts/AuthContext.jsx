@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { auth } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -7,8 +8,7 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('/api/auth/me')
-            .then((res) => res.json())
+        auth.me()
             .then((json) => {
                 if (json.success) setUser(json.data);
             })
@@ -16,35 +16,29 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (data) => {
-        const res = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        const json = await res.json();
+        const json = await auth.login(data);
         if (json.success) setUser(json.data);
         return json;
     };
 
     const register = async (data) => {
         const { confirm_password, ...payload } = data;
-        const res = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-        });
-        const json = await res.json();
+        const json = await auth.register(payload);
         if (json.success) setUser(json.data);
         return json;
     };
 
     const logout = async () => {
-        await fetch('/api/auth/logout', { method: 'POST' });
+        await auth.logout();
         setUser(null);
     };
 
+    const upgradeRole = (userData) => {
+        setUser(userData);
+    };
+
     return (
-        <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, loading, login, register, logout, upgradeRole }}>
             {children}
         </AuthContext.Provider>
     );
