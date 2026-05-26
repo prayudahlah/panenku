@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.distributed
+.env.production
+*.log
+drizzle/meta/
+docker/nginx/ssl/
+.vite/
+test-results/
+playwright-report/
