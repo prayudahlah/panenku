@@ -18,6 +18,7 @@ export const auth = {
 export const references = {
   getProvinces: () => fetchApi('/provinces'),
   getCities: (provinceId) => fetchApi(`/cities/${provinceId}`),
+  getProductCategories: () => fetchApi('/product-categories'),
 };
 
 export const seller = {
@@ -35,6 +36,10 @@ export const admin = {
 
 export const audit = {
   list: (params) => fetchApi(`/audit-logs?${new URLSearchParams(params)}`),
+};
+
+export const products = {
+  list: (params) => fetchApi(`/products?${new URLSearchParams(params)}`),
 };
 
 export const panenApi = {
