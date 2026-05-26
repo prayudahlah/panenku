@@ -24,8 +24,10 @@ const Login = () => {
     const onSubmit = async (data) => {
         setApiError('');
         const json = await login(data);
-        if (json.success) navigate('/');
-        else setApiError(json.message || 'Login gagal');
+        if (json.success) {
+            if (json.data?.role === 'admin') navigate('/admin/users');
+            else navigate('/');
+        } else setApiError(json.message || 'Login gagal');
     };
 
     const inputClass = (error) =>

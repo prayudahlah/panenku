@@ -50,7 +50,7 @@ export default function UserDropdown() {
             </button>
 
             {open && (
-                <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-xl shadow-lg border py-1 z-50">
+                <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-xl shadow-lg border py-3 z-50">
                     {items.map((item) => (
                         <button
                             key={item.path}
