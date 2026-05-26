@@ -14,7 +14,7 @@ export async function register(input: RegisterInput): Promise<ServiceResult<User
         email: input.email,
         phone: input.phone,
         passwordHash,
-        role: 'seller',
+        role: 'buyer',
         status: 'active',
     });
 

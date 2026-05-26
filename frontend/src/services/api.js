@@ -15,6 +15,16 @@ export const auth = {
   me: () => fetchApi('/auth/me'),
 };
 
+export const references = {
+  getProvinces: () => fetchApi('/references/provinces'),
+  getCities: (provinceId) => fetchApi(`/references/cities/${provinceId}`),
+};
+
+export const seller = {
+  register: (data) => fetchApi('/seller/register', { method: 'POST', body: JSON.stringify(data) }),
+  getMyProfile: () => fetchApi('/seller/profiles/me'),
+};
+
 export const panenApi = {
   list: (params) => fetchApi(`/panen?${new URLSearchParams(params)}`),
   create: (data) => fetchApi('/panen', { method: 'POST', body: JSON.stringify(data) }),

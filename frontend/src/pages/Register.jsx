@@ -25,8 +25,7 @@ const Register = () => {
     const [apiError, setApiError] = useState('');
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
-        resolver: zodResolver(registerSchema),
-        defaultValues: { role: 'seller' },
+        resolver: zodResolver(registerSchema)
     });
 
     const onSubmit = async (data) => {
