@@ -16,21 +16,25 @@ export const auth = {
 };
 
 export const references = {
-  getProvinces: () => fetchApi('/references/provinces'),
-  getCities: (provinceId) => fetchApi(`/references/cities/${provinceId}`),
+  getProvinces: () => fetchApi('/provinces'),
+  getCities: (provinceId) => fetchApi(`/cities/${provinceId}`),
 };
 
 export const seller = {
-  register: (data) => fetchApi('/seller/register', { method: 'POST', body: JSON.stringify(data) }),
-  getMyProfile: () => fetchApi('/seller/profiles/me'),
+  register: (data) => fetchApi('/sellers/register', { method: 'POST', body: JSON.stringify(data) }),
+  getMyProfile: () => fetchApi('/sellers/profiles/me'),
 };
 
 export const admin = {
-  listUsers: () => fetchApi('/admin/users'),
-  updateUserStatus: (id, status) => fetchApi(`/admin/users/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
-  listSellers: () => fetchApi('/admin/sellers'),
-  listProducts: (sellerId) => fetchApi(`/admin/products?sellerId=${sellerId}`),
-  takedownProduct: (id) => fetchApi(`/admin/products/${id}/takedown`, { method: 'PATCH' }),
+  listUsers: () => fetchApi('/users'),
+  updateUserStatus: (id, status) => fetchApi(`/users/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  listSellers: () => fetchApi('/sellers'),
+  listProducts: (sellerId) => fetchApi(`/products?sellerId=${sellerId}`),
+  takedownProduct: (id) => fetchApi(`/products/${id}/takedown`, { method: 'PATCH' }),
+};
+
+export const audit = {
+  list: (params) => fetchApi(`/audit-logs?${new URLSearchParams(params)}`),
 };
 
 export const panenApi = {

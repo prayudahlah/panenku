@@ -2,7 +2,7 @@ import { Elysia } from 'elysia';
 import { swagger } from '@elysiajs/swagger';
 import { betterSession } from 'elysia-better-session';
 import { upsertSessionAdapter } from './utils/session-adapter';
-import { authRoutes, sellerRoutes, referenceRoutes, adminRoutes } from './routes';
+import { authRoutes, sellerRoutes, referenceRoutes, userRoutes, productRoutes, auditRoutes } from './routes';
 
 const app = new Elysia()
     .use(swagger({
@@ -29,7 +29,7 @@ const app = new Elysia()
             initialData: () => ({ userId: null, email: null, role: null }),
         })
     )
-    .group('/api/v1', (api) => api.use(authRoutes).use(referenceRoutes).use(sellerRoutes).use(adminRoutes))
+    .group('/api/v1', (api) => api.use(authRoutes).use(referenceRoutes).use(sellerRoutes).use(userRoutes).use(productRoutes).use(auditRoutes))
     .listen(process.env.BACKEND_PORT || 3000);
 
 console.log(`Panenku API running on port ${app.server?.port}`);

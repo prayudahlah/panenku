@@ -1,5 +1,5 @@
 import { CreateSellerProfileRequest } from '../dtos/seller';
-import { sellerService } from '../services';
+import { sellerService, adminService } from '../services';
 
 export const sellerController = (app: any) =>
     app
@@ -26,5 +26,11 @@ export const sellerController = (app: any) =>
                 set.status = result.status || 400;
                 return { success: false, message: result.error };
             }
+            return { success: true, data: result.data };
+        })
+
+        .get('/', async ({ session, set }: any) => {
+            if (session.get('role') !== 'admin') { set.status = 403; return { success: false, message: 'Akses ditolak' }; }
+            const result = await adminService.listSellers();
             return { success: true, data: result.data };
         });
