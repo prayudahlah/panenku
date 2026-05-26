@@ -1,8 +1,18 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { products, references } from '../services/api';
 import ProductGrid from '../components/ProductGrid';
+
+function buildPageNumbers(total, current) {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    const pages = [1];
+    if (current > 3) pages.push('...');
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) pages.push(i);
+    if (current < total - 2) pages.push('...');
+    pages.push(total);
+    return pages;
+}
 
 const sortOptions = [
     { value: 'createdAt_desc', label: 'Terbaru' },
@@ -130,23 +140,6 @@ export default function Catalog() {
 
     return (
         <div className="max-w-[80%] mx-auto px-4 py-8">
-            <form onSubmit={handleSearch} className="mb-6">
-                <div className="flex max-w-2xl">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        <input
-                            value={searchInput}
-                            onChange={(e) => setSearchInput(e.target.value)}
-                            placeholder="Cari produk..."
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-green"
-                        />
-                    </div>
-                    <button type="submit" className="px-6 py-2 bg-primary-green text-white font-medium rounded-r-lg hover:opacity-90 transition">
-                        Cari
-                    </button>
-                </div>
-            </form>
-
             <div className="flex gap-6">
                 <aside className="w-64 shrink-0 self-start sticky top-8">
                     <div className="bg-white rounded-xl border p-4 space-y-6">
@@ -239,7 +232,7 @@ export default function Catalog() {
                     />
 
                     {totalPages > 1 && (
-                        <div className="flex items-center justify-center gap-2 mt-8">
+                        <div className="flex items-center justify-center gap-1 mt-8">
                             <button
                                 disabled={page <= 1}
                                 onClick={() => goToPage(page - 1)}
@@ -247,15 +240,19 @@ export default function Catalog() {
                             >
                                 Sebelumnya
                             </button>
-                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                                <button
-                                    key={p}
-                                    onClick={() => goToPage(p)}
-                                    className={`px-3 py-1.5 border rounded-lg text-sm ${p === page ? 'bg-primary-green text-white border-primary-green' : 'hover:bg-gray-50'}`}
-                                >
-                                    {p}
-                                </button>
-                            ))}
+                            {buildPageNumbers(totalPages, page).map((p, i) =>
+                                p === '...' ? (
+                                    <span key={`e-${i}`} className="px-2 text-gray-400">...</span>
+                                ) : (
+                                    <button
+                                        key={p}
+                                        onClick={() => goToPage(p)}
+                                        className={`px-3 py-1.5 border rounded-lg text-sm ${p === page ? 'bg-primary-green text-white border-primary-green' : 'hover:bg-gray-50'}`}
+                                    >
+                                        {p}
+                                    </button>
+                                )
+                            )}
                             <button
                                 disabled={page >= totalPages}
                                 onClick={() => goToPage(page + 1)}
