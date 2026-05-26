@@ -1,0 +1,272 @@
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Search, ChevronDown } from 'lucide-react';
+import { products, references } from '../services/api';
+import ProductGrid from '../components/ProductGrid';
+
+const sortOptions = [
+    { value: 'createdAt_desc', label: 'Terbaru' },
+    { value: 'price_asc', label: 'Harga termurah' },
+    { value: 'price_desc', label: 'Harga termahal' },
+    { value: 'name_asc', label: 'Nama A-Z' },
+    { value: 'name_desc', label: 'Nama Z-A' },
+];
+
+export default function Catalog() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [productsData, setProductsData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [meta, setMeta] = useState({ total: 0, page: 1, limit: 12 });
+    const [categories, setCategories] = useState([]);
+    const [expandedParents, setExpandedParents] = useState(new Set());
+
+    const q = searchParams.get('q') || '';
+    const categoryId = searchParams.get('categoryId') || '';
+    const minPrice = searchParams.get('minPrice') || '';
+    const maxPrice = searchParams.get('maxPrice') || '';
+    const sort = searchParams.get('sort') || 'createdAt_desc';
+    const page = Number(searchParams.get('page')) || 1;
+
+    const [searchInput, setSearchInput] = useState(q);
+    const [minInput, setMinInput] = useState(minPrice);
+    const [maxInput, setMaxInput] = useState(maxPrice);
+
+    useEffect(() => {
+        setSearchInput(q);
+    }, [q]);
+
+    useEffect(() => {
+        setMinInput(minPrice);
+        setMaxInput(maxPrice);
+    }, [minPrice, maxPrice]);
+
+    useEffect(() => {
+        references.getProductCategories().then((json) => {
+            if (json.success) setCategories(json.data);
+        });
+    }, []);
+
+    const { parents, childrenByParent } = useMemo(() => {
+        const p = categories.filter((c) => !c.parentId);
+        const map = {};
+        categories.forEach((c) => { if (c.parentId) (map[c.parentId] ??= []).push(c); });
+        return { parents: p, childrenByParent: map };
+    }, [categories]);
+
+    useEffect(() => {
+        if (categoryId) {
+            const cat = categories.find((c) => c.id === Number(categoryId));
+            if (cat && cat.parentId) setExpandedParents((prev) => new Set(prev).add(cat.parentId));
+        }
+    }, [categoryId, categories]);
+
+    const fetchProducts = useCallback(() => {
+        const [sortBy, sortOrder] = sort.split('_');
+        const params = { page: String(page), limit: '12', sortBy, sortOrder };
+        if (q) params.q = q;
+        if (categoryId) params.categoryId = categoryId;
+        if (minPrice) params.minPrice = minPrice;
+        if (maxPrice) params.maxPrice = maxPrice;
+
+        setLoading(true);
+        products.list(params).then((json) => {
+            if (json.success) {
+                setProductsData(json.data);
+                setMeta(json.meta);
+            }
+            setLoading(false);
+        });
+    }, [q, categoryId, minPrice, maxPrice, sort, page]);
+
+    useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+    const navigateWithParams = useCallback((updates) => {
+        const params = new URLSearchParams();
+        if (q) params.set('q', q);
+        if (categoryId && updates.categoryId !== null && !('categoryId' in updates)) params.set('categoryId', categoryId);
+        if (minPrice && updates.minPrice !== null && !('minPrice' in updates)) params.set('minPrice', minPrice);
+        if (maxPrice && updates.maxPrice !== null && !('maxPrice' in updates)) params.set('maxPrice', maxPrice);
+        if (sort && sort !== 'createdAt_desc' && !('sort' in updates)) params.set('sort', sort);
+        Object.entries(updates).forEach(([k, v]) => { if (v !== null && v !== undefined && v !== '') params.set(k, String(v)); });
+        setSearchParams(params);
+    }, [q, categoryId, minPrice, maxPrice, sort, setSearchParams]);
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        navigateWithParams({ q: searchInput || null, page: 1 });
+    };
+
+    const handleSortChange = (value) => {
+        navigateWithParams({ sort: value === 'createdAt_desc' ? null : value, page: 1 });
+    };
+
+    const selectCategory = (id) => {
+        navigateWithParams({ categoryId: categoryId === String(id) ? null : String(id), page: 1 });
+    };
+
+    const toggleParent = (id) => {
+        setExpandedParents((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id); else next.add(id);
+            return next;
+        });
+    };
+
+    const applyPrice = () => {
+        navigateWithParams({ minPrice: minInput || null, maxPrice: maxInput || null, page: 1 });
+    };
+
+    const resetFilters = () => {
+        setMinInput('');
+        setMaxInput('');
+        navigateWithParams({ categoryId: null, minPrice: null, maxPrice: null, page: 1 });
+    };
+
+    const totalPages = Math.ceil(meta.total / meta.limit);
+
+    const goToPage = (p) => {
+        navigateWithParams({ page: p });
+    };
+
+    return (
+        <div className="max-w-[80%] mx-auto px-4 py-8">
+            <form onSubmit={handleSearch} className="mb-6">
+                <div className="flex max-w-2xl">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <input
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                            placeholder="Cari produk..."
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-green"
+                        />
+                    </div>
+                    <button type="submit" className="px-6 py-2 bg-primary-green text-white font-medium rounded-r-lg hover:opacity-90 transition">
+                        Cari
+                    </button>
+                </div>
+            </form>
+
+            <div className="flex gap-6">
+                <aside className="w-64 shrink-0 self-start sticky top-8">
+                    <div className="bg-white rounded-xl border p-4 space-y-6">
+                        <div>
+                            <h3 className="text-sm font-semibold text-gray-900 mb-2">Kategori</h3>
+                            <button
+                                onClick={() => selectCategory(null)}
+                                className={`w-full text-left text-sm py-1 rounded px-2 ${!categoryId ? 'bg-primary-green/10 text-primary-green font-medium' : 'text-gray-600 hover:text-gray-900'}`}
+                            >
+                                Semua
+                            </button>
+                            {parents.map((parent) => (
+                                <div key={parent.id}>
+                                    <button
+                                        onClick={() => toggleParent(parent.id)}
+                                        className="flex items-center gap-1 w-full text-left text-sm font-medium py-1.5 px-2 rounded hover:bg-gray-50"
+                                    >
+                                        <ChevronDown
+                                            size={14}
+                                            className={`shrink-0 transition-transform ${expandedParents.has(parent.id) ? '' : '-rotate-90'}`}
+                                        />
+                                        {parent.name}
+                                    </button>
+                                    {expandedParents.has(parent.id) && childrenByParent[parent.id]?.map((child) => (
+                                        <button
+                                            key={child.id}
+                                            onClick={() => selectCategory(child.id)}
+                                            className={`w-full text-left text-sm py-1 rounded px-6 ${Number(categoryId) === child.id ? 'bg-primary-green/10 text-primary-green font-medium' : 'text-gray-600 hover:text-gray-900'}`}
+                                        >
+                                            {child.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="border-t pt-4">
+                            <h3 className="text-sm font-semibold text-gray-900 mb-2">Rentang Harga</h3>
+                            <div className="space-y-2">
+                                <input
+                                    type="number"
+                                    value={minInput}
+                                    onChange={(e) => setMinInput(e.target.value)}
+                                    placeholder="Harga min"
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
+                                />
+                                <input
+                                    type="number"
+                                    value={maxInput}
+                                    onChange={(e) => setMaxInput(e.target.value)}
+                                    placeholder="Harga maks"
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
+                                />
+                                <button
+                                    onClick={applyPrice}
+                                    className="w-full px-3 py-1.5 text-sm bg-primary-green text-white rounded-lg hover:opacity-90"
+                                >
+                                    Terapkan
+                                </button>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={resetFilters}
+                            className="w-full px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                        >
+                            Reset filter
+                        </button>
+                    </div>
+                </aside>
+
+                <main className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
+                        <p className="text-sm text-gray-500">Menampilkan {meta.total} produk</p>
+                        <select
+                            value={sort}
+                            onChange={(e) => handleSortChange(e.target.value)}
+                            className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
+                        >
+                            {sortOptions.map((opt) => (
+                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <ProductGrid
+                        products={productsData}
+                        loading={loading}
+                        emptyMessage="Tidak ada produk yang cocok dengan pencarian Anda"
+                    />
+
+                    {totalPages > 1 && (
+                        <div className="flex items-center justify-center gap-2 mt-8">
+                            <button
+                                disabled={page <= 1}
+                                onClick={() => goToPage(page - 1)}
+                                className="px-3 py-1.5 border rounded-lg text-sm disabled:opacity-30 hover:bg-gray-50"
+                            >
+                                Sebelumnya
+                            </button>
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                                <button
+                                    key={p}
+                                    onClick={() => goToPage(p)}
+                                    className={`px-3 py-1.5 border rounded-lg text-sm ${p === page ? 'bg-primary-green text-white border-primary-green' : 'hover:bg-gray-50'}`}
+                                >
+                                    {p}
+                                </button>
+                            ))}
+                            <button
+                                disabled={page >= totalPages}
+                                onClick={() => goToPage(page + 1)}
+                                className="px-3 py-1.5 border rounded-lg text-sm disabled:opacity-30 hover:bg-gray-50"
+                            >
+                                Selanjutnya
+                            </button>
+                        </div>
+                    )}
+                </main>
+            </div>
+        </div>
+    );
+}

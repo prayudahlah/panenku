@@ -1,9 +1,17 @@
-import { eq } from 'drizzle-orm';
+import { eq, isNull } from 'drizzle-orm';
 import { db } from '../db';
-import { provinces, cities } from '../db/schema';
+import { provinces, cities, productCategories } from '../db/schema';
 
 export async function getAllProvinces() {
     return db.select({ id: provinces.id, name: provinces.name }).from(provinces).orderBy(provinces.name);
+}
+
+export async function getAllProductCategories() {
+    return db
+        .select({ id: productCategories.id, name: productCategories.name, parentId: productCategories.parentId })
+        .from(productCategories)
+        .where(isNull(productCategories.deletedAt))
+        .orderBy(productCategories.name);
 }
 
 export async function getCitiesByProvince(provinceId: number) {
