@@ -10,3 +10,4 @@ docker/nginx/ssl/
 .vite/
 test-results/
 playwright-report/
+.idea

@@ -1,0 +1,201 @@
+user_id,farm_name,land_certificate,address,city_id,province_id,status
+1,Mitra Agro,CERT-0001,"Jl. Diponegoro No. 88, Kota Bandung",187,13,active
+2,Panen Lestari,CERT-0002,"Jl. Kartini No. 221, Kota Bogor",190,13,active
+3,Berkah Bumi,CERT-0003,"Jl. Teratai No. 221, Kota Depok",193,13,active
+4,Hasil Sejahtera,CERT-0004,"Jl. Cempaka No. 34, Kota Semarang",228,14,active
+5,Berkah Panen,CERT-0005,"Jl. Anggrek No. 144, Kota Surakarta",229,14,active
+6,Pangan Lestari,CERT-0006,"Jl. Diponegoro No. 120, Kota Yogyakarta",235,15,active
+7,Subur Jaya,CERT-0007,"Jl. Mawar No. 64, Kota Surabaya",273,16,active
+8,Koperasi Tani,CERT-0008,"Jl. Merdeka No. 75, Kota Malang",269,16,active
+9,Makmur Berkah,CERT-0009,"Jl. Durian No. 158, Kota Kediri",267,16,inactive
+10,Tani Mandiri,CERT-0010,"Jl. Durian No. 231, Kota Jakarta Pusat",155,11,active
+11,Sumber Rejeki,CERT-0011,"Jl. Kartini No. 240, Kota Jakarta Selatan",155,11,active
+12,Tani Mandiri,CERT-0012,"Jl. Kartini No. 49, Kota Jakarta Timur",155,11,active
+13,Pangan Lestari,CERT-0013,"Jl. Mawar No. 132, Kota Tangerang",167,12,active
+14,Bumi Mandiri,CERT-0014,"Jl. Pemuda No. 79, Kota Serang",166,12,active
+15,Berkah Bumi,CERT-0015,"Jl. Sudirman No. 242, Kota Medan",51,2,active
+16,Pangan Lestari,CERT-0016,"Jl. Mawar No. 248, Kota Palembang",123,8,active
+17,Tani Sentosa,CERT-0017,"Jl. Kenanga No. 91, Kota Bandar Lampung",153,10,active
+18,Koperasi Tani,CERT-0018,"Jl. Pahlawan No. 127, Kota Denpasar",282,17,active
+19,Berkah Bumi,CERT-0019,"Jl. Durian No. 168, Kota Mataram",292,18,active
+20,Sumber Rejeki,CERT-0020,"Jl. Pahlawan No. 138, Kota Makassar",432,29,active
+21,Berkah Panen,CERT-0021,"Jl. Sudirman No. 111, Kota Bandung",187,13,active
+22,Mitra Tani,CERT-0022,"Jl. Pahlawan No. 187, Kota Bogor",190,13,active
+23,Berkah Bumi Utama,CERT-0023,"Jl. Cempaka No. 94, Kota Depok",193,13,active
+24,Kebun Abadi,CERT-0024,"Jl. Merdeka No. 146, Kota Semarang",228,14,active
+25,Tani Sentosa,CERT-0025,"Jl. Kartini No. 142, Kota Surakarta",229,14,active
+26,Tunas Harapan,CERT-0026,"Jl. Cempaka No. 130, Kota Yogyakarta",235,15,active
+27,Koperasi Pangan,CERT-0027,"Jl. Anggrek No. 72, Kota Surabaya",273,16,active
+28,Tani Sentosa,CERT-0028,"Jl. Kenanga No. 175, Kota Malang",269,16,active
+29,Berkah Bumi,CERT-0029,"Jl. Ahmad Yani No. 250, Kota Kediri",267,16,active
+30,Tani Mandiri Utama,CERT-0030,"Jl. Kartini No. 204, Kota Jakarta Pusat",155,11,active
+31,Sumber Rejeki Utama,CERT-0031,"Jl. Anggrek No. 241, Kota Jakarta Selatan",155,11,suspended
+32,Tani Mandiri Utama,CERT-0032,"Jl. Ahmad Yani No. 51, Kota Jakarta Timur",155,11,active
+33,Pangan Lestari Utama,CERT-0033,"Jl. Cempaka No. 129, Kota Tangerang",167,12,active
+34,Mitra Agro,CERT-0034,"Jl. Merdeka No. 36, Kota Serang",166,12,active
+35,Berkah Bumi Utama,CERT-0035,"Jl. Mangga No. 122, Kota Medan",51,2,suspended
+36,Koperasi Bumi,CERT-0036,"Jl. Ahmad Yani No. 156, Kota Palembang",123,8,active
+37,Agro Sentosa,CERT-0037,"Jl. Ahmad Yani No. 84, Kota Bandar Lampung",153,10,active
+38,Sumber Rejeki,CERT-0038,"Jl. Kartini No. 42, Kota Denpasar",282,17,inactive
+39,Agro Mandiri,CERT-0039,"Jl. Kenanga No. 190, Kota Mataram",292,18,active
+40,Sumber Rejeki Utama,CERT-0040,"Jl. Kenanga No. 87, Kota Makassar",432,29,active
+41,Tani Sentosa,CERT-0041,"Jl. Anggrek No. 137, Kota Bandung",187,13,active
+42,Makmur Berkah,CERT-0042,"Jl. Kenanga No. 77, Kota Bogor",190,13,active
+43,Berkah Bumi Mandiri,CERT-0043,"Jl. Merdeka No. 95, Kota Depok",193,13,active
+44,Mitra Panen,CERT-0044,"Jl. Sudirman No. 107, Kota Semarang",228,14,active
+45,Koperasi Mitra,CERT-0045,"Jl. Mangga No. 231, Kota Surakarta",229,14,active
+46,Panen Raya,CERT-0046,"Jl. Teratai No. 162, Kota Yogyakarta",235,15,active
+47,Kebun Abadi,CERT-0047,"Jl. Mawar No. 68, Kota Surabaya",273,16,active
+48,Agro Sentosa,CERT-0048,"Jl. Mangga No. 249, Kota Malang",269,16,inactive
+49,Agro Mandiri,CERT-0049,"Jl. Kenanga No. 59, Kota Kediri",267,16,active
+50,Koperasi Mitra,CERT-0050,"Jl. Kenanga No. 123, Kota Jakarta Pusat",155,11,active
+51,Berkah,CERT-0051,"Jl. Subur No. 9, Kabupaten Bireuen",13,1,active
+52,Agro,CERT-0052,"Jl. Tani No. 81, Kabupaten Tapanuli Tengah",46,2,active
+53,Panen,CERT-0053,"Jl. Lembah No. 157, Kabupaten Pasaman Barat",63,3,active
+54,Berkah,CERT-0054,"Jl. Bibit No. 84, Kota Dumai",86,4,active
+55,Abadi,CERT-0055,"Jl. Berkah No. 118, Kota Tanjungpinang",94,5,active
+56,Abadi,CERT-0056,"Jl. Lembah No. 223, Kota Sungai Penuh",105,6,active
+57,Lestari,CERT-0057,"Jl. Subur No. 246, Kabupaten Ogan Komering Ulu Selatan",116,7,active
+58,Lestari,CERT-0058,"Jl. Ladang No. 198, Kabupaten Belitung",127,8,active
+59,Jaya,CERT-0059,"Jl. Sawah No. 144, Kabupaten Kaur",133,9,active
+60,Lestari,CERT-0060,"Jl. Desa No. 140, Kota Metro",154,10,active
+61,Sejahtera,CERT-0061,"Jl. Lembah No. 38, Kabupaten Administrasi Kepulauan Seribu",155,11,inactive
+62,Agro,CERT-0062,"Jl. Tani No. 168, Kabupaten Serang",163,12,active
+63,Panen,CERT-0063,"Jl. Bibit No. 70, Kabupaten Sukabumi",184,13,active
+64,Lestari,CERT-0064,"Jl. Dusun No. 190, Kota Tegal",230,14,active
+65,Tani,CERT-0065,"Jl. Bibit No. 58, Kabupaten Gunungkidul",232,15,active
+66,Agro,CERT-0066,"Jl. Gunung No. 121, Kabupaten Banyuwangi",237,16,active
+67,Tani,CERT-0067,"Jl. Damai No. 41, Kabupaten Buleleng",276,17,inactive
+68,Jaya,CERT-0068,"Jl. Lembah No. 247, Kabupaten Sumbawa Barat",290,18,active
+69,Tani,CERT-0069,"Jl. Panen Raya No. 167, Kabupaten Manggarai Timur",302,19,inactive
+70,Tani,CERT-0070,"Jl. Berkah No. 107, Kabupaten Sambas",323,20,inactive
+71,Tani,CERT-0071,"Jl. Kebun No. 202, Kota Palangka Raya",342,21,suspended
+72,Tani,CERT-0072,"Jl. Dusun No. 155, Kabupaten Hulu Sungai Tengah",347,22,active
+73,Lestari,CERT-0073,"Jl. Desa No. 140, Kabupaten Kutai Kartanegara",358,23,active
+74,Abadi,CERT-0074,"Jl. Subur No. 208, Kabupaten Malinau",367,24,active
+75,Jaya,CERT-0075,"Jl. Gunung No. 48, Kabupaten Bolaang Mongondow Timur",373,25,active
+76,Lestari,CERT-0076,"Jl. Lembah No. 50, Kabupaten Gorontalo",388,26,active
+77,Mandiri,CERT-0077,"Jl. Bibit No. 84, Kabupaten Tojo Una-Una",402,27,active
+78,Agro,CERT-0078,"Jl. Berkah No. 123, Kabupaten Polewali Mandar",410,28,active
+79,Tani,CERT-0079,"Jl. Subur No. 115, Kabupaten Kepulauan Selayar",418,29,active
+80,Lestari,CERT-0080,"Jl. Dusun No. 3, Kabupaten Kolaka",440,30,active
+81,Panen,CERT-0081,"Jl. Panen Raya No. 120, Kabupaten Maluku Tengah",457,31,active
+82,Abadi,CERT-0082,"Jl. Damai No. 181, Kabupaten Pulau Morotai",469,32,inactive
+83,Lestari,CERT-0083,"Jl. Subur No. 57, Kabupaten Jayapura",474,33,active
+84,Berkah,CERT-0084,"Jl. Dusun No. 96, Kota Kediri",267,34,active
+85,Abadi,CERT-0085,"Jl. Cemara No. 56, Kabupaten Merauke",492,35,active
+86,Abadi,CERT-0086,"Jl. Gunung No. 93, Kabupaten Dogiyai",494,36,active
+87,Tani,CERT-0087,"Jl. Damai No. 130, Kabupaten Lanny Jaya",502,37,active
+88,Berkah,CERT-0088,"Jl. Cemara No. 134, Kabupaten Tambrauw",513,38,active
+89,Makmur,CERT-0089,"Jl. Damai No. 131, Kabupaten Aceh Tamiang",7,1,active
+90,Jaya,CERT-0090,"Jl. Kebun No. 117, Kabupaten Batu Bara",25,2,active
+91,Jaya,CERT-0091,"Jl. Ladang No. 186, Kabupaten Sijunjung",65,3,active
+92,Tani,CERT-0092,"Jl. Dusun No. 19, Kabupaten Kepulauan Meranti",80,4,active
+93,Agro,CERT-0093,"Jl. Pertanian No. 240, Kabupaten Kepulauan Anambas",90,5,active
+94,Tani,CERT-0094,"Jl. Berkah No. 197, Kota Sungai Penuh",105,6,active
+95,Mandiri,CERT-0095,"Jl. Damai No. 98, Kabupaten Ogan Komering Ulu Selatan",116,7,active
+96,Mandiri,CERT-0096,"Jl. Desa No. 224, Kabupaten Bangka Tengah",126,8,active
+97,Agro,CERT-0097,"Jl. Bibit No. 101, Kabupaten Lebong",135,9,active
+98,Panen,CERT-0098,"Jl. Lembah No. 6, Kabupaten Tulang Bawang Barat",151,10,active
+99,Abadi,CERT-0099,"Jl. Kebun No. 211, Kota Administrasi Jakarta Timur",159,11,active
+100,Sejahtera,CERT-0100,"Jl. Subur No. 240, Kabupaten Tangerang",164,12,active
+101,Tani,CERT-0101,"Jl. Kebun No. 158, Kota Banjar",188,13,active
+102,Tani,CERT-0102,"Jl. Panen Raya No. 26, Kabupaten Wonosobo",224,14,active
+103,Makmur,CERT-0103,"Jl. Cemara No. 13, Kabupaten Sleman",234,15,active
+104,Mandiri,CERT-0104,"Jl. Bibit No. 56, Kabupaten Banyuwangi",237,16,active
+105,Berkah,CERT-0105,"Jl. Ladang No. 60, Kabupaten Badung",274,17,active
+106,Makmur,CERT-0106,"Jl. Desa No. 210, Kabupaten Lombok Utara",288,18,active
+107,Berkah,CERT-0107,"Jl. Bibit No. 57, Kabupaten Manggarai Timur",302,19,suspended
+108,Tani,CERT-0108,"Jl. Dusun No. 226, Kabupaten Kubu Raya",319,20,active
+109,Mandiri,CERT-0109,"Jl. Pertanian No. 249, Kabupaten Barito Utara",331,21,active
+110,Mandiri,CERT-0110,"Jl. Sawah No. 179, Kabupaten Tapin",353,22,active
+111,Lestari,CERT-0111,"Jl. Lembah No. 138, Kabupaten Kutai Barat",357,23,active
+112,Lestari,CERT-0112,"Jl. Berkah No. 207, Kabupaten Malinau",367,24,active
+113,Abadi,CERT-0113,"Jl. Kebun No. 143, Kabupaten Bolaang Mongondow",371,25,active
+114,Panen,CERT-0114,"Jl. Sawah No. 166, Kabupaten Gorontalo Utara",389,26,active
+115,Sejahtera,CERT-0115,"Jl. Gunung No. 213, Kabupaten Parigi Moutong",399,27,active
+116,Mandiri,CERT-0116,"Jl. Dusun No. 11, Kabupaten Mamuju",407,28,active
+117,Makmur,CERT-0117,"Jl. Bibit No. 56, Kota Makassar",432,29,active
+118,Sejahtera,CERT-0118,"Jl. Damai No. 4, Kabupaten Muna Barat",448,30,active
+119,Agro,CERT-0119,"Jl. Lembah No. 123, Kabupaten Kepulauan Tanimbar",455,31,active
+120,Mandiri,CERT-0120,"Jl. Bibit No. 83, Kota Ternate",471,32,inactive
+121,Jaya,CERT-0121,"Jl. Sawah No. 79, Kabupaten Supiori",479,33,active
+122,Jaya,CERT-0122,"Jl. Lembah No. 185, Kabupaten Pegunungan Arfak",486,34,active
+123,Panen,CERT-0123,"Jl. Kebun No. 12, Kabupaten Mappi",491,35,active
+124,Berkah,CERT-0124,"Jl. Bibit No. 240, Kabupaten Mimika",496,36,active
+125,Lestari,CERT-0125,"Jl. Sawah No. 59, Kabupaten Yalimo",507,37,active
+126,Jaya,CERT-0126,"Jl. Desa No. 87, Kabupaten Raja Ampat",510,38,active
+127,Jaya,CERT-0127,"Jl. Gunung No. 204, Kabupaten Pidie",16,1,active
+128,Abadi,CERT-0128,"Jl. Damai No. 228, Kabupaten Humbang Hasundutan",28,2,active
+129,Tani,CERT-0129,"Jl. Cemara No. 217, Kabupaten Solok Selatan",67,3,active
+130,Tani,CERT-0130,"Jl. Cemara No. 162, Kabupaten Bengkalis",76,4,active
+131,Tani,CERT-0131,"Jl. Tani No. 96, Kabupaten Karimun",89,5,active
+132,Jaya,CERT-0132,"Jl. Bibit No. 142, Kabupaten Tanjung Jabung Timur",102,6,active
+133,Abadi,CERT-0133,"Jl. Bibit No. 74, Kabupaten Banyuasin",106,7,active
+134,Mandiri,CERT-0134,"Jl. Damai No. 46, Kabupaten Belitung Timur",128,8,active
+135,Abadi,CERT-0135,"Jl. Subur No. 159, Kabupaten Bengkulu Tengah",131,9,active
+136,Lestari,CERT-0136,"Jl. Panen Raya No. 96, Kabupaten Mesuji",145,10,active
+137,Makmur,CERT-0137,"Jl. Gunung No. 58, Kota Administrasi Jakarta Timur",159,11,active
+138,Tani,CERT-0138,"Jl. Kebun No. 97, Kabupaten Lebak",161,12,active
+139,Tani,CERT-0139,"Jl. Panen Raya No. 128, Kabupaten Bandung Barat",170,13,active
+140,Sejahtera,CERT-0140,"Jl. Cemara No. 250, Kabupaten Purworejo",216,14,active
+141,Panen,CERT-0141,"Jl. Cemara No. 178, Kabupaten Bantul",231,15,active
+142,Lestari,CERT-0142,"Jl. Panen Raya No. 176, Kota Probolinggo",272,16,active
+143,Berkah,CERT-0143,"Jl. Sawah No. 5, Kota Denpasar",282,17,inactive
+144,Mandiri,CERT-0144,"Jl. Ladang No. 42, Kota Bima",291,18,inactive
+145,Mandiri,CERT-0145,"Jl. Bibit No. 85, Kabupaten Sumba Timur",311,19,active
+146,Berkah,CERT-0146,"Jl. Gunung No. 186, Kabupaten Sintang",326,20,active
+147,Sejahtera,CERT-0147,"Jl. Kebun No. 60, Kabupaten Seruyan",340,21,active
+148,Makmur,CERT-0148,"Jl. Dusun No. 102, Kabupaten Hulu Sungai Utara",348,22,active
+149,Tani,CERT-0149,"Jl. Lembah No. 116, Kota Bontang",364,23,active
+150,Abadi,CERT-0150,"Jl. Kebun No. 48, Kabupaten Nunukan",368,24,inactive
+151,Mandiri,CERT-0151,"Jl. Dusun No. 76, Kabupaten Minahasa Utara",381,25,active
+152,Agro,CERT-0152,"Jl. Kebun No. 183, Kabupaten Boalemo",386,26,active
+153,Mandiri,CERT-0153,"Jl. Panen Raya No. 24, Kabupaten Banggai Laut",394,27,active
+154,Jaya,CERT-0154,"Jl. Ladang No. 27, Kabupaten Mamuju",407,28,active
+155,Mandiri,CERT-0155,"Jl. Bibit No. 132, Kabupaten Gowa",416,29,active
+156,Agro,CERT-0156,"Jl. Panen Raya No. 153, Kabupaten Bombana",435,30,active
+157,Mandiri,CERT-0157,"Jl. Kebun No. 100, Kabupaten Maluku Tengah",457,31,active
+158,Makmur,CERT-0158,"Jl. Desa No. 98, Kabupaten Halmahera Timur",466,32,active
+159,Lestari,CERT-0159,"Jl. Berkah No. 17, Kabupaten Mamberamo Raya",477,33,active
+160,Mandiri,CERT-0160,"Jl. Lembah No. 20, Kabupaten Manokwari",484,34,active
+161,Jaya,CERT-0161,"Jl. Subur No. 118, Kabupaten Boven Digoel",490,35,active
+162,Tani,CERT-0162,"Jl. Sawah No. 216, Kabupaten Nabire",497,36,inactive
+163,Jaya,CERT-0163,"Jl. Cemara No. 211, Kabupaten Tolikara",506,37,active
+164,Lestari,CERT-0164,"Jl. Gunung No. 52, Kota Sorong",514,38,active
+165,Mandiri,CERT-0165,"Jl. Ladang No. 189, Kabupaten Aceh Singkil",6,1,inactive
+166,Makmur,CERT-0166,"Jl. Sawah No. 97, Kabupaten Padang Lawas",39,2,active
+167,Sejahtera,CERT-0167,"Jl. Dusun No. 52, Kabupaten Pasaman Barat",63,3,active
+168,Berkah,CERT-0168,"Jl. Bibit No. 7, Kabupaten Rokan Hulu",84,4,active
+169,Panen,CERT-0169,"Jl. Ladang No. 213, Kota Tanjungpinang",94,5,active
+170,Jaya,CERT-0170,"Jl. Ladang No. 62, Kabupaten Tanjung Jabung Barat",101,6,active
+171,Mandiri,CERT-0171,"Jl. Panen Raya No. 115, Kabupaten Lahat",108,7,active
+172,Makmur,CERT-0172,"Jl. Bibit No. 237, Kota Pangkalpinang",129,8,active
+173,Abadi,CERT-0173,"Jl. Sawah No. 180, Kota Bengkulu",139,9,active
+174,Agro,CERT-0174,"Jl. Desa No. 171, Kota Bandar Lampung",153,10,active
+175,Makmur,CERT-0175,"Jl. Desa No. 166, Kabupaten Administrasi Kepulauan Seribu",155,11,suspended
+176,Mandiri,CERT-0176,"Jl. Panen Raya No. 67, Kabupaten Serang",163,12,active
+177,Abadi,CERT-0177,"Jl. Dusun No. 57, Kabupaten Sumedang",185,13,active
+178,Jaya,CERT-0178,"Jl. Dusun No. 177, Kabupaten Kendal",208,14,active
+179,Tani,CERT-0179,"Jl. Ladang No. 107, Kabupaten Kulon Progo",233,15,active
+180,Agro,CERT-0180,"Jl. Gunung No. 37, Kota Blitar",266,16,active
+181,Jaya,CERT-0181,"Jl. Bibit No. 124, Kabupaten Karangasem",279,17,active
+182,Jaya,CERT-0182,"Jl. Tani No. 82, Kabupaten Dompu",284,18,active
+183,Agro,CERT-0183,"Jl. Sawah No. 166, Kabupaten Belu",294,19,active
+184,Panen,CERT-0184,"Jl. Bibit No. 41, Kabupaten Kayong Utara",317,20,active
+185,Jaya,CERT-0185,"Jl. Kebun No. 162, Kabupaten Kotawaringin Barat",335,21,active
+186,Mandiri,CERT-0186,"Jl. Gunung No. 158, Kabupaten Tapin",353,22,active
+187,Makmur,CERT-0187,"Jl. Pertanian No. 181, Kota Bontang",364,23,active
+188,Agro,CERT-0188,"Jl. Lembah No. 224, Kabupaten Nunukan",368,24,active
+189,Sejahtera,CERT-0189,"Jl. Panen Raya No. 68, Kabupaten Kepulauan Siau Tagulandang Biaro",376,25,active
+190,Abadi,CERT-0190,"Jl. Sawah No. 153, Kabupaten Gorontalo Utara",389,26,inactive
+191,Makmur,CERT-0191,"Jl. Sawah No. 217, Kabupaten Morowali Utara",398,27,active
+192,Lestari,CERT-0192,"Jl. Dusun No. 22, Kabupaten Mamasa",406,28,inactive
+193,Agro,CERT-0193,"Jl. Panen Raya No. 47, Kabupaten Luwu Utara",421,29,active
+194,Abadi,CERT-0194,"Jl. Dusun No. 36, Kabupaten Buton Selatan",437,30,active
+195,Berkah,CERT-0195,"Jl. Bibit No. 178, Kabupaten Maluku Tenggara",458,31,active
+196,Abadi,CERT-0196,"Jl. Ladang No. 36, Kota Ternate",471,32,active
+197,Makmur,CERT-0197,"Jl. Sawah No. 244, Kabupaten Waropen",480,33,active
+198,Panen,CERT-0198,"Jl. Bibit No. 130, Kabupaten Kaimana",483,34,active
+199,Jaya,CERT-0199,"Jl. Cemara No. 114, Kabupaten Merauke",492,35,active
+200,Makmur,CERT-0200,"Jl. Lembah No. 57, Kabupaten Dogiyai",494,36,active

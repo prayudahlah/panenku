@@ -1,0 +1,351 @@
+seller_id,category_id,name,description,unit_id,min_order_qty,price_per_unit,stock_quantity,is_negotiable
+75,11,Bayam Hijau Organik,"Bayam Hijau Organik segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,9174,70,True
+9,11,Bayam Hijau Organik,"Bayam Hijau Organik segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,10842,109,True
+71,11,Bayam Hijau Organik,"Bayam Hijau Organik segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,10817,99,True
+131,11,Kangkung Segar,"Kangkung Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,7074,138,True
+29,11,Kangkung Segar,"Kangkung Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,8775,81,True
+147,11,Kangkung Segar,"Kangkung Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,8774,35,True
+185,11,Sawi Hijau,"Sawi Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,9155,67,False
+113,11,Sawi Hijau,"Sawi Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,10707,91,False
+140,11,Sawi Hijau,"Sawi Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,9242,114,False
+9,11,Pakcoy Segar,"Pakcoy Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,11454,115,True
+116,11,Pakcoy Segar,"Pakcoy Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,11780,135,True
+68,11,Pakcoy Segar,"Pakcoy Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,12992,50,True
+189,11,Selada Hijau,"Selada Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,15851,90,False
+151,11,Selada Hijau,"Selada Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,15496,53,False
+158,11,Daun Bawang Segar,"Daun Bawang Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,11940,71,True
+36,11,Daun Bawang Segar,"Daun Bawang Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,12007,54,True
+137,12,Tomat Merah Premium,"Tomat Merah Premium segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,15174,225,True
+72,12,Tomat Merah Premium,"Tomat Merah Premium segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,15918,211,True
+153,12,Tomat Merah Premium,"Tomat Merah Premium segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,13953,450,True
+174,12,Cabai Merah Keriting,"Cabai Merah Keriting segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,45553,349,True
+25,12,Cabai Merah Keriting,"Cabai Merah Keriting segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,45025,422,True
+35,12,Cabai Merah Keriting,"Cabai Merah Keriting segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,44404,119,True
+34,12,Terong Ungu,"Terong Ungu segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,12514,90,False
+64,12,Terong Ungu,"Terong Ungu segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,12939,177,False
+101,12,Cabai Rawit Merah,"Cabai Rawit Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,40169,237,True
+126,12,Cabai Rawit Merah,"Cabai Rawit Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,46725,165,True
+20,12,Timun Segar,"Timun Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,8707,206,False
+163,12,Timun Segar,"Timun Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,7766,202,False
+178,12,Paprika Hijau,"Paprika Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,24660,78,True
+95,12,Paprika Hijau,"Paprika Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,25614,121,True
+188,12,Labu Siam,"Labu Siam segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,7484,94,False
+24,12,Labu Siam,"Labu Siam segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,7344,80,False
+17,13,Wortel Segar,"Wortel Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,18247,145,True
+137,13,Wortel Segar,"Wortel Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,15974,75,True
+102,13,Wortel Segar,"Wortel Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,14961,106,True
+56,13,Wortel Segar,"Wortel Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,14226,149,True
+88,13,Lobak Putih,"Lobak Putih segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,11238,109,True
+175,13,Lobak Putih,"Lobak Putih segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,14107,235,True
+196,13,Lobak Putih,"Lobak Putih segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,11534,375,True
+113,13,Bawang Merah,"Bawang Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,34426,179,True
+117,13,Bawang Merah,"Bawang Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,34461,314,True
+1,13,Bawang Merah,"Bawang Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,33439,144,True
+71,13,Bawang Putih,"Bawang Putih segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,33534,74,False
+24,13,Bawang Putih,"Bawang Putih segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,36727,217,False
+168,13,Bawang Putih,"Bawang Putih segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,30293,211,False
+186,13,Bit Merah Segar,"Bit Merah Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,16564,91,True
+180,13,Bit Merah Segar,"Bit Merah Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,19099,22,True
+194,13,Bit Merah Segar,"Bit Merah Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,17874,36,True
+58,14,Mangga Harum Manis,"Mangga Harum Manis segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,1,25295,23,False
+133,14,Mangga Harum Manis,"Mangga Harum Manis segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,1,25408,108,False
+109,14,Pepaya California,"Pepaya California segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,15124,159,True
+178,14,Pepaya California,"Pepaya California segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,16403,529,True
+27,14,Pisang Cavendish,"Pisang Cavendish segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,20165,143,True
+81,14,Pisang Cavendish,"Pisang Cavendish segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,20261,287,True
+35,14,Melon Hijau,"Melon Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,25253,59,False
+165,14,Melon Hijau,"Melon Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,22201,37,False
+167,14,Semangka Merah,"Semangka Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,11784,196,True
+43,14,Semangka Merah,"Semangka Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,12461,76,True
+106,14,Durian Monthong,"Durian Monthong segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,52798,75,True
+158,14,Durian Monthong,"Durian Monthong segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,43800,22,True
+193,14,Nanas Madu,"Nanas Madu segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,15403,83,False
+32,14,Nanas Madu,"Nanas Madu segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,17084,74,False
+36,14,Rambutan Binjai,"Rambutan Binjai segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,9330,33,True
+64,14,Rambutan Binjai,"Rambutan Binjai segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,10160,91,True
+156,15,Apel Fuji,"Apel Fuji segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,1,32605,178,True
+73,15,Apel Fuji,"Apel Fuji segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,1,42284,70,True
+200,15,Apel Fuji,"Apel Fuji segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,1,39218,67,True
+177,15,Apel Fuji,"Apel Fuji segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,1,36765,144,True
+62,15,Anggur Merah,"Anggur Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,44191,119,True
+127,15,Anggur Merah,"Anggur Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,51408,124,True
+99,15,Anggur Merah,"Anggur Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,57165,201,True
+82,15,Jeruk Mandarin,"Jeruk Mandarin segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,27706,164,False
+34,15,Jeruk Mandarin,"Jeruk Mandarin segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,23990,188,False
+100,15,Jeruk Mandarin,"Jeruk Mandarin segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,26970,245,False
+198,15,Pir Hijau,"Pir Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,35917,25,True
+19,15,Pir Hijau,"Pir Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,32015,127,True
+5,15,Pir Hijau,"Pir Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,39711,68,True
+74,15,Jeruk Lemon,"Jeruk Lemon segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,20006,88,False
+161,15,Jeruk Lemon,"Jeruk Lemon segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,21210,41,False
+183,15,Jeruk Lemon,"Jeruk Lemon segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,20219,116,False
+72,16,Stroberi Segar,"Stroberi Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,65324,499,False
+22,16,Stroberi Segar,"Stroberi Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,52003,227,False
+80,16,Stroberi Segar,"Stroberi Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,59504,410,False
+21,16,Stroberi Segar,"Stroberi Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,60607,360,False
+131,16,Stroberi Segar,"Stroberi Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,54696,273,False
+62,16,Blueberry Segar,"Blueberry Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,75207,57,True
+15,16,Blueberry Segar,"Blueberry Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,73653,61,True
+63,16,Blueberry Segar,"Blueberry Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,89030,27,True
+23,16,Blueberry Segar,"Blueberry Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,72572,24,True
+112,16,Blueberry Segar,"Blueberry Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,72539,49,True
+89,16,Raspberry Segar,"Raspberry Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,2,81007,19,True
+134,16,Raspberry Segar,"Raspberry Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,2,97590,27,True
+133,16,Raspberry Segar,"Raspberry Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,2,100433,55,True
+185,16,Raspberry Segar,"Raspberry Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,2,77292,57,True
+67,16,Raspberry Segar,"Raspberry Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,2,83843,15,True
+183,17,Beras Pandan Wangi,"Beras Pandan Wangi segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,12223,93,True
+148,17,Beras Pandan Wangi,"Beras Pandan Wangi segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,13412,99,True
+161,17,Beras Pandan Wangi,"Beras Pandan Wangi segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,14280,81,True
+66,17,Beras IR64,"Beras IR64 segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,1,14537,497,True
+198,17,Beras IR64,"Beras IR64 segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,1,11499,534,True
+27,17,Beras IR64,"Beras IR64 segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,1,11060,600,True
+4,17,Beras Premium Karung Besar,"Beras Premium Karung Besar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",3,25,14377175,41,False
+63,17,Beras Premium Karung Besar,"Beras Premium Karung Besar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",3,25,12977868,80,False
+12,17,Beras Premium Karung Besar,"Beras Premium Karung Besar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",3,25,16055060,53,False
+183,17,Beras Merah Organik,"Beras Merah Organik segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,17564,60,True
+190,17,Beras Merah Organik,"Beras Merah Organik segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,17547,104,True
+168,17,Beras Merah Organik,"Beras Merah Organik segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,16764,32,True
+96,17,Beras Hitam,"Beras Hitam segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,23143,22,False
+31,17,Beras Hitam,"Beras Hitam segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,20173,61,False
+129,17,Beras Hitam,"Beras Hitam segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,19003,51,False
+120,18,Jagung Manis,"Jagung Manis segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,11378,53,False
+73,18,Jagung Manis,"Jagung Manis segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,10228,29,False
+199,18,Jagung Manis,"Jagung Manis segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,12229,36,False
+80,18,Jagung Manis,"Jagung Manis segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,12441,47,False
+152,18,Jagung Pipil Kering,"Jagung Pipil Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,9086,390,True
+127,18,Jagung Pipil Kering,"Jagung Pipil Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,10781,160,True
+198,18,Jagung Pipil Kering,"Jagung Pipil Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,8519,218,True
+199,18,Jagung Pipil Kering,"Jagung Pipil Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,9198,196,True
+178,18,Jagung Pipil Grosir,"Jagung Pipil Grosir segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",4,20,1023794,62,True
+3,18,Jagung Pipil Grosir,"Jagung Pipil Grosir segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",4,20,1017853,54,True
+86,18,Jagung Pipil Grosir,"Jagung Pipil Grosir segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",4,20,865980,125,True
+1,18,Jagung Pipil Grosir,"Jagung Pipil Grosir segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",4,20,927147,123,True
+37,18,Jagung Muda Sayur,"Jagung Muda Sayur segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,7023,158,False
+183,18,Jagung Muda Sayur,"Jagung Muda Sayur segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,8953,102,False
+72,18,Jagung Muda Sayur,"Jagung Muda Sayur segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,8482,82,False
+192,19,Gandum Lokal,"Gandum Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,13350,579,True
+22,19,Gandum Lokal,"Gandum Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,13086,437,True
+149,19,Gandum Lokal,"Gandum Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,14707,659,True
+25,19,Gandum Lokal,"Gandum Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,13815,266,True
+130,19,Gandum Lokal,"Gandum Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,14167,568,True
+180,19,Sorgum Kering,"Sorgum Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,11179,40,True
+189,19,Sorgum Kering,"Sorgum Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,10929,139,True
+84,19,Sorgum Kering,"Sorgum Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,12304,51,True
+82,19,Sorgum Kering,"Sorgum Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,10791,95,True
+116,19,Sorgum Kering,"Sorgum Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,11663,105,True
+198,19,Tepung Gandum,"Tepung Gandum segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,16731,37,False
+54,19,Tepung Gandum,"Tepung Gandum segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,16151,100,False
+116,19,Tepung Gandum,"Tepung Gandum segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,19762,102,False
+79,19,Tepung Gandum,"Tepung Gandum segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,15517,117,False
+119,19,Tepung Gandum,"Tepung Gandum segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,17070,34,False
+64,20,Singkong Mentega,"Singkong Mentega segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,6052,71,False
+92,20,Singkong Mentega,"Singkong Mentega segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,7672,54,False
+102,20,Singkong Mentega,"Singkong Mentega segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,7949,149,False
+132,20,Singkong Mentega,"Singkong Mentega segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,7117,107,False
+25,20,Ubi Jalar Ungu,"Ubi Jalar Ungu segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,9750,193,True
+119,20,Ubi Jalar Ungu,"Ubi Jalar Ungu segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,11927,305,True
+27,20,Ubi Jalar Ungu,"Ubi Jalar Ungu segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,10003,430,True
+36,20,Ubi Jalar Ungu,"Ubi Jalar Ungu segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,11614,806,True
+22,20,Ubi Jalar Kuning,"Ubi Jalar Kuning segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,11252,80,False
+150,20,Ubi Jalar Kuning,"Ubi Jalar Kuning segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,11491,115,False
+151,20,Ubi Jalar Kuning,"Ubi Jalar Kuning segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,10437,286,False
+67,20,Ubi Jalar Kuning,"Ubi Jalar Kuning segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,8775,297,False
+85,20,Talas Segar,"Talas Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,13592,27,True
+32,20,Talas Segar,"Talas Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,13526,67,True
+11,20,Talas Segar,"Talas Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,12807,74,True
+98,21,Kentang Dieng,"Kentang Dieng segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,15545,84,True
+175,21,Kentang Dieng,"Kentang Dieng segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,15877,230,True
+110,21,Kentang Dieng,"Kentang Dieng segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,14626,175,True
+45,21,Kentang Dieng,"Kentang Dieng segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,15703,106,True
+91,21,Kentang Dieng,"Kentang Dieng segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,16551,160,True
+16,21,Kentang Granola,"Kentang Granola segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,17563,119,False
+23,21,Kentang Granola,"Kentang Granola segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,19604,64,False
+72,21,Kentang Granola,"Kentang Granola segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,20668,106,False
+99,21,Kentang Granola,"Kentang Granola segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,15405,83,False
+36,21,Kentang Granola,"Kentang Granola segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,19152,97,False
+125,21,Kentang Bibit,"Kentang Bibit segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,21263,44,True
+89,21,Kentang Bibit,"Kentang Bibit segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,20804,48,True
+145,21,Kentang Bibit,"Kentang Bibit segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,24612,111,True
+129,21,Kentang Bibit,"Kentang Bibit segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,19086,135,True
+83,21,Kentang Bibit,"Kentang Bibit segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,22194,109,True
+60,22,Kacang Tanah Kupas,"Kacang Tanah Kupas segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,25182,475,False
+41,22,Kacang Tanah Kupas,"Kacang Tanah Kupas segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,19935,508,False
+26,22,Kacang Tanah Kupas,"Kacang Tanah Kupas segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,21063,445,False
+64,22,Kacang Tanah Kupas,"Kacang Tanah Kupas segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,25051,239,False
+169,22,Kacang Tanah Kupas,"Kacang Tanah Kupas segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,25340,444,False
+62,22,Kacang Tanah Kupas,"Kacang Tanah Kupas segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,20765,338,False
+69,22,Kacang Tanah Kupas,"Kacang Tanah Kupas segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,25112,383,False
+137,22,Kacang Tanah Kupas,"Kacang Tanah Kupas segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,25856,101,False
+180,22,Kacang Tanah Mentah,"Kacang Tanah Mentah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,18227,109,True
+91,22,Kacang Tanah Mentah,"Kacang Tanah Mentah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,15505,75,True
+146,22,Kacang Tanah Mentah,"Kacang Tanah Mentah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,18548,65,True
+145,22,Kacang Tanah Mentah,"Kacang Tanah Mentah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,17881,152,True
+37,22,Kacang Tanah Mentah,"Kacang Tanah Mentah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,18616,285,True
+49,22,Kacang Tanah Mentah,"Kacang Tanah Mentah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,17140,109,True
+127,22,Kacang Tanah Mentah,"Kacang Tanah Mentah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,19633,303,True
+16,23,Kedelai Lokal,"Kedelai Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,20974,601,True
+6,23,Kedelai Lokal,"Kedelai Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,21625,329,True
+38,23,Kedelai Lokal,"Kedelai Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,21518,341,True
+151,23,Kedelai Lokal,"Kedelai Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,16725,288,True
+181,23,Kedelai Lokal,"Kedelai Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,16927,208,True
+37,23,Kedelai Lokal,"Kedelai Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,21557,563,True
+199,23,Kedelai Lokal,"Kedelai Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,21625,483,True
+29,23,Kedelai Lokal,"Kedelai Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,17142,662,True
+178,23,Kedelai Impor,"Kedelai Impor segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,9635,663,True
+158,23,Kedelai Impor,"Kedelai Impor segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,9383,274,True
+92,23,Kedelai Impor,"Kedelai Impor segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,8505,641,True
+58,23,Kedelai Impor,"Kedelai Impor segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,10218,745,True
+171,23,Kedelai Impor,"Kedelai Impor segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,10812,547,True
+151,23,Kedelai Impor,"Kedelai Impor segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,9046,372,True
+45,23,Kedelai Impor,"Kedelai Impor segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,10926,577,True
+164,24,Kacang Hijau,"Kacang Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,19628,100,True
+145,24,Kacang Hijau,"Kacang Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,20270,125,True
+27,24,Kacang Hijau,"Kacang Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,19808,115,True
+128,24,Kacang Hijau,"Kacang Hijau segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,19285,96,True
+164,24,Kacang Merah,"Kacang Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,21335,35,False
+187,24,Kacang Merah,"Kacang Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,26448,47,False
+86,24,Kacang Merah,"Kacang Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,27152,78,False
+115,24,Kacang Merah,"Kacang Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,21611,54,False
+108,24,Kacang Almond Lokal,"Kacang Almond Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,72444,23,True
+43,24,Kacang Almond Lokal,"Kacang Almond Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,62569,43,True
+106,24,Kacang Almond Lokal,"Kacang Almond Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,70630,33,True
+127,24,Kacang Almond Lokal,"Kacang Almond Lokal segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,70035,18,True
+116,24,Kacang Mete Kupas,"Kacang Mete Kupas segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,75077,29,False
+19,24,Kacang Mete Kupas,"Kacang Mete Kupas segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,90839,16,False
+9,24,Kacang Mete Kupas,"Kacang Mete Kupas segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,72082,33,False
+188,25,Daun Salam Kering,"Daun Salam Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,25,8562,125,False
+20,25,Daun Salam Kering,"Daun Salam Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,25,10061,96,False
+141,25,Daun Salam Kering,"Daun Salam Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,25,8814,91,False
+24,25,Daun Salam Kering,"Daun Salam Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,25,9289,68,False
+14,25,Serai Segar,"Serai Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,11423,130,True
+26,25,Serai Segar,"Serai Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,10162,239,True
+85,25,Serai Segar,"Serai Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,10120,183,True
+53,25,Serai Segar,"Serai Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,9392,65,True
+101,25,Daun Jeruk Kering,"Daun Jeruk Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,10,7168,40,True
+147,25,Daun Jeruk Kering,"Daun Jeruk Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,10,7826,35,True
+141,25,Daun Jeruk Kering,"Daun Jeruk Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,10,8388,57,True
+126,25,Daun Jeruk Kering,"Daun Jeruk Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,10,7279,16,True
+44,25,Kemiri Kering,"Kemiri Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,17146,96,False
+164,25,Kemiri Kering,"Kemiri Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,13269,139,False
+75,25,Kemiri Kering,"Kemiri Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,14869,155,False
+68,26,Jahe Merah,"Jahe Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,36476,279,True
+24,26,Jahe Merah,"Jahe Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,40163,408,True
+165,26,Jahe Merah,"Jahe Merah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,35414,334,True
+120,26,Kunyit Segar,"Kunyit Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,16516,272,False
+68,26,Kunyit Segar,"Kunyit Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,13430,318,False
+58,26,Kunyit Segar,"Kunyit Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,13185,308,False
+139,26,Jahe Putih,"Jahe Putih segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,25672,322,True
+106,26,Jahe Putih,"Jahe Putih segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,27555,433,True
+194,26,Jahe Putih,"Jahe Putih segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,24389,314,True
+122,26,Kencur Segar,"Kencur Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,22289,96,False
+147,26,Kencur Segar,"Kencur Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,17473,156,False
+183,26,Lengkuas Segar,"Lengkuas Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,12007,124,True
+9,26,Lengkuas Segar,"Lengkuas Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,13081,99,True
+159,26,Kunyit Bubuk,"Kunyit Bubuk segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,20,7088,204,True
+38,26,Kunyit Bubuk,"Kunyit Bubuk segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",2,20,7214,251,True
+55,27,Kopi Arabika,"Kopi Arabika segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,74248,376,True
+50,27,Kopi Arabika,"Kopi Arabika segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,77398,435,True
+33,27,Kopi Arabika,"Kopi Arabika segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,76020,339,True
+11,27,Kopi Arabika,"Kopi Arabika segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,80403,395,True
+109,27,Kopi Arabika,"Kopi Arabika segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,92837,126,True
+143,27,Kopi Robusta,"Kopi Robusta segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,65383,79,True
+102,27,Kopi Robusta,"Kopi Robusta segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,55491,64,True
+142,27,Kopi Robusta,"Kopi Robusta segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,66707,69,True
+84,27,Kopi Robusta,"Kopi Robusta segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,57444,25,True
+71,27,Kopi Robusta,"Kopi Robusta segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,66298,55,True
+26,27,Kopi Liberika,"Kopi Liberika segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,77716,61,False
+28,27,Kopi Liberika,"Kopi Liberika segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,77935,26,False
+145,27,Kopi Liberika,"Kopi Liberika segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,73250,44,False
+200,27,Kopi Liberika,"Kopi Liberika segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,69433,21,False
+74,27,Kopi Liberika,"Kopi Liberika segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,67962,46,False
+175,28,Teh Hijau Kering,"Teh Hijau Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,55843,305,False
+178,28,Teh Hijau Kering,"Teh Hijau Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,46063,537,False
+103,28,Teh Hijau Kering,"Teh Hijau Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,56312,622,False
+10,28,Teh Hijau Kering,"Teh Hijau Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,42803,577,False
+102,28,Teh Hijau Kering,"Teh Hijau Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,47045,276,False
+126,28,Teh Hitam Kering,"Teh Hitam Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,40064,332,True
+179,28,Teh Hitam Kering,"Teh Hitam Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,44231,291,True
+176,28,Teh Hitam Kering,"Teh Hitam Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,41887,176,True
+26,28,Teh Hitam Kering,"Teh Hitam Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,46964,112,True
+59,28,Teh Hitam Kering,"Teh Hitam Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,41103,290,True
+190,28,Teh Putih Kering,"Teh Putih Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,82222,51,True
+125,28,Teh Putih Kering,"Teh Putih Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,67326,36,True
+195,28,Teh Putih Kering,"Teh Putih Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,75152,24,True
+133,28,Teh Putih Kering,"Teh Putih Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,82904,76,True
+96,28,Teh Putih Kering,"Teh Putih Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,64401,28,True
+52,29,Biji Kakao Fermentasi,"Biji Kakao Fermentasi segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,60561,96,True
+15,29,Biji Kakao Fermentasi,"Biji Kakao Fermentasi segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,63681,97,True
+64,29,Biji Kakao Fermentasi,"Biji Kakao Fermentasi segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,69248,102,True
+9,29,Biji Kakao Fermentasi,"Biji Kakao Fermentasi segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,78884,150,True
+117,29,Biji Kakao Fermentasi,"Biji Kakao Fermentasi segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,64580,118,True
+115,29,Biji Kakao Non-Fermentasi,"Biji Kakao Non-Fermentasi segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,47746,105,False
+46,29,Biji Kakao Non-Fermentasi,"Biji Kakao Non-Fermentasi segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,55917,269,False
+122,29,Biji Kakao Non-Fermentasi,"Biji Kakao Non-Fermentasi segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,52832,139,False
+151,29,Biji Kakao Non-Fermentasi,"Biji Kakao Non-Fermentasi segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,48298,105,False
+142,29,Biji Kakao Non-Fermentasi,"Biji Kakao Non-Fermentasi segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,51083,330,False
+57,29,Kakao Bubuk,"Kakao Bubuk segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,32575,87,True
+166,29,Kakao Bubuk,"Kakao Bubuk segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,29960,139,True
+58,29,Kakao Bubuk,"Kakao Bubuk segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,37809,31,True
+174,29,Kakao Bubuk,"Kakao Bubuk segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,39320,120,True
+53,29,Kakao Bubuk,"Kakao Bubuk segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,36061,31,True
+65,30,Kelapa Kupas,"Kelapa Kupas segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,10638,646,True
+156,30,Kelapa Kupas,"Kelapa Kupas segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,9326,776,True
+79,30,Kelapa Kupas,"Kelapa Kupas segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,20,11054,471,True
+56,30,Kelapa Tua,"Kelapa Tua segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,8425,436,False
+120,30,Kelapa Tua,"Kelapa Tua segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,7753,132,False
+78,30,Kelapa Tua,"Kelapa Tua segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,8027,368,False
+96,30,Kelapa Muda,"Kelapa Muda segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,12337,69,True
+144,30,Kelapa Muda,"Kelapa Muda segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,12663,97,True
+166,30,Kelapa Muda,"Kelapa Muda segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,11410,68,True
+84,30,Gula Kelapa Bubuk,"Gula Kelapa Bubuk segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",6,50,19889,489,True
+71,30,Gula Kelapa Bubuk,"Gula Kelapa Bubuk segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",6,50,19863,169,True
+67,30,Gula Kelapa Bubuk,"Gula Kelapa Bubuk segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",6,50,19098,190,True
+15,30,VCO Minyak Kelapa,"VCO Minyak Kelapa segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,5,47167,250,False
+154,30,VCO Minyak Kelapa,"VCO Minyak Kelapa segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,5,47987,243,False
+104,30,VCO Minyak Kelapa,"VCO Minyak Kelapa segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,5,51715,132,False
+108,31,Madu Hutan,"Madu Hutan segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,2,76593,645,True
+104,31,Madu Hutan,"Madu Hutan segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,2,90923,282,True
+100,31,Madu Hutan,"Madu Hutan segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,2,95048,305,True
+189,31,Madu Hutan,"Madu Hutan segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,2,89924,699,True
+172,31,Madu Randu,"Madu Randu segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,50,92704,443,True
+92,31,Madu Randu,"Madu Randu segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,50,93487,166,True
+130,31,Madu Randu,"Madu Randu segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,50,73859,143,True
+77,31,Madu Randu,"Madu Randu segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,50,77918,429,True
+196,31,Madu Klanceng,"Madu Klanceng segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,2,125559,30,False
+47,31,Madu Klanceng,"Madu Klanceng segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,2,110039,76,False
+175,31,Madu Klanceng,"Madu Klanceng segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,2,117137,77,False
+86,31,Madu Klanceng,"Madu Klanceng segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,2,115380,55,False
+119,31,Madu Kaliandra,"Madu Kaliandra segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,5,82279,118,True
+31,31,Madu Kaliandra,"Madu Kaliandra segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,5,97288,116,True
+121,31,Madu Kaliandra,"Madu Kaliandra segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",5,5,94208,57,True
+31,32,Bambu Kering,"Bambu Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,9395,18,True
+175,32,Bambu Kering,"Bambu Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,11062,24,True
+98,32,Bambu Kering,"Bambu Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,9100,43,True
+136,32,Bambu Kering,"Bambu Kering segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,2,10208,78,True
+118,32,Rotan Asalan,"Rotan Asalan segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,13561,41,True
+37,32,Rotan Asalan,"Rotan Asalan segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,14246,168,True
+81,32,Rotan Asalan,"Rotan Asalan segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,14160,38,True
+184,32,Rotan Asalan,"Rotan Asalan segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,14784,59,True
+199,32,Bambu Petung,"Bambu Petung segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,10770,111,False
+44,32,Bambu Petung,"Bambu Petung segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,13007,38,False
+148,32,Bambu Petung,"Bambu Petung segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,11761,72,False
+196,32,Bambu Petung,"Bambu Petung segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,10,11744,77,False
+2,32,Rotan Poles,"Rotan Poles segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,22745,49,True
+10,32,Rotan Poles,"Rotan Poles segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,21355,45,True
+137,32,Rotan Poles,"Rotan Poles segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,5,27499,34,True
+174,33,Rumput Gajah,"Rumput Gajah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,2753,763,True
+2,33,Rumput Gajah,"Rumput Gajah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,2830,221,True
+161,33,Rumput Gajah,"Rumput Gajah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,3003,364,True
+188,33,Rumput Gajah,"Rumput Gajah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,2608,182,True
+64,33,Rumput Gajah,"Rumput Gajah segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,50,3403,469,True
+134,33,Hijauan Pakan Segar,"Hijauan Pakan Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,100,2232,1693,False
+153,33,Hijauan Pakan Segar,"Hijauan Pakan Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,100,1905,1561,False
+135,33,Hijauan Pakan Segar,"Hijauan Pakan Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,100,1915,563,False
+87,33,Hijauan Pakan Segar,"Hijauan Pakan Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,100,2268,1585,False
+112,33,Hijauan Pakan Segar,"Hijauan Pakan Segar segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,100,1942,619,False
+187,33,Konsentrat Pakan,"Konsentrat Pakan segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,8215,107,True
+34,33,Konsentrat Pakan,"Konsentrat Pakan segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,7679,242,True
+55,33,Konsentrat Pakan,"Konsentrat Pakan segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,6889,305,True
+188,33,Konsentrat Pakan,"Konsentrat Pakan segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,7413,209,True
+6,33,Konsentrat Pakan,"Konsentrat Pakan segar dan berkualitas, cocok untuk kebutuhan pasar tradisional maupun modern.",1,25,6916,338,True
