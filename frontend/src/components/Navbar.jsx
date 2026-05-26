@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
-import { Bell, ShoppingCart } from 'lucide-react';
+import { Bell, ShoppingCart, User, LogOut } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const navItems = [
     { label: ShoppingCart, path: '/cart' },
@@ -7,6 +8,8 @@ const navItems = [
 ];
 
 export default function Navbar() {
+    const { user, logout } = useAuth();
+
     return (
         <nav className="bg-white shadow-md">
             <div className="max-w-[80%] mx-auto px-4">
@@ -36,21 +39,33 @@ export default function Navbar() {
 
                         {/* Auth Items */}
                         <div className="flex space-x-2 items-center">
-                            <NavLink
-                                key='/login'
-                                to='/login'
-                                className="px-3 py-1.5 rounded-xl text-sm font-bold text-primary-green border-primary-green border-2 hover:mb-1"
-                            >
-                                Masuk
-                            </NavLink>
+                            {user ? (
+                                <div className="flex items-center gap-3">
+                                    <span className="text-sm font-medium text-gray-700">{user.fullName}</span>
+                                    <div className="w-8 h-8 rounded-full bg-primary-green flex items-center justify-center">
+                                        <User size={16} className="text-white" />
+                                    </div>
+                                    <button onClick={logout} className="text-gray-400 hover:text-red-500 transition">
+                                        <LogOut size={18} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <NavLink
+                                        to='/login'
+                                        className="px-3 py-1.5 rounded-xl text-sm font-bold text-primary-green border-primary-green border-2 hover:mb-1"
+                                    >
+                                        Masuk
+                                    </NavLink>
 
-                            <NavLink
-                                key='/register'
-                                to='/register'
-                                className="px-3 py-1.5 rounded-xl text-sm font-bold text-white bg-primary-green border-primary-green border-2 hover:mb-1"
-                            >
-                                Daftar
-                            </NavLink>
+                                    <NavLink
+                                        to='/register'
+                                        className="px-3 py-1.5 rounded-xl text-sm font-bold text-white bg-primary-green border-primary-green border-2 hover:mb-1"
+                                    >
+                                        Daftar
+                                    </NavLink>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
