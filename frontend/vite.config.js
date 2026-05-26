@@ -1,16 +1,26 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite'
+import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
-  server: {
-    host: '0.0.0.0',
-    port: parseInt(process.env.FRONTEND_PORT || '5173'),
-    proxy: {
-      '/api': {
-        target: process.env.VITE_API_URL || 'http://localhost:3000',
-        changeOrigin: true,
-      },
+    plugins: [
+        react(),
+        tailwindcss(),
+    ],
+    server: {
+        host: '0.0.0.0',
+        port: parseInt(process.env.FRONTEND_PORT || '5173'),
+        proxy: {
+            '/api': {
+                target: process.env.VITE_API_URL || 'http://localhost:3000',
+                changeOrigin: true,
+            },
+        },
     },
-  },
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, './src'),
+        }
+    }
 });
