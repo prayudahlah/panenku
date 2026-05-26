@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { users } from '../db/schema/users';
+import { users } from '../db/schema';
 
 export async function findUserByEmail(email: string) {
   return null;

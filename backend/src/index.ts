@@ -2,7 +2,7 @@ import { Elysia } from 'elysia';
 import { swagger } from '@elysiajs/swagger';
 import { betterSession, createDrizzleSessionAdapter } from 'elysia-better-session';
 import { db } from './db';
-import { sessions } from './db/schema/session';
+import { sessions } from './db/schema';
 import { authRoutes } from './routes/auth';
 import { panenRoutes } from './routes/panen';
 import { laporanRoutes } from './routes/laporan';
