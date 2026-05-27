@@ -19,6 +19,7 @@ export const auth = {
 export const references = {
   getProvinces: () => fetchApi('/provinces'),
   getCities: (provinceId) => fetchApi(`/cities/${provinceId}`),
+  getAllCities: () => fetchApi('/cities'),
   getProductCategories: () => fetchApi('/product-categories'),
 };
 

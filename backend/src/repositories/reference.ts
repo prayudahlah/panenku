@@ -14,6 +14,13 @@ export async function getAllProductCategories() {
         .orderBy(productCategories.name);
 }
 
+export async function getAllCities() {
+    return db
+        .select({ id: cities.id, name: cities.name, provinceId: cities.provinceId })
+        .from(cities)
+        .orderBy(cities.name);
+}
+
 export async function getCitiesByProvince(provinceId: number) {
     return db
         .select({ id: cities.id, name: cities.name })
