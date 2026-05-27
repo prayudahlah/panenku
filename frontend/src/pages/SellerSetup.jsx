@@ -2,38 +2,68 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { references, seller } from '../services/api';
+import MapPicker from '../components/MapPicker';
+import { MapPin, AlertTriangle } from 'lucide-react';
 
 export default function SellerSetup() {
     const { user, upgradeRole } = useAuth();
     const navigate = useNavigate();
     const [provinces, setProvinces] = useState([]);
-    const [cities, setCities] = useState([]);
+    const [allCities, setAllCities] = useState([]);
     const [form, setForm] = useState({ farmName: '', address: '', provinceId: '', cityId: '' });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState('form');
+    const [locationOk, setLocationOk] = useState(false);
 
     useEffect(() => {
         references.getProvinces().then((json) => {
             if (json.success) setProvinces(json.data);
         }).catch(() => setError('Gagal memuat data provinsi'));
+
+        references.getAllCities().then((json) => {
+            if (json.success) setAllCities(json.data);
+        }).catch(() => setError('Gagal memuat data kota'));
     }, []);
 
-    const handleProvinceChange = (e) => {
-        const pid = e.target.value;
-        setForm((f) => ({ ...f, provinceId: pid, cityId: '' }));
-        if (pid) {
-            references.getCities(pid).then((json) => {
-                if (json.success) setCities(json.data);
-            });
-        } else {
-            setCities([]);
-        }
+    const filteredCities = form.provinceId
+        ? allCities.filter((c) => c.provinceId === Number(form.provinceId))
+        : [];
+
+    const stripPrefix = (name) => name.replace(/^(Kota|Kabupaten)\s+/i, '');
+
+    const handleMapLocation = ({ address, provinceName, cityName }) => {
+        setForm((f) => ({ ...f, address }));
+        setLocationOk(false);
+
+        const province = provinces.find(
+            (p) =>
+                provinceName.toLowerCase().includes(p.name.toLowerCase()) ||
+                p.name.toLowerCase().includes(provinceName.toLowerCase())
+        );
+
+        if (!province) { return; }
+        setForm((f) => ({ ...f, provinceId: String(province.id), cityId: '' }));
+
+        const citiesInProvince = allCities.filter((c) => c.provinceId === province.id);
+        const city = citiesInProvince.find((c) => {
+            return stripPrefix(c.name).toLowerCase() === stripPrefix(cityName).toLowerCase();
+        });
+
+        if (!cityName || !city) { return; }
+        setForm((f) => ({ ...f, cityId: String(city.id) }));
+        setLocationOk(true);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        if (!form.provinceId || !form.cityId) {
+            setError(locationOk ? 'Klik peta untuk memilih lokasi toko' : 'Pilih provinsi & kota secara manual, atau klik peta untuk mendeteksi otomatis');
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -99,11 +129,22 @@ export default function SellerSetup() {
                     </div>
 
                     <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">Lokasi Toko</label>
+                        <MapPicker onLocationSelect={handleMapLocation} height="280px" />
+                        {locationOk && (
+                            <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                                <MapPin size={12} /> Lokasi terdeteksi
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
                         <label className="text-sm font-medium text-gray-700">Provinsi</label>
                         <select
                             value={form.provinceId}
-                            onChange={handleProvinceChange}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green mt-1"
+                            onChange={(e) => setForm((f) => ({ ...f, provinceId: e.target.value, cityId: '' }))}
+                            disabled={locationOk}
+                            className={`w-full border rounded-lg px-3 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary-green ${locationOk ? 'bg-gray-100 border-gray-200 text-gray-500 cursor-not-allowed' : 'border-gray-300'}`}
                             required
                         >
                             <option value="">Pilih provinsi</option>
@@ -118,15 +159,20 @@ export default function SellerSetup() {
                         <select
                             value={form.cityId}
                             onChange={(e) => setForm((f) => ({ ...f, cityId: e.target.value }))}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green mt-1"
+                            disabled={locationOk || !form.provinceId}
+                            className={`w-full border rounded-lg px-3 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary-green ${locationOk ? 'bg-gray-100 border-gray-200 text-gray-500 cursor-not-allowed' : 'border-gray-300'}`}
                             required
-                            disabled={!form.provinceId}
                         >
                             <option value="">Pilih kota</option>
-                            {cities.map((c) => (
+                            {filteredCities.map((c) => (
                                 <option key={c.id} value={c.id}>{c.name}</option>
                             ))}
                         </select>
+                        {!locationOk && form.provinceId !== '' && (
+                            <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
+                                <AlertTriangle size={12} /> Lokasi tidak terdeteksi otomatis. Pilih provinsi & kota secara manual.
+                            </p>
+                        )}
                     </div>
 
                     <div>
@@ -139,6 +185,9 @@ export default function SellerSetup() {
                             className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green mt-1"
                             required
                         />
+                        <p className="text-xs text-gray-400 mt-1">
+                            Alamat sudah terisi otomatis dari peta. Tambahkan detail seperti nama jalan, gang, atau kode pos secara manual.
+                        </p>
                     </div>
 
                     <button
