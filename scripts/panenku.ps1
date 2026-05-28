@@ -6,7 +6,7 @@ param(
     [switch]$Volumes
 )
 
-$ComposeDir = Join-Path $PSScriptRoot ".." "compose"
+$ComposeDir = [System.IO.Path]::Combine($PSScriptRoot, "..", "compose")
 $BuildFlag = if ($Build) { "--build" } else { "" }
 $VolumesFlag = if ($Volumes) { "-v" } else { "" }
 
@@ -27,19 +27,19 @@ $WatchFlag = ""
 
 switch ($Mode) {
     "dev" {
-        $EnvFile = Join-Path $PSScriptRoot ".." ".env.local"
-        $ComposeFile = Join-Path $ComposeDir "compose.yml"
+        $EnvFile = [System.IO.Path]::Combine($PSScriptRoot, "..", ".env.local")
+        $ComposeFile = [System.IO.Path]::Combine($ComposeDir, "compose.yml")
         if ($Action -eq "up") { $WatchFlag = "--watch" }
     }
     "distributed" {
         if (-not $Service) { Write-Host "Error: specify service (db|be|fe|proxy)"; Show-Usage }
-        $EnvFile = Join-Path $PSScriptRoot ".." ".env.distributed"
+        $EnvFile = [System.IO.Path]::Combine($PSScriptRoot, "..", ".env.distributed")
 
         switch ($Service) {
-            "db"    { $ComposeFile = Join-Path $ComposeDir "compose.db.yml" }
-            "be"    { $ComposeFile = Join-Path $ComposeDir "compose.backend.yml" }
-            "fe"    { $ComposeFile = Join-Path $ComposeDir "compose.frontend.yml" }
-            "proxy" { $ComposeFile = Join-Path $ComposeDir "compose.proxy.yml" }
+            "db"    { $ComposeFile = [System.IO.Path]::Combine($ComposeDir, "compose.db.yml") }
+            "be"    { $ComposeFile = [System.IO.Path]::Combine($ComposeDir, "compose.backend.yml") }
+            "fe"    { $ComposeFile = [System.IO.Path]::Combine($ComposeDir, "compose.frontend.yml") }
+            "proxy" { $ComposeFile = [System.IO.Path]::Combine($ComposeDir, "compose.proxy.yml") }
             default { Write-Host "Error: unknown service '$Service'"; Show-Usage }
         }
 
