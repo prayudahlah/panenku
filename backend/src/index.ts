@@ -39,6 +39,18 @@ const app = new Elysia()
             initialData: () => ({ userId: null, email: null, role: null }),
         })
     )
-    .group('/api/v1', (api) => api.use(authRoutes).use(cartRoutes).use(referenceRoutes).use(sellerRoutes).use(userRoutes).use(productRoutes).use(auditRoutes).use(negotiationRoutes).use(notificationRoutes).use(contractRoutes)).listen(process.env.BACKEND_PORT || 3000);
+    .group('/api/v1', (api) => api
+        .use(authRoutes)
+        .use(cartRoutes)
+        .use(referenceRoutes)
+        .use(sellerRoutes)
+        .use(userRoutes)
+        .use(productRoutes)
+        .use(auditRoutes)
+        .use(negotiationRoutes)
+        .use(notificationRoutes)
+        .use(contractRoutes)
+    )
+    .listen(process.env.BACKEND_PORT || 3000);
 
 console.log(`Panenku API running on port ${app.server?.port}`);
