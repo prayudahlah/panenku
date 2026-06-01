@@ -22,6 +22,8 @@ import ProductDetail from './pages/ProductDetail';
 import Notifications from './pages/Notifications';
 import Negotiations from './pages/Negotiations';
 import NegotiationDetail from './pages/NegotiationDetail';
+import ContractNew from './pages/ContractNew';
+import ContractDetail from './pages/ContractDetail';
 
 const App = () => {
     return (
@@ -43,6 +45,8 @@ const App = () => {
                             <Route path="shop" element={<TokoSetting />} />
                             <Route path="shop/dashboard" element={<DashboardSeller />} />
                             <Route path="products" element={<ProductList />} />
+                            <Route path="contracts/new" element={<ContractNew />} />
+                            <Route path="contracts/:id" element={<ContractDetail />} />
                         </Route>
                     </Route>
                     <Route element={<ProtectedRoute />}>
