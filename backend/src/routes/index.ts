@@ -1,4 +1,5 @@
 export { authRoutes } from './auth';
+export { cartRoutes } from './cart';
 export { sellerRoutes } from './sellers';
 export { referenceRoutes } from './reference';
 export { userRoutes } from './users';
