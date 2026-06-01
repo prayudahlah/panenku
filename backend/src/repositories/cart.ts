@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { eq, and, isNull, sql } from 'drizzle-orm';
+import { eq, and, isNull, asc } from 'drizzle-orm';
 import { carts, cartItems, products, sellerProfiles, units } from '../db/schema';
 
 type DBLike = typeof db;
@@ -52,6 +52,31 @@ export async function updateCartItemQuantity(id: number, quantity: string, tx?: 
     await conn.update(cartItems).set({ quantity }).where(eq(cartItems.id, id));
 }
 
+export async function findCartItemById(itemId: number) {
+    const result = await db
+        .select({
+            id: cartItems.id,
+            cartId: cartItems.cartId,
+            productId: cartItems.productId,
+            quantity: cartItems.quantity,
+            unitId: cartItems.unitId,
+            userId: carts.userId,
+            productDeletedAt: products.deletedAt,
+            productStock: products.stockQuantity,
+        })
+        .from(cartItems)
+        .innerJoin(carts, eq(cartItems.cartId, carts.id))
+        .leftJoin(products, eq(cartItems.productId, products.id))
+        .where(eq(cartItems.id, itemId))
+        .limit(1);
+    return result[0] || null;
+}
+
+export async function deleteCartItem(id: number, tx?: DBLike) {
+    const conn = tx || db;
+    await conn.delete(cartItems).where(eq(cartItems.id, id));
+}
+
 export async function findProductWithSeller(productId: number) {
     const result = await db
         .select({
@@ -78,4 +103,26 @@ export async function findUnitById(unitId: number) {
         .where(eq(units.id, unitId))
         .limit(1);
     return result[0] || null;
+}
+
+export async function findCartWithItems(userId: number) {
+    const result = await db
+        .select({
+            cartId: carts.id,
+            cartItemId: cartItems.id,
+            productId: cartItems.productId,
+            quantity: cartItems.quantity,
+            unitId: cartItems.unitId,
+            unitName: units.name,
+            productName: products.name,
+            pricePerUnit: products.pricePerUnit,
+            productDeletedAt: products.deletedAt,
+        })
+        .from(carts)
+        .innerJoin(cartItems, eq(carts.id, cartItems.cartId))
+        .leftJoin(products, eq(cartItems.productId, products.id))
+        .leftJoin(units, eq(cartItems.unitId, units.id))
+        .where(eq(carts.userId, userId))
+        .orderBy(asc(cartItems.addedAt));
+    return result;
 }

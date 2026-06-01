@@ -12,6 +12,14 @@ export type AddCartItemInput = {
     unitId: number;
 };
 
+export const UpdateCartItemRequest = t.Object({
+    quantity: t.Number({ minimum: 1 }),
+});
+
+export type UpdateCartItemInput = {
+    quantity: number;
+};
+
 export type CartItemResponse = {
     cartId: number;
     cartItemId: number;
