@@ -72,7 +72,8 @@ export const productsController = (app: any) =>
             if (!userId) return authError(set);
 
             const result = await catalogService.deleteSellerProduct({
-                sellerId: Number(userId),
+                actorId: Number(userId),
+                actorRole: session.get('role'),
                 productId: Number(id),
                 ipAddress: request?.headers?.get('x-forwarded-for') || request?.headers?.get('x-real-ip') || undefined,
             });
