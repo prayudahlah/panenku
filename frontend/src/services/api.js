@@ -21,6 +21,7 @@ export const references = {
   getCities: (provinceId) => fetchApi(`/cities/${provinceId}`),
   getAllCities: () => fetchApi('/cities'),
   getProductCategories: () => fetchApi('/product-categories'),
+  getUnits: () => fetchApi('/units'),
 };
 
 export const seller = {
@@ -50,6 +51,18 @@ export const panenApi = {
   getById: (id) => fetchApi(`/panen/${id}`),
   update: (id, data) => fetchApi(`/panen/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id) => fetchApi(`/panen/${id}`, { method: 'DELETE' }),
+};
+
+export const contracts = {
+  create: (data) => fetchApi('/contracts', { method: 'POST', body: JSON.stringify(data) }),
+  list: () => fetchApi('/contracts'),
+  getById: (id) => fetchApi(`/contracts/${id}`),
+  respond: (id, data) => fetchApi(`/contracts/${id}/respond`, { method: 'PATCH', body: JSON.stringify(data) }),
+};
+
+export const userAddresses = {
+  list: () => fetchApi('/users/addresses'),
+  create: (data) => fetchApi('/users/addresses', { method: 'POST', body: JSON.stringify(data) }),
 };
 
 export const negotiations = {
