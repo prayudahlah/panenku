@@ -30,9 +30,9 @@ const BLOCKING_ORDER_STATUS_ERROR: Record<string, string> = {
 };
 
 const BLOCKING_ORDER_STATUS_MESSAGE: Record<string, string> = {
-    pending: 'Produk memiliki pesanan dengan status awaiting_payment',
-    processed: 'Produk memiliki pesanan dengan status diproses',
-    shipped: 'Produk memiliki pesanan dengan status dikirim',
+    pending: 'Produk tidak dapat dihapus karena masih ada pesanan yang menunggu pembayaran',
+    processed: 'Produk tidak dapat dihapus karena masih ada pesanan yang sedang diproses',
+    shipped: 'Produk tidak dapat dihapus karena masih ada pesanan yang sedang dikirim',
 };
 
 function getStockStatus(stockValue: unknown) {
@@ -288,6 +288,16 @@ export async function findBlockingOrderStatus(productId: number) {
         errorCode: BLOCKING_ORDER_STATUS_ERROR[code] || 'ERR-DEL-06',
         message: BLOCKING_ORDER_STATUS_MESSAGE[code] || 'Produk tidak dapat dihapus',
     };
+}
+
+export async function findActiveProductById(productId: number) {
+    const result = await db
+        .select()
+        .from(products)
+        .where(and(eq(products.id, productId), isNull(products.deletedAt)))
+        .limit(1);
+
+    return result[0] || null;
 }
 
 export async function softDeleteSellerProduct({

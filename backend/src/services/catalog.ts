@@ -158,20 +158,38 @@ export const updateSellerProduct = async (sellerId: number, productId: number, i
 };
 
 export const deleteSellerProduct = async ({
-    sellerId,
+    actorId,
+    actorRole,
     productId,
     ipAddress,
 }: {
-    sellerId: number;
+    actorId: number;
+    actorRole?: string;
     productId: number;
     ipAddress?: string;
 }): Promise<ServiceResult<any>> => {
-    const sellerValidation = await validateActiveSeller(sellerId, 'ERR-DEL-01', 'ERR-DEL-02');
-    if (sellerValidation.error) return sellerValidation;
+    let product: any = null;
+    let productSellerId: number;
 
-    const product = await catalogRepo.findSellerProductById(sellerId, productId);
-    if (!product) {
-        return { status: 404, error: 'Produk tidak ditemukan atau bukan milik penjual' };
+    if (actorRole === 'admin') {
+        product = await catalogRepo.findActiveProductById(productId);
+
+        if (!product) {
+            return { status: 404, error: 'Produk tidak ditemukan' };
+        }
+
+        productSellerId = product.sellerId;
+    } else {
+        const sellerValidation = await validateActiveSeller(actorId, 'ERR-DEL-01', 'ERR-DEL-02');
+        if (sellerValidation.error) return sellerValidation;
+
+        product = await catalogRepo.findSellerProductById(actorId, productId);
+
+        if (!product) {
+            return { status: 404, error: 'Produk tidak ditemukan atau bukan milik penjual' };
+        }
+
+        productSellerId = actorId;
     }
 
     const blockingStatus = await catalogRepo.findBlockingOrderStatus(productId);
@@ -186,8 +204,8 @@ export const deleteSellerProduct = async ({
     try {
         const data = await catalogRepo.softDeleteSellerProduct({
             productId,
-            sellerId,
-            actorId: sellerId,
+            sellerId: productSellerId,
+            actorId,
             ipAddress,
         });
 
