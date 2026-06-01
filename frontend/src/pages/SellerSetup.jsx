@@ -10,7 +10,7 @@ export default function SellerSetup() {
     const navigate = useNavigate();
     const [provinces, setProvinces] = useState([]);
     const [allCities, setAllCities] = useState([]);
-    const [form, setForm] = useState({ farmName: '', address: '', provinceId: '', cityId: '' });
+    const [form, setForm] = useState({ farmName: '', address: '', provinceId: '', cityId: '', landCertificate: 'CERT-1' });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState('form');
@@ -72,6 +72,7 @@ export default function SellerSetup() {
                 address: form.address,
                 cityId: Number(form.cityId),
                 provinceId: Number(form.provinceId),
+                landCertificate: form.landCertificate,
             });
 
             if (!json.success) {
@@ -188,6 +189,19 @@ export default function SellerSetup() {
                         <p className="text-xs text-gray-400 mt-1">
                             Alamat sudah terisi otomatis dari peta. Tambahkan detail seperti nama jalan, gang, atau kode pos secara manual.
                         </p>
+                    </div>
+
+                    <div>
+                        <label className="text-sm font-medium text-gray-700">Sertifikat Kepemilikan Tanah</label>
+                        <input
+                            type="file"
+                            accept=".pdf"
+                            onChange={(e) => setForm((f) => ({ ...f, landCertificate: e.target.files[0]?.name || f.landCertificate }))}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary-green file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-primary-green file:text-white hover:file:opacity-90"
+                        />
+                        {form.landCertificate && (
+                            <p className="text-xs text-gray-500 mt-1">Terpilih: {form.landCertificate}</p>
+                        )}
                     </div>
 
                     <button
