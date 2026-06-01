@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatNumber } from '../../utils/format';
 import { admin } from '../../services/api';
 
 export default function Products() {
@@ -89,8 +90,8 @@ export default function Products() {
                                     <tr key={p.id} className="hover:bg-gray-50">
                                         <td className="px-4 py-3">{p.id}</td>
                                         <td className="px-4 py-3 font-medium">{p.name}</td>
-                                        <td className="px-4 py-3">Rp {Number(p.pricePerUnit).toLocaleString('id-ID')}</td>
-                                        <td className="px-4 py-3">{Number(p.stockQuantity).toLocaleString('id-ID')}</td>
+                                        <td className="px-4 py-3">Rp {formatNumber(p.pricePerUnit)}</td>
+                                        <td className="px-4 py-3">{formatNumber(p.stockQuantity)}</td>
                                         <td className="px-4 py-3">
                                             <span className={`px-2 py-0.5 rounded text-xs font-medium ${p.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                                 {p.status}

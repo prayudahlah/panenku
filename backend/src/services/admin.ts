@@ -11,7 +11,7 @@ export async function listUsers(): Promise<ServiceResult<any[]>> {
 export async function updateUserStatus(userId: number, status: string, adminId?: number): Promise<ServiceResult<any>> {
     const user = await adminRepo.findById(userId);
     if (!user) return { error: 'User tidak ditemukan', status: 404 };
-    if (user.role === 'admin') return { error: 'Tidak dapat mengubah status admin', status: 403 };
+    if (['admin', 'super_admin'].includes(user.role)) return { error: 'Tidak dapat mengubah status admin', status: 403 };
 
     const oldStatus = user.status;
 

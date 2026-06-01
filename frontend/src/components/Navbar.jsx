@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Bell, ShoppingCart, Search } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNotifications } from '../hooks/useNotifications';
 import UserDropdown from './UserDropdown';
 
 const navItems = [
@@ -11,6 +12,7 @@ const navItems = [
 
 export default function Navbar() {
     const { user } = useAuth();
+    const { unreadCount } = useNotifications();
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
 
@@ -49,9 +51,14 @@ export default function Navbar() {
                                 <NavLink
                                     key={item.path}
                                     to={item.path}
-                                    className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-200"
+                                    className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-200 relative"
                                 >
                                     <item.label size={24} />
+                                    {item.path === '/notifications' && unreadCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                            {unreadCount > 9 ? '9+' : unreadCount}
+                                        </span>
+                                    )}
                                 </NavLink>
                             ))}
                         </div>
@@ -65,14 +72,14 @@ export default function Navbar() {
                                 <>
                                     <NavLink
                                         to="/login"
-                                        className="px-3 py-1.5 rounded-xl text-sm font-bold text-primary-green border-primary-green border-2 hover:mb-1"
+                                        className="px-3 py-1.5 rounded-xl text-sm font-bold text-primary-green border-primary-green border-2 hover:shadow-md"
                                     >
                                         Masuk
                                     </NavLink>
 
                                     <NavLink
                                         to="/register"
-                                        className="px-3 py-1.5 rounded-xl text-sm font-bold text-white bg-primary-green border-primary-green border-2 hover:mb-1"
+                                        className="px-3 py-1.5 rounded-xl text-sm font-bold text-white bg-primary-green border-primary-green border-2 hover:shadow-md"
                                     >
                                         Daftar
                                     </NavLink>

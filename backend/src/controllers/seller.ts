@@ -13,7 +13,7 @@ export const sellerController = (app: any) =>
             const result = await sellerService.register(userId, body);
             if (result.error) {
                 set.status = result.status || 400;
-                return { success: false, message: result.error };
+                return { success: false, message: result.error, errorCode: result.errorCode };
             }
 
             session.set('role', 'seller');
@@ -78,7 +78,7 @@ export const sellerController = (app: any) =>
         })
 
         .get('/', async ({ session, set }: any) => {
-            if (session.get('role') !== 'admin') {
+            if (!['admin', 'super_admin'].includes(session.get('role'))) {
                 set.status = 403;
                 return { success: false, message: 'Akses ditolak' };
             }

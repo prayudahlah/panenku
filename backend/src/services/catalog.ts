@@ -110,6 +110,7 @@ export const list = async (filters: {
     categoryId?: number;
     minPrice?: number;
     maxPrice?: number;
+    isNegotiable?: boolean;
     sortBy?: string;
     sortOrder?: string;
     page?: number;

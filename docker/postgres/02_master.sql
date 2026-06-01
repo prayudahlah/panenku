@@ -5,7 +5,7 @@ DO $$
 BEGIN
     SET LOCAL search_path TO master;
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
-        CREATE TYPE master.user_role AS ENUM ('seller', 'buyer', 'admin');
+        CREATE TYPE master.user_role AS ENUM ('seller', 'buyer', 'admin', 'super_admin');
     END IF;
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_status') THEN
         CREATE TYPE master.user_status AS ENUM ('active', 'inactive', 'suspended');

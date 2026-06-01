@@ -1,11 +1,11 @@
 import { authRepo, sellerRepo } from '../repositories';
 import type { CreateSellerProfileInput } from '../dtos/seller';
 
-type ServiceResult<T> = { data?: T; error?: string; status?: number };
+type ServiceResult<T> = { data?: T; error?: string; status?: number; errorCode?: string };
 
 export async function register(userId: number, input: CreateSellerProfileInput): Promise<ServiceResult<any>> {
     const existing = await sellerRepo.findByUserId(userId);
-    if (existing) return { error: 'Sudah memiliki toko', status: 409 };
+    if (existing) return { error: 'Sudah memiliki toko', status: 409, errorCode: 'ERR-SELL-01' };
 
     const user = await authRepo.findById(userId);
     if (!user) return { error: 'User tidak ditemukan', status: 404 };
@@ -17,6 +17,7 @@ export async function register(userId: number, input: CreateSellerProfileInput):
         address: input.address,
         cityId: input.cityId,
         provinceId: input.provinceId,
+        landCertificate: input.landCertificate ?? null,
     });
 
     const updated = await authRepo.updateRole(userId, 'seller');

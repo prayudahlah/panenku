@@ -19,11 +19,6 @@ export const productsController = (app: any) =>
     app
         .get('/', async ({ session, set, query }: any) => {
             if (query.sellerId) {
-                if (session.get('role') !== 'admin') {
-                    set.status = 403;
-                    return { success: false, message: 'Akses ditolak' };
-                }
-
                 const result = await adminService.listProductsBySeller(Number(query.sellerId));
                 return { success: true, data: result.data };
             }
@@ -33,6 +28,7 @@ export const productsController = (app: any) =>
                 categoryId: query.categoryId ? Number(query.categoryId) : undefined,
                 minPrice: query.minPrice ? Number(query.minPrice) : undefined,
                 maxPrice: query.maxPrice ? Number(query.maxPrice) : undefined,
+                isNegotiable: query.isNegotiable ? query.isNegotiable === 'true' : undefined,
                 sortBy: query.sortBy || query.sort_by,
                 sortOrder: query.sortOrder || query.order,
                 page: query.page ? Number(query.page) : 1,
