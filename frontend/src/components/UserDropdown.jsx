@@ -1,15 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LogOut, Store, Wheat, LayoutDashboard, ShoppingCart, Package, Shield, UserPlus } from 'lucide-react';
+import { User, LogOut, Store, Wheat, LayoutDashboard, ShoppingCart, Package, Shield, UserPlus, MessageCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const menus = {
     buyer: [
+        { label: 'Negosiasi', icon: MessageCircle, path: '/negotiations' },
         { label: 'Transaksi Saya', icon: Package, path: '/transactions' },
         { label: 'Keranjang', icon: ShoppingCart, path: '/cart' },
         { label: 'Daftar Jadi Penjual', icon: UserPlus, path: '/shop/new' },
     ],
     seller: [
+        { label: 'Negosiasi', icon: MessageCircle, path: '/negotiations' },
         { label: 'Transaksi Saya', icon: Package, path: '/transactions' },
         { label: 'Keranjang', icon: ShoppingCart, path: '/cart' },
         { label: 'Toko Saya', icon: Store, path: '/shop' },

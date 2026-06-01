@@ -1,4 +1,6 @@
 import { usersController } from '../controllers';
 
 export const userRoutes = (app: any) =>
-    app.group('/users', (group: any) => group.use(usersController));
+    app.group('/users', (group: any) =>
+        group.guard({ detail: { tags: ['Users'] } }, (g) => g.use(usersController))
+    );

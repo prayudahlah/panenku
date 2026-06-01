@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatDateTime } from '../../utils/format';
 import { admin, audit } from '../../services/api';
 import { Search, Filter } from 'lucide-react';
 
@@ -149,7 +150,7 @@ export default function AuditLogs() {
                                 <td className="px-4 py-3 text-gray-500">{l.entityType || '-'}</td>
                                 <td className="px-4 py-3">{l.entityId || '-'}</td>
                                 <td className="px-4 py-3 text-gray-500 text-xs">
-                                    {l.createdAt ? new Date(l.createdAt).toLocaleString('id-ID') : '-'}
+                                    {formatDateTime(l.createdAt)}
                                 </td>
                             </tr>
                         ))}

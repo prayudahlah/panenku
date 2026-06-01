@@ -1,4 +1,6 @@
 import { sellerController } from '../controllers';
 
 export const sellerRoutes = (app: any) =>
-    app.group('/sellers', (group: any) => group.use(sellerController));
+    app.group('/sellers', (group: any) =>
+        group.guard({ detail: { tags: ['Sellers'] } }, (g) => g.use(sellerController))
+    );
