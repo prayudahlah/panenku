@@ -112,7 +112,7 @@ export const list = async (filters: {
     maxPrice?: number;
     isNegotiable?: boolean;
     sortBy?: string;
-    sortOrder?: string;
+    isAscending?: boolean;
     page?: number;
     limit?: number;
 }) => {
