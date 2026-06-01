@@ -4,4 +4,5 @@ export * as referenceRepo from './reference';
 export * as adminRepo from './admin';
 export * as auditRepo from './audit';
 export * as catalogRepo from './catalog';
-
+export * as negotiationRepo from './negotiation';
+export * as notificationRepo from './notification';

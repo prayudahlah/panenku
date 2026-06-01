@@ -1,9 +1,10 @@
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+import { API_URL } from '../constants';
 
 export async function fetchApi(path, options = {}) {
   const res = await fetch(`${API_URL}${path}`, {
     headers: { 'Content-Type': 'application/json', ...options.headers },
     ...options,
+    credentials: 'include',
   });
   return res.json();
 }
@@ -48,4 +49,12 @@ export const panenApi = {
   getById: (id) => fetchApi(`/panen/${id}`),
   update: (id, data) => fetchApi(`/panen/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id) => fetchApi(`/panen/${id}`, { method: 'DELETE' }),
+};
+
+export const negotiations = {
+  initiate: (data) => fetchApi('/negotiations', { method: 'POST', body: JSON.stringify(data) }),
+  list: () => fetchApi('/negotiations'),
+  getById: (id) => fetchApi(`/negotiations/${id}`),
+  sellerRespond: (id, data) => fetchApi(`/negotiations/${id}/seller`, { method: 'PATCH', body: JSON.stringify(data) }),
+  buyerRespond: (id, data) => fetchApi(`/negotiations/${id}/buyer`, { method: 'PATCH', body: JSON.stringify(data) }),
 };

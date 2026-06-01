@@ -4,3 +4,5 @@ export { referenceController } from './reference';
 export { usersController } from './users';
 export { productsController } from './products';
 export { auditController } from './audit';
+export { negotiationController } from './negotiation';
+export { notificationController } from './notification';
