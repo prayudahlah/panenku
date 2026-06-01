@@ -3,7 +3,7 @@ import { cartService } from '../services';
 
 export const cartController = (app: any) =>
     app
-        .get('/', async ({ session, set }: any) => {
+        .get('/items', async ({ session, set }: any) => {
             const userId = session.get('userId');
             if (!userId) {
                 set.status = 401;
