@@ -3,3 +3,5 @@ export * from './cart';
 export * from './seller';
 export * from './negotiation';
 export * from './products';
+export * from './userAddress';
+export * from './contract';

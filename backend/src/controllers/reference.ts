@@ -10,6 +10,10 @@ export const referenceController = (app: any) =>
             const data = await referenceRepo.getAllCities();
             return { success: true, data };
         })
+        .get('/units', async () => {
+            const data = await referenceRepo.getAllUnits();
+            return { success: true, data };
+        })
         .get('/product-categories', async () => {
             const data = await referenceRepo.getAllProductCategories();
             return { success: true, data };

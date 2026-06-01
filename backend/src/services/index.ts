@@ -7,3 +7,5 @@ export * as catalogService from './catalog';
 export * as negotiationService from './negotiation';
 export * as notificationService from './notification';
 export * as sseService from './sse';
+export * as userAddressService from './userAddress';
+export * as contractService from './contract';

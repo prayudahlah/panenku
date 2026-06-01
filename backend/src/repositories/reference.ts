@@ -1,6 +1,6 @@
 import { eq, isNull } from 'drizzle-orm';
 import { db } from '../db';
-import { provinces, cities, productCategories } from '../db/schema';
+import { provinces, cities, productCategories, units } from '../db/schema';
 
 export async function getAllProvinces() {
     return db.select({ id: provinces.id, name: provinces.name }).from(provinces).orderBy(provinces.name);
@@ -19,6 +19,14 @@ export async function getAllCities() {
         .select({ id: cities.id, name: cities.name, provinceId: cities.provinceId })
         .from(cities)
         .orderBy(cities.name);
+}
+
+export async function getAllUnits() {
+    return db
+        .select({ id: units.id, name: units.name })
+        .from(units)
+        .where(isNull(units.deletedAt))
+        .orderBy(units.name);
 }
 
 export async function getCitiesByProvince(provinceId: number) {
