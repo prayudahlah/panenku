@@ -14,7 +14,7 @@ $$
             WHERE
                 typname = 'negotiation_status_enum'
         ) THEN
-            CREATE TYPE transaction.negotiation_status_enum AS ENUM ('accepted', 'canceled', 'rejected', 'ongoing');
+            CREATE TYPE transaction.negotiation_status_enum AS ENUM ('accepted', 'canceled', 'expired', 'rejected', 'ongoing');
         END IF;
     END
 $$;
