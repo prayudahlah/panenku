@@ -3,6 +3,7 @@ import { useParams, useLocation, useNavigate, Link } from 'react-router-dom';
 import { formatNumber } from '../utils/format';
 import { useAuth } from '../contexts/AuthContext';
 import { negotiations } from '../services/api';
+import { Handshake } from 'lucide-react';
 
 export default function ProductDetail() {
     const { id } = useParams();
@@ -108,6 +109,19 @@ export default function ProductDetail() {
                     <span className="inline-block mt-3 text-xs bg-secondary-brown-100 text-secondary-brown-800 px-2 py-0.5 rounded-full font-medium">Bisa nego</span>
                 )}
             </div>
+
+            {isBuyer && (
+                <Link
+                    to={`/contracts/new?sellerId=${product.sellerId}&sellerName=${encodeURIComponent(product.farmName)}`}
+                    className="bg-white rounded-xl border p-6 flex items-center justify-between hover:shadow-md transition mb-6"
+                >
+                    <div>
+                        <h2 className="text-lg font-bold">Ajukan Kemitraan</h2>
+                        <p className="text-sm text-gray-500 mt-0.5">Kerjasama rutin dengan {product.farmName}</p>
+                    </div>
+                    <Handshake size={24} className="text-primary-green shrink-0" />
+                </Link>
+            )}
 
             {canNego && (
                 <div className="bg-white rounded-xl border p-6">
