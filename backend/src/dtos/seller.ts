@@ -5,7 +5,7 @@ export const CreateSellerProfileRequest = t.Object({
     address: t.String({ minLength: 5, maxLength: 255 }),
     cityId: t.Number(),
     provinceId: t.Number(),
-    landCertificate: t.Optional(t.String({ maxLength: 100 })),
+    landCertificate: t.String({ maxLength: 100 }),
 });
 
 export type CreateSellerProfileInput = {
@@ -13,7 +13,7 @@ export type CreateSellerProfileInput = {
     address: string;
     cityId: number;
     provinceId: number;
-    landCertificate?: string;
+    landCertificate: string;
 };
 
 export type SellerProfileResponse = {
