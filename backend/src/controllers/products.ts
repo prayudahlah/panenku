@@ -17,24 +17,47 @@ function serviceError(result: any, set: any) {
 
 export const productsController = (app: any) =>
     app
+        
         .get('/', async ({ session, set, query }: any) => {
+            // Admin: list produk per penjual (endpoint internal)
             if (query.sellerId) {
+<<<<<<< HEAD
+=======
+                if (session.get('role') !== 'admin') {
+                    set.status = 403;
+                    return { success: false, message: 'Akses ditolak' };
+                }
+>>>>>>> 8a64e11 (feat(FSD-04): add public seller profile and seller products endpoints)
                 const result = await adminService.listProductsBySeller(Number(query.sellerId));
                 return { success: true, data: result.data };
             }
 
+           
             const result = await catalogService.list({
                 search: query.search,
                 categoryId: query.categoryId ? Number(query.categoryId) : undefined,
                 minPrice: query.minPrice ? Number(query.minPrice) : undefined,
                 maxPrice: query.maxPrice ? Number(query.maxPrice) : undefined,
+<<<<<<< HEAD
                 isNegotiable: query.isNegotiable ? query.isNegotiable === 'true' : undefined,
                 sortBy: query.sortBy || query.sort_by,
                 sortOrder: query.sortOrder || query.order,
+=======
+             
+                isNegotiable: query.isNegotiable !== undefined
+                    ? query.isNegotiable === 'true'
+                    : undefined,
+                sortBy: query.sortBy,
+                
+                isAscending: query.isAscending !== undefined
+                    ? query.isAscending === 'true'
+                    : query.sortOrder === 'asc',
+>>>>>>> 8a64e11 (feat(FSD-04): add public seller profile and seller products endpoints)
                 page: query.page ? Number(query.page) : 1,
                 limit: query.limit ? Number(query.limit) : 12,
             });
 
+<<<<<<< HEAD
             return {
                 success: true,
                 data: result.rows,
@@ -78,3 +101,30 @@ export const productsController = (app: any) =>
 
             return { success: true, message: 'Produk berhasil dihapus dari katalog', data: result.data };
         });
+=======
+          
+            const message =
+                result.rows.length === 0 ? 'Tidak ada produk ditemukan' : undefined;
+
+            return {
+                success: true,
+                ...(message && { message }),
+                data: result.rows,
+                meta: {
+                    total: result.total,
+                    page: result.page,
+                    limit: result.limit,
+                },
+            };
+        })
+
+        
+        .patch('/:id/takedown', async ({ session, params: { id }, set }: any) => {
+            if (session.get('role') !== 'admin') {
+                set.status = 403;
+                return { success: false, message: 'Akses ditolak' };
+            }
+            const result = await adminService.takedownProduct(Number(id));
+            return { success: true, data: result.data };
+        });
+>>>>>>> 8a64e11 (feat(FSD-04): add public seller profile and seller products endpoints)
