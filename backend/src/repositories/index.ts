@@ -7,3 +7,5 @@ export * as auditRepo from './audit';
 export * as catalogRepo from './catalog';
 export * as negotiationRepo from './negotiation';
 export * as notificationRepo from './notification';
+export * as userAddressRepo from './userAddress';
+export * as contractRepo from './contract';
