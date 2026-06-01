@@ -11,3 +11,4 @@ CREATE TABLE IF NOT EXISTS audit.audit_logs (
     ip_address  VARCHAR(45),
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+

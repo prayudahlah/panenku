@@ -56,6 +56,7 @@ export async function list({
     categoryId,
     minPrice,
     maxPrice,
+    isNegotiable,
     sortBy = 'createdAt',
     sortOrder = 'desc',
     page = 1,
@@ -65,6 +66,7 @@ export async function list({
     categoryId?: number;
     minPrice?: number;
     maxPrice?: number;
+    isNegotiable?: boolean;
     sortBy?: string;
     sortOrder?: string;
     page?: number;
@@ -78,6 +80,7 @@ export async function list({
     if (categoryId) conditions.push(eq(products.categoryId, categoryId));
     if (minPrice !== undefined) conditions.push(sql`${products.pricePerUnit} >= ${minPrice}`);
     if (maxPrice !== undefined) conditions.push(sql`${products.pricePerUnit} <= ${maxPrice}`);
+    if (isNegotiable !== undefined) conditions.push(eq(products.isNegotiable, isNegotiable));
 
     const where = and(...conditions);
 

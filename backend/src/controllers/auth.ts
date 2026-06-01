@@ -7,7 +7,7 @@ export const authController = (app: any) =>
             const result = await authService.register(body);
             if (result.error) {
                 set.status = result.status || 400;
-                return { success: false, message: result.error };
+                return { success: false, message: result.error, errorCode: result.errorCode };
             }
 
             session.set('userId', result.data!.id);
@@ -18,11 +18,12 @@ export const authController = (app: any) =>
             return { success: true, message: 'Registrasi berhasil', data: result.data };
         }, { body: RegisterRequest })
 
-        .post('/login', async ({ body, session, set }: any) => {
-            const result = await authService.login(body);
+        .post('/login', async ({ body, session, set, request }: any) => {
+            const ipAddress = request.headers?.['x-forwarded-for']?.split(',')[0]?.trim() || request.headers?.['x-real-ip'] || 'unknown';
+            const result = await authService.login(body, ipAddress);
             if (result.error) {
                 set.status = result.status || 400;
-                return { success: false, message: result.error };
+                return { success: false, message: result.error, errorCode: result.errorCode };
             }
 
             session.set('userId', result.data!.id);
@@ -32,7 +33,11 @@ export const authController = (app: any) =>
             return { success: true, message: 'Login berhasil', data: result.data };
         }, { body: LoginRequest })
 
-        .post('/logout', async ({ session }: any) => {
+        .post('/logout', async ({ session, set }: any) => {
+            if (!session.get('userId')) {
+                set.status = 401;
+                return { success: false, message: 'Belum login', errorCode: 'ERR-LOGOUT-01' };
+            }
             session.destroy();
             return { success: true, message: 'Logout berhasil' };
         })

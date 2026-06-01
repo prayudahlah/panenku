@@ -3,7 +3,7 @@ import { auditService } from '../services';
 export const auditController = (app: any) =>
     app
         .get('/', async ({ session, set, query }: any) => {
-            if (session.get('role') !== 'admin') { set.status = 403; return { success: false, message: 'Akses ditolak' }; }
+            if (!['admin', 'super_admin'].includes(session.get('role'))) { set.status = 403; return { success: false, message: 'Akses ditolak' }; }
 
             const { rows, total, page, limit } = await auditService.listLogs({
                 action: query.action,
