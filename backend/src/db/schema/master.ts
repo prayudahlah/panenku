@@ -49,3 +49,15 @@ export const products = master.table('products', {
     deletedAt: timestamp('deleted_at', { mode: 'date' }),
     createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
 });
+
+export const userAddresses = master.table('user_addresses', {
+    id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+    userId: bigint('user_id', { mode: 'number' }).notNull(),
+    label: text('label').notNull(),
+    provinceId: bigint('province_id', { mode: 'number' }).notNull(),
+    cityId: bigint('city_id', { mode: 'number' }).notNull(),
+    address: text('address').notNull(),
+    isDefault: boolean('is_default').notNull().default(false),
+    deletedAt: timestamp('deleted_at', { mode: 'date' }),
+    createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
+});

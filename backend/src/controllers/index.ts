@@ -7,3 +7,5 @@ export { productsController } from './products';
 export { auditController } from './audit';
 export { negotiationController } from './negotiation';
 export { notificationController } from './notification';
+export { userAddressController } from './userAddress';
+export { contractController } from './contract';
