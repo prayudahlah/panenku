@@ -27,6 +27,9 @@ export default function Notifications() {
         if (notif.referenceType === 'negotiation' && notif.referenceId) {
             navigate(`/negotiations/${notif.referenceId}`);
         }
+        if (notif.referenceType === 'contract' && notif.referenceId) {
+            navigate(`/contracts/${notif.referenceId}`);
+        }
     };
 
     return (
