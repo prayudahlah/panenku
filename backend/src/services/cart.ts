@@ -4,6 +4,25 @@ import type { AddCartItemInput, CartItemResponse } from '../dtos/cart';
 
 type ServiceResult<T> = { data?: T; error?: string; status?: number; errorCode?: string };
 
+type CartViewItem = {
+    cartItemId: number;
+    productId: number;
+    productName: string;
+    isAvailable: boolean;
+    quantity: number;
+    unitId: number;
+    unitName: string;
+    pricePerUnit: string;
+    subtotal: number;
+};
+
+type CartViewResponse = {
+    cartId: number | null;
+    items: CartViewItem[];
+    totalAmount: number;
+    itemCount: number;
+};
+
 export async function addItem(userId: number, body: AddCartItemInput): Promise<ServiceResult<CartItemResponse>> {
     const product = await cartRepo.findProductWithSeller(body.productId);
     if (!product) return { error: 'Produk tidak ditemukan', status: 404, errorCode: 'ERR-CART-03' };
@@ -59,4 +78,59 @@ export async function addItem(userId: number, body: AddCartItemInput): Promise<S
 
     if (result.error) return { error: result.msg, status: result.status };
     return { data: result.data };
+}
+
+export async function viewCart(userId: number): Promise<ServiceResult<CartViewResponse>> {
+    const rows = await cartRepo.findCartWithItems(userId);
+
+    if (rows.length === 0) {
+        return { data: { cartId: null, items: [], totalAmount: 0, itemCount: 0 } };
+    }
+
+    const cartId = rows[0].cartId;
+    let totalAmount = 0;
+
+    const items: CartViewItem[] = rows.map((row) => {
+        const isAvailable = !row.productDeletedAt;
+        const unitPrice = isAvailable ? Number(row.pricePerUnit) : 0;
+        const qty = Number(row.quantity);
+        const subtotal = qty * unitPrice;
+        totalAmount += subtotal;
+
+        return {
+            cartItemId: row.cartItemId,
+            productId: row.productId,
+            productName: isAvailable ? row.productName! : 'Produk tidak tersedia',
+            isAvailable,
+            quantity: qty,
+            unitId: row.unitId,
+            unitName: row.unitName!,
+            pricePerUnit: isAvailable ? row.pricePerUnit! : '0',
+            subtotal,
+        };
+    });
+
+    return { data: { cartId, items, totalAmount, itemCount: items.length } };
+}
+
+export async function updateItemQuantity(userId: number, itemId: number, quantity: number): Promise<ServiceResult<{ cartItemId: number; quantity: number }>> {
+    const item = await cartRepo.findCartItemById(itemId);
+    if (!item) return { error: 'Item keranjang tidak ditemukan', status: 404 };
+    if (item.userId !== userId) return { error: 'Akses ditolak', status: 403 };
+    if (item.productDeletedAt) return { error: 'Produk tidak tersedia', status: 410 };
+
+    const stock = Number(item.productStock);
+    if (quantity > stock) return { error: 'Kuantitas melebihi stok yang tersedia', status: 422 };
+
+    await cartRepo.updateCartItemQuantity(itemId, String(quantity));
+    return { data: { cartItemId: itemId, quantity } };
+}
+
+export async function removeItem(userId: number, itemId: number): Promise<ServiceResult<void>> {
+    const item = await cartRepo.findCartItemById(itemId);
+    if (!item) return { error: 'Item keranjang tidak ditemukan', status: 404 };
+    if (item.userId !== userId) return { error: 'Akses ditolak', status: 403 };
+
+    await cartRepo.deleteCartItem(itemId);
+    return { data: undefined };
 }
