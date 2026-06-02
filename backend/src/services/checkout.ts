@@ -92,6 +92,7 @@ export async function checkout(userId: number, body: CheckoutInput): Promise<Ser
                     discount: '0',
                     subtotal: String(itemSubtotal),
                 });
+                await checkoutRepo.deductProductStock(tx, item.productId, Number(item.quantity));
             }
 
             orderCount++;
@@ -153,13 +154,18 @@ export async function cancel(userId: number, checkoutId: number): Promise<Servic
     await db.transaction(async (tx: any) => {
         await checkoutRepo.updatePaymentStatus(tx, checkout.paymentId!, PAYMENT_STATUS_CANCELLED);
         await checkoutRepo.updateCheckoutStatus(tx, checkoutId, CHECKOUT_STATUS_CANCELLED);
+
+        const items = await checkoutRepo.findOrderItemsByCheckout(tx, checkoutId);
+        for (const item of items) {
+            await checkoutRepo.deductProductStock(tx, item.productId, -Number(item.quantity));
+        }
     });
 
     return { data: { checkoutId, status: 'cancelled' } };
 }
 
-const SHIPMENT_STATUS_PICKED_UP = 3;
-const ORDER_ITEM_STATUS_SHIPPED = 5;
+const SHIPMENT_STATUS_PICKED_UP = 2;
+const ORDER_ITEM_STATUS_SHIPPED = 4;
 
 export async function confirmShipment(
     userId: number, checkoutId: number, orderId: number
