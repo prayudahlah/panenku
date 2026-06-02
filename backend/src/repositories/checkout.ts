@@ -114,3 +114,41 @@ export async function clearCartItems(tx: DBLike, userId: number) {
         await tx.delete(cartItems).where(eq(cartItems.cartId, userCart[0].id));
     }
 }
+
+export async function findCheckoutById(id: number) {
+    const result = await db
+        .select({
+            id: checkouts.id,
+            buyerId: checkouts.buyerId,
+            totalAmount: checkouts.totalAmount,
+            checkoutStatusId: checkouts.checkoutStatusId,
+            paymentId: checkouts.paymentId,
+            shippingAddress: checkouts.shippingAddress,
+        })
+        .from(checkouts)
+        .where(eq(checkouts.id, id))
+        .limit(1);
+    return result[0] || null;
+}
+
+export async function updateCheckoutStatus(tx: DBLike, checkoutId: number, checkoutStatusId: number) {
+    await tx.update(checkouts).set({ checkoutStatusId }).where(eq(checkouts.id, checkoutId));
+}
+
+export async function updatePaymentStatus(tx: DBLike, paymentId: number, paymentStatusId: number, paidAt?: Date) {
+    const data: any = { paymentStatusId };
+    if (paidAt) data.paidAt = paidAt;
+    await tx.update(payments).set(data).where(eq(payments.id, paymentId));
+}
+
+export async function confirmOrderItemsByCheckout(tx: DBLike, checkoutId: number, statusId: number) {
+    await tx
+        .update(orderItems)
+        .set({ orderItemStatusId: statusId })
+        .where(
+            inArray(
+                orderItems.orderId,
+                db.select({ id: orders.id }).from(orders).where(eq(orders.checkoutId, checkoutId))
+            )
+        );
+}
