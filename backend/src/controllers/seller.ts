@@ -9,13 +9,11 @@ export const sellerController = (app: any) =>
                 set.status = 401;
                 return { success: false, code: 'ERR-LOG-01', message: 'Belum login' };
             }
-
             const result = await sellerService.register(userId, body);
             if (result.error) {
                 set.status = result.status || 400;
-                return { success: false, message: result.error, errorCode: result.errorCode };
+                return { success: false, message: result.error, errorCode: result.code };
             }
-
             session.set('role', 'seller');
             return { success: true, data: result.data };
         }, { body: CreateSellerProfileRequest })
@@ -23,28 +21,23 @@ export const sellerController = (app: any) =>
         .get('/catalog', async ({ session, query, set }: any) => {
             const userId = session.get('userId');
             const role = session.get('role');
-
             if (!userId) {
                 set.status = 401;
                 return { success: false, code: 'ERR-LOG-01', message: 'User belum login' };
             }
-
             if (role !== 'seller') {
                 set.status = 403;
                 return { success: false, code: 'ERR-PROD-01', message: 'Akun bukan penjual' };
             }
-
             const profile = await sellerService.getProfile(Number(userId));
             if (profile.error) {
                 set.status = profile.status || 404;
                 return { success: false, code: 'ERR-PROD-01', message: profile.error };
             }
-
             if (profile.data.status !== 'active') {
                 set.status = 403;
                 return { success: false, code: 'ERR-PROD-02', message: 'Profil penjual tidak aktif' };
             }
-
             const result = await catalogService.listSellerCatalog({
                 sellerId: Number(userId),
                 sortBy: query.sort_by || query.sortBy,
@@ -52,7 +45,6 @@ export const sellerController = (app: any) =>
                 page: query.page ? Number(query.page) : 1,
                 limit: query.limit ? Number(query.limit) : 10,
             });
-
             return {
                 success: true,
                 data: result.data,
@@ -67,13 +59,52 @@ export const sellerController = (app: any) =>
                 set.status = 401;
                 return { success: false, code: 'ERR-LOG-01', message: 'Belum login' };
             }
-
             const result = await sellerService.getProfile(userId);
             if (result.error) {
                 set.status = result.status || 400;
                 return { success: false, message: result.error };
             }
+            return { success: true, data: result.data };
+        })
 
+        // FSD-04.3: GET /sellers/:sellerId/products
+        .get('/:sellerId/products', async ({ params: { sellerId }, query, set }: any) => {
+            const result = await sellerService.getCatalogBySellerPublic(Number(sellerId), {
+                search: query.search,
+                categoryId: query.categoryId ? Number(query.categoryId) : undefined,
+                minPrice: query.minPrice ? Number(query.minPrice) : undefined,
+                maxPrice: query.maxPrice ? Number(query.maxPrice) : undefined,
+                isNegotiable: query.isNegotiable !== undefined ? query.isNegotiable === 'true' : undefined,
+                sortBy: query.sortBy || query.sort_by,
+                isAscending: query.isAscending !== undefined
+                    ? query.isAscending === 'true'
+                    : (query.sort_order === 'asc'),
+                page: query.page ? Number(query.page) : 1,
+                limit: query.limit ? Number(query.limit) : 12,
+            });
+            if (result.error) {
+                set.status = result.status || 400;
+                return { success: false, message: result.error, ...(result.code && { code: result.code }) };
+            }
+            return {
+                success: true,
+                ...(result.data.message && { message: result.data.message }),
+                data: result.data.rows,
+                meta: {
+                    total: result.data.total,
+                    page: result.data.page,
+                    limit: result.data.limit,
+                },
+            };
+        })
+
+        // FSD-04.2: GET /sellers/:sellerId
+        .get('/:sellerId', async ({ params: { sellerId }, set }: any) => {
+            const result = await sellerService.getPublicProfile(Number(sellerId));
+            if (result.error) {
+                set.status = result.status || 400;
+                return { success: false, message: result.error, ...(result.code && { code: result.code }) };
+            }
             return { success: true, data: result.data };
         })
 
@@ -82,7 +113,6 @@ export const sellerController = (app: any) =>
                 set.status = 403;
                 return { success: false, message: 'Akses ditolak' };
             }
-
             const result = await adminService.listSellers();
             return { success: true, data: result.data };
         });
