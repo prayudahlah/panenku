@@ -3,7 +3,20 @@ import { swagger } from '@elysiajs/swagger';
 import { cors } from '@elysiajs/cors';
 import { betterSession } from 'elysia-better-session';
 import { upsertSessionAdapter } from './utils/session-adapter';
-import { authRoutes, cartRoutes, checkoutRoutes, sellerRoutes, referenceRoutes, userRoutes, productRoutes, auditRoutes, negotiationRoutes, notificationRoutes, contractRoutes } from './routes';
+import {
+    authRoutes,
+    cartRoutes,
+    checkoutRoutes,
+    sellerRoutes,
+    referenceRoutes,
+    userRoutes,
+    productRoutes,
+    auditRoutes,
+    negotiationRoutes,
+    notificationRoutes,
+    contractRoutes,
+    dashboardRoutes,
+} from './routes';
 
 const app = new Elysia()
     .onError(({ code, error, set }) => {
@@ -51,6 +64,7 @@ const app = new Elysia()
         .use(negotiationRoutes)
         .use(notificationRoutes)
         .use(contractRoutes)
+        .use(dashboardRoutes)
     )
     .listen(process.env.BACKEND_PORT || 3000);
 

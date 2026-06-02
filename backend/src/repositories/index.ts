@@ -10,3 +10,4 @@ export * as negotiationRepo from './negotiation';
 export * as notificationRepo from './notification';
 export * as userAddressRepo from './userAddress';
 export * as contractRepo from './contract';
+export * as dashboardRepo from './dashboard';
