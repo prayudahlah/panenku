@@ -1,5 +1,6 @@
 export * as authRepo from './auth';
 export * as cartRepo from './cart';
+export * as checkoutRepo from './checkout';
 export * as sellerRepo from './sellerProfile';
 export * as referenceRepo from './reference';
 export * as adminRepo from './admin';
