@@ -3,16 +3,11 @@ import { sellerService, adminService, catalogService } from '../services';
 
 export const sellerController = (app: any) =>
     app
-     
         .post('/register', async ({ body, session, set }: any) => {
             const userId = session.get('userId');
             if (!userId) {
                 set.status = 401;
-<<<<<<< HEAD
                 return { success: false, code: 'ERR-LOG-01', message: 'Belum login' };
-=======
-                return { success: false, message: 'Belum login' };
->>>>>>> 8a64e11 (feat(FSD-04): add public seller profile and seller products endpoints)
             }
 
             const result = await sellerService.register(userId, body);
@@ -25,7 +20,6 @@ export const sellerController = (app: any) =>
             return { success: true, data: result.data };
         }, { body: CreateSellerProfileRequest })
 
-<<<<<<< HEAD
         .get('/catalog', async ({ session, query, set }: any) => {
             const userId = session.get('userId');
             const role = session.get('role');
@@ -67,18 +61,11 @@ export const sellerController = (app: any) =>
             };
         })
 
-=======
-        
->>>>>>> 8a64e11 (feat(FSD-04): add public seller profile and seller products endpoints)
         .get('/profiles/me', async ({ session, set }: any) => {
             const userId = session.get('userId');
             if (!userId) {
                 set.status = 401;
-<<<<<<< HEAD
                 return { success: false, code: 'ERR-LOG-01', message: 'Belum login' };
-=======
-                return { success: false, message: 'Belum login' };
->>>>>>> 8a64e11 (feat(FSD-04): add public seller profile and seller products endpoints)
             }
 
             const result = await sellerService.getProfile(userId);
@@ -90,74 +77,12 @@ export const sellerController = (app: any) =>
             return { success: true, data: result.data };
         })
 
-        
-        .get('/:sellerId/products', async ({ params: { sellerId }, query, set }: any) => {
-            const result = await sellerService.getCatalogBySellerPublic(Number(sellerId), {
-                search: query.search,
-                categoryId: query.categoryId ? Number(query.categoryId) : undefined,
-                minPrice: query.minPrice ? Number(query.minPrice) : undefined,
-                maxPrice: query.maxPrice ? Number(query.maxPrice) : undefined,
-                isNegotiable: query.isNegotiable !== undefined
-                    ? query.isNegotiable === 'true'
-                    : undefined,
-                sortBy: query.sortBy,
-                isAscending: query.isAscending ? query.isAscending === 'true' : false,
-                page: query.page ? Number(query.page) : 1,
-                limit: query.limit ? Number(query.limit) : 12,
-            });
-
-            if (result.error) {
-                set.status = result.status || 400;
-                
-                return {
-                    success: false,
-                    message: result.error,
-                    ...(result.code && { code: result.code }),
-                };
-            }
-
-            return {
-                success: true,
-                
-                ...(result.data.message && { message: result.data.message }),
-                data: result.data.rows,
-                meta: {
-                    total: result.data.total,
-                    page: result.data.page,
-                    limit: result.data.limit,
-                },
-            };
-        })
-
-        
-        .get('/:sellerId', async ({ params: { sellerId }, set }: any) => {
-            const result = await sellerService.getPublicProfile(Number(sellerId));
-            if (result.error) {
-                set.status = result.status || 400;
-                // FIX: Sertakan error code dari spec
-                return {
-                    success: false,
-                    message: result.error,
-                    ...(result.code && { code: result.code }),
-                };
-            }
-            return { success: true, data: result.data };
-        })
-
-      
         .get('/', async ({ session, set }: any) => {
-<<<<<<< HEAD
             if (!['admin', 'super_admin'].includes(session.get('role'))) {
                 set.status = 403;
                 return { success: false, message: 'Akses ditolak' };
             }
 
-=======
-            if (session.get('role') !== 'admin') {
-                set.status = 403;
-                return { success: false, message: 'Akses ditolak' };
-            }
->>>>>>> 8a64e11 (feat(FSD-04): add public seller profile and seller products endpoints)
             const result = await adminService.listSellers();
             return { success: true, data: result.data };
         });

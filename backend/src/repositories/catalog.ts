@@ -1,5 +1,4 @@
 import { db } from '../db';
-<<<<<<< HEAD
 import {
     products,
     productCategories,
@@ -51,11 +50,6 @@ function getSellerCatalogOrderBy(sortBy = 'createdAt', sortOrder: SortOrder = 'd
     if (sortBy === 'name') return direction(products.name);
     return desc(products.createdAt);
 }
-=======
-import { products, productCategories, units, sellerProfiles } from '../db/schema';
-import { and, eq, count, sql, desc, asc, isNull, ilike, or, SQL } from 'drizzle-orm';
-
->>>>>>> 8a64e11 (feat(FSD-04): add public seller profile and seller products endpoints)
 
 export async function list({
     search,
@@ -64,7 +58,7 @@ export async function list({
     maxPrice,
     isNegotiable,
     sortBy = 'createdAt',
-    isAscending = false,
+    sortOrder = 'desc',
     page = 1,
     limit = 12,
 }: {
@@ -74,11 +68,10 @@ export async function list({
     maxPrice?: number;
     isNegotiable?: boolean;
     sortBy?: string;
-    isAscending?: boolean;
+    sortOrder?: string;
     page?: number;
     limit?: number;
 }) {
-<<<<<<< HEAD
     const safePage = Math.max(Number(page) || 1, 1);
     const safeLimit = Math.max(Number(limit) || 12, 1);
     const conditions = [isNull(products.deletedAt)];
@@ -88,63 +81,18 @@ export async function list({
     if (minPrice !== undefined) conditions.push(sql`${products.pricePerUnit} >= ${minPrice}`);
     if (maxPrice !== undefined) conditions.push(sql`${products.pricePerUnit} <= ${maxPrice}`);
     if (isNegotiable !== undefined) conditions.push(eq(products.isNegotiable, isNegotiable));
-=======
-    const conditions: (SQL<unknown> | undefined)[] = [
-        
-        isNull(products.deletedAt),
-        
-        sql`${products.stockQuantity} > 0`,
-    ];
-
-    
-    if (search) {
-        conditions.push(
-            or(
-                ilike(products.name, `%${search}%`),
-                ilike(sql`COALESCE(${products.description}, '')`, `%${search}%`)
-            )!
-        );
-    }
-
-    
-    if (categoryId) {
-        conditions.push(eq(products.categoryId, categoryId));
-    }
-
-    
-    if (minPrice !== undefined && minPrice > 0) {
-        conditions.push(sql`${products.pricePerUnit} >= ${minPrice}`);
-    }
-    if (maxPrice !== undefined && maxPrice > 0) {
-        conditions.push(sql`${products.pricePerUnit} <= ${maxPrice}`);
-    }
-
-    
-    if (isNegotiable !== undefined) {
-        conditions.push(eq(products.isNegotiable, isNegotiable));
-    }
->>>>>>> 8a64e11 (feat(FSD-04): add public seller profile and seller products endpoints)
 
     const where = and(...conditions);
 
-    
-    const orderBy =
-        sortBy === 'price'
-            ? isAscending ? asc(products.pricePerUnit) : desc(products.pricePerUnit)
-            : sortBy === 'name'
-                ? isAscending ? asc(products.name) : desc(products.name)
-                : isAscending ? asc(products.createdAt) : desc(products.createdAt);
+    const orderBy = sortBy === 'price'
+        ? (sortOrder === 'asc' ? asc(products.pricePerUnit) : desc(products.pricePerUnit))
+        : sortBy === 'name'
+            ? (sortOrder === 'asc' ? asc(products.name) : desc(products.name))
+            : desc(products.createdAt);
 
     const offset = (safePage - 1) * safeLimit;
 
-    
-    const [total] = await db
-        .select({ count: count() })
-        .from(products)
-        .innerJoin(productCategories, eq(products.categoryId, productCategories.id))
-        .innerJoin(units, eq(products.unitId, units.id))
-        .innerJoin(sellerProfiles, eq(products.sellerId, sellerProfiles.userId))
-        .where(where);
+    const [total] = await db.select({ count: count() }).from(products).where(where);
 
     const rows = await db
         .select({
@@ -390,108 +338,4 @@ export async function softDeleteSellerProduct({
     }
 
     return deletedProduct;
-}
-
-
-export async function listBySeller({
-    sellerId,
-    search,
-    categoryId,
-    minPrice,
-    maxPrice,
-    isNegotiable,
-    sortBy = 'createdAt',
-    isAscending = false,
-    page = 1,
-    limit = 12,
-}: {
-    sellerId: number;
-    search?: string;
-    categoryId?: number;
-    minPrice?: number;
-    maxPrice?: number;
-    isNegotiable?: boolean;
-    sortBy?: string;
-    isAscending?: boolean;
-    page?: number;
-    limit?: number;
-}) {
-    const conditions: (SQL<unknown> | undefined)[] = [
-        isNull(products.deletedAt),
-        
-        sql`${products.stockQuantity} > 0`,
-        eq(products.sellerId, sellerId),
-    ];
-
-    if (search) {
-        conditions.push(
-            or(
-                ilike(products.name, `%${search}%`),
-                ilike(sql`COALESCE(${products.description}, '')`, `%${search}%`)
-            )!
-        );
-    }
-
-    if (categoryId) {
-        conditions.push(eq(products.categoryId, categoryId));
-    }
-
-    if (minPrice !== undefined && minPrice > 0) {
-        conditions.push(sql`${products.pricePerUnit} >= ${minPrice}`);
-    }
-    if (maxPrice !== undefined && maxPrice > 0) {
-        conditions.push(sql`${products.pricePerUnit} <= ${maxPrice}`);
-    }
-
-    if (isNegotiable !== undefined) {
-        conditions.push(eq(products.isNegotiable, isNegotiable));
-    }
-
-    const where = and(...conditions);
-
-    const orderBy =
-        sortBy === 'price'
-            ? isAscending ? asc(products.pricePerUnit) : desc(products.pricePerUnit)
-            : sortBy === 'name'
-                ? isAscending ? asc(products.name) : desc(products.name)
-                : isAscending ? asc(products.createdAt) : desc(products.createdAt);
-
-    const offset = (page - 1) * limit;
-
-    
-    const [total] = await db
-        .select({ count: count() })
-        .from(products)
-        .innerJoin(productCategories, eq(products.categoryId, productCategories.id))
-        .innerJoin(units, eq(products.unitId, units.id))
-        .innerJoin(sellerProfiles, eq(products.sellerId, sellerProfiles.userId))
-        .where(where);
-
-    const rows = await db
-        .select({
-            id: products.id,
-            name: products.name,
-            description: products.description,
-            pricePerUnit: products.pricePerUnit,
-            unitId: products.unitId,
-            unitName: units.name,
-            minOrderQty: products.minOrderQty,
-            stockQuantity: products.stockQuantity,
-            isNegotiable: products.isNegotiable,
-            categoryId: products.categoryId,
-            categoryName: productCategories.name,
-            sellerId: products.sellerId,
-            farmName: sellerProfiles.farmName,
-            createdAt: products.createdAt,
-        })
-        .from(products)
-        .innerJoin(productCategories, eq(products.categoryId, productCategories.id))
-        .innerJoin(units, eq(products.unitId, units.id))
-        .innerJoin(sellerProfiles, eq(products.sellerId, sellerProfiles.userId))
-        .where(where)
-        .orderBy(orderBy)
-        .limit(limit)
-        .offset(offset);
-
-    return { rows, total: Number(total.count), page, limit };
 }
