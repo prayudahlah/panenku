@@ -157,3 +157,38 @@ export async function cancel(userId: number, checkoutId: number): Promise<Servic
 
     return { data: { checkoutId, status: 'cancelled' } };
 }
+
+const SHIPMENT_STATUS_PICKED_UP = 3;
+const ORDER_ITEM_STATUS_SHIPPED = 5;
+
+export async function confirmShipment(
+    userId: number, checkoutId: number, orderId: number
+): Promise<ServiceResult<{ orderId: number; shipmentId: number; status: string }>> {
+    const order = await checkoutRepo.findOrderWithShipment(orderId);
+    if (!order) return { error: 'Pesanan tidak ditemukan', status: 404 };
+    if (order.checkoutId !== checkoutId) return { error: 'Pesanan tidak ditemukan', status: 404 };
+
+    const sellerProfile = await checkoutRepo.findSellerProfileByUserId(userId);
+    if (!sellerProfile) return { error: 'Akses ditolak', status: 403 };
+    if (sellerProfile.id !== order.sellerId) return { error: 'Akses ditolak', status: 403 };
+
+    if (order.checkoutStatusId !== CHECKOUT_STATUS_PAID) return { error: 'Checkout belum dibayar', status: 422 };
+
+    const result = await db.transaction(async (tx: any) => {
+        const newShipment = await checkoutRepo.createShipmentPickedUp(tx, {
+            courierName: order.courierName,
+            provinceId: order.provinceId,
+            cityId: order.cityId,
+            shippingAddress: order.shippingAddress,
+            shipmentStatusId: SHIPMENT_STATUS_PICKED_UP,
+            shippedAt: new Date(),
+        });
+
+        await checkoutRepo.updateOrderShipmentId(tx, orderId, newShipment.id);
+        await checkoutRepo.updateOrderItemsByOrderId(tx, orderId, ORDER_ITEM_STATUS_SHIPPED);
+
+        return { orderId, shipmentId: newShipment.id, status: 'shipped' };
+    });
+
+    return { data: result };
+}
