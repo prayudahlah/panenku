@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { eq, and, isNull, inArray } from 'drizzle-orm';
+import { eq, and, isNull, inArray, sql } from 'drizzle-orm';
 import { carts, cartItems, products, sellerProfiles, units, checkouts, orders, orderItems, payments, shipments } from '../db/schema';
 
 type DBLike = typeof db;
@@ -206,4 +206,19 @@ export async function updateOrderShipmentId(tx: DBLike, orderId: number, shipmen
 
 export async function updateOrderItemsByOrderId(tx: DBLike, orderId: number, statusId: number) {
     await tx.update(orderItems).set({ orderItemStatusId: statusId }).where(eq(orderItems.orderId, orderId));
+}
+
+export async function deductProductStock(tx: DBLike, productId: number, quantity: number) {
+    await tx
+        .update(products)
+        .set({ stockQuantity: sql`${products.stockQuantity} - ${quantity}` })
+        .where(eq(products.id, productId));
+}
+
+export async function findOrderItemsByCheckout(tx: DBLike, checkoutId: number) {
+    return await tx
+        .select({ productId: orderItems.productId, quantity: orderItems.quantity })
+        .from(orderItems)
+        .innerJoin(orders, eq(orderItems.orderId, orders.id))
+        .where(eq(orders.checkoutId, checkoutId));
 }
