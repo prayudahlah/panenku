@@ -16,8 +16,18 @@ export type CheckoutInput = {
     cityId: number;
 };
 
+export type CheckoutItemDetail = {
+    productId: number;
+    productName: string;
+    quantity: number;
+    unitName: string;
+    pricePerUnit: string;
+    subtotal: string;
+};
+
 export type CheckoutResponse = {
     checkoutId: number;
     totalAmount: string;
     orderCount: number;
+    items: CheckoutItemDetail[];
 };
