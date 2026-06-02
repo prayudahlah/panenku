@@ -8,3 +8,4 @@ export { auditRoutes } from './audit';
 export { negotiationRoutes } from './negotiation';
 export { notificationRoutes } from './notification';
 export { contractRoutes } from './contract';
+export { dashboardRoutes } from './dashboard';
