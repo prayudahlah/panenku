@@ -13,6 +13,7 @@ const ERR = {
     CAT_01: 'ERR-CAT-01',
     CAT_02: 'ERR-CAT-02',
     CAT_03: 'ERR-CAT-03',
+    TIMEOUT: 'ERR-TIMEOUT-01',
 } as const;
 
 export async function register(
