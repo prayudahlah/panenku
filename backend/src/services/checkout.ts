@@ -120,3 +120,40 @@ export async function checkout(userId: number, body: CheckoutInput): Promise<Ser
 
     return { data: result };
 }
+
+const CHECKOUT_STATUS_PAID = 5;
+const CHECKOUT_STATUS_CANCELLED = 2;
+const PAYMENT_STATUS_PAID = 2;
+const PAYMENT_STATUS_CANCELLED = 8;
+const ORDER_ITEM_STATUS_CONFIRMED = 2;
+
+export async function pay(userId: number, checkoutId: number): Promise<ServiceResult<{ checkoutId: number; status: string }>> {
+    const checkout = await checkoutRepo.findCheckoutById(checkoutId);
+    if (!checkout) return { error: 'Checkout tidak ditemukan', status: 404 };
+    if (checkout.buyerId !== userId) return { error: 'Akses ditolak', status: 403 };
+    if (checkout.checkoutStatusId !== CHECKOUT_STATUS_AWAITING_PAYMENT) return { error: 'Checkout tidak dalam status awaiting_payment', status: 422 };
+    if (!checkout.paymentId) return { error: 'Pembayaran tidak ditemukan', status: 404 };
+
+    await db.transaction(async (tx: any) => {
+        await checkoutRepo.updatePaymentStatus(tx, checkout.paymentId!, PAYMENT_STATUS_PAID, new Date());
+        await checkoutRepo.updateCheckoutStatus(tx, checkoutId, CHECKOUT_STATUS_PAID);
+        await checkoutRepo.confirmOrderItemsByCheckout(tx, checkoutId, ORDER_ITEM_STATUS_CONFIRMED);
+    });
+
+    return { data: { checkoutId, status: 'paid' } };
+}
+
+export async function cancel(userId: number, checkoutId: number): Promise<ServiceResult<{ checkoutId: number; status: string }>> {
+    const checkout = await checkoutRepo.findCheckoutById(checkoutId);
+    if (!checkout) return { error: 'Checkout tidak ditemukan', status: 404 };
+    if (checkout.buyerId !== userId) return { error: 'Akses ditolak', status: 403 };
+    if (checkout.checkoutStatusId !== CHECKOUT_STATUS_AWAITING_PAYMENT) return { error: 'Checkout tidak dalam status awaiting_payment', status: 422 };
+    if (!checkout.paymentId) return { error: 'Pembayaran tidak ditemukan', status: 404 };
+
+    await db.transaction(async (tx: any) => {
+        await checkoutRepo.updatePaymentStatus(tx, checkout.paymentId!, PAYMENT_STATUS_CANCELLED);
+        await checkoutRepo.updateCheckoutStatus(tx, checkoutId, CHECKOUT_STATUS_CANCELLED);
+    });
+
+    return { data: { checkoutId, status: 'cancelled' } };
+}
