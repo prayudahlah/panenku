@@ -142,8 +142,8 @@ BEGIN
 EXCEPTION
     WHEN OTHERS THEN
         p_result := 'ERR-DASH-01';
-        p_data := JSONB_BUILD_OBJECT('sqlstate', SQLSTATE);
-        p_message := 'Gagal mengambil data dashboard pembeli: ' || SQLERRM;
+        p_data := '{}'::JSONB;
+        p_message := 'Gagal mengambil data dashboard pembeli, silakan coba lagi';
 END;
 $$;
 
@@ -226,8 +226,6 @@ BEGIN
         LIMIT 5
     ) data_row;
 
-    -- Tabel util.notifications tidak ada di database kamu.
-    -- Jadi sementara dikembalikan array kosong.
     v_notifications := '[]'::JSONB;
 
     SELECT COALESCE(JSONB_AGG(TO_JSONB(data_row)), '[]'::JSONB)
@@ -266,8 +264,8 @@ BEGIN
 EXCEPTION
     WHEN OTHERS THEN
         p_result := 'ERR-DASH-01';
-        p_data := JSONB_BUILD_OBJECT('sqlstate', SQLSTATE);
-        p_message := 'Gagal mengambil data dashboard penjual: ' || SQLERRM;
+        p_data := '{}'::JSONB;
+        p_message := 'Gagal mengambil data dashboard penjual, silakan coba lagi';
 END;
 $$;
 
@@ -430,7 +428,7 @@ BEGIN
 EXCEPTION
     WHEN OTHERS THEN
         p_result := 'ERR-DASH-01';
-        p_data := JSONB_BUILD_OBJECT('sqlstate', SQLSTATE);
-        p_message := 'Gagal mengambil data dashboard admin: ' || SQLERRM;
+        p_data := '{}'::JSONB;
+        p_message := 'Gagal mengambil data dashboard admin, silakan coba lagi';
 END;
 $$;

@@ -4,13 +4,28 @@ export const dashboardController = (app: any) =>
     app
         .get('/buyer', async ({ session, set }: any) => {
             const userId = Number(session.get('userId'));
-            if (!userId) { set.status = 401; return { success: false, message: 'Belum login' }; }
-            if (session.get('role') !== 'buyer') { set.status = 403; return { success: false, message: 'Hanya pembeli yang dapat mengakses dashboard pembeli' }; }
+            if (!userId) {
+                set.status = 401;
+                return { success: false, message: 'Belum login', errorCode: 'ERR-LOG-01' };
+            }
+
+            if (session.get('role') !== 'buyer') {
+                set.status = 403;
+                return {
+                    success: false,
+                    message: 'Hanya pembeli yang dapat mengakses dashboard pembeli',
+                    errorCode: 'ERR-DASH-02',
+                };
+            }
 
             const result = await dashboardService.getBuyerDashboard(userId);
             if (result.error) {
                 set.status = result.status || 400;
-                return { success: false, message: result.error };
+                return {
+                    success: false,
+                    message: result.error,
+                    errorCode: result.errorCode,
+                };
             }
 
             return { success: true, data: result.data };
@@ -18,13 +33,28 @@ export const dashboardController = (app: any) =>
 
         .get('/seller', async ({ session, set }: any) => {
             const userId = Number(session.get('userId'));
-            if (!userId) { set.status = 401; return { success: false, message: 'Belum login' }; }
-            if (session.get('role') !== 'seller') { set.status = 403; return { success: false, message: 'Hanya penjual yang dapat mengakses dashboard penjual' }; }
+            if (!userId) {
+                set.status = 401;
+                return { success: false, message: 'Belum login', errorCode: 'ERR-LOG-01' };
+            }
+
+            if (session.get('role') !== 'seller') {
+                set.status = 403;
+                return {
+                    success: false,
+                    message: 'Hanya penjual yang dapat mengakses dashboard penjual',
+                    errorCode: 'ERR-DASH-02',
+                };
+            }
 
             const result = await dashboardService.getSellerDashboard(userId);
             if (result.error) {
                 set.status = result.status || 400;
-                return { success: false, message: result.error };
+                return {
+                    success: false,
+                    message: result.error,
+                    errorCode: result.errorCode,
+                };
             }
 
             return { success: true, data: result.data };
@@ -32,13 +62,28 @@ export const dashboardController = (app: any) =>
 
         .get('/admin', async ({ session, set }: any) => {
             const userId = Number(session.get('userId'));
-            if (!userId) { set.status = 401; return { success: false, message: 'Belum login' }; }
-            if (session.get('role') !== 'admin') { set.status = 403; return { success: false, message: 'Hanya admin yang dapat mengakses dashboard admin' }; }
+            if (!userId) {
+                set.status = 401;
+                return { success: false, message: 'Belum login', errorCode: 'ERR-LOG-01' };
+            }
+
+            if (session.get('role') !== 'admin') {
+                set.status = 403;
+                return {
+                    success: false,
+                    message: 'Hanya admin yang dapat mengakses dashboard admin',
+                    errorCode: 'ERR-DASH-02',
+                };
+            }
 
             const result = await dashboardService.getAdminDashboard(userId);
             if (result.error) {
                 set.status = result.status || 400;
-                return { success: false, message: result.error };
+                return {
+                    success: false,
+                    message: result.error,
+                    errorCode: result.errorCode,
+                };
             }
 
             return { success: true, data: result.data };
