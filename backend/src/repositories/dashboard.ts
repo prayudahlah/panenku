@@ -46,7 +46,7 @@ function normalizeProcedureResult(result: any): DashboardProcedureResult {
 
 export async function getBuyerDashboard(userId: number) {
     const result = await db.execute(sql`
-        CALL public.sp_get_buyer_dashboard(
+        CALL util.sp_get_buyer_dashboard(
             ${userId}::BIGINT,
             NULL::VARCHAR,
             NULL::JSONB,
@@ -59,7 +59,7 @@ export async function getBuyerDashboard(userId: number) {
 
 export async function getSellerDashboard(userId: number) {
     const result = await db.execute(sql`
-        CALL public.sp_get_seller_dashboard(
+        CALL util.sp_get_seller_dashboard(
             ${userId}::BIGINT,
             NULL::VARCHAR,
             NULL::JSONB,
@@ -72,7 +72,7 @@ export async function getSellerDashboard(userId: number) {
 
 export async function getAdminDashboard(userId: number) {
     const result = await db.execute(sql`
-        CALL public.sp_get_admin_dashboard(
+        CALL util.sp_get_admin_dashboard(
             ${userId}::BIGINT,
             NULL::VARCHAR,
             NULL::JSONB,
