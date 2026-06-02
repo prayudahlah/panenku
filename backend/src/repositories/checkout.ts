@@ -142,7 +142,7 @@ export async function updatePaymentStatus(tx: DBLike, paymentId: number, payment
 }
 
 export async function confirmOrderItemsByCheckout(tx: DBLike, checkoutId: number, statusId: number) {
-    await tx
+        await tx
         .update(orderItems)
         .set({ orderItemStatusId: statusId })
         .where(
@@ -151,4 +151,59 @@ export async function confirmOrderItemsByCheckout(tx: DBLike, checkoutId: number
                 db.select({ id: orders.id }).from(orders).where(eq(orders.checkoutId, checkoutId))
             )
         );
+}
+
+export async function findSellerProfileByUserId(userId: number) {
+    const result = await db
+        .select({ id: sellerProfiles.id, userId: sellerProfiles.userId, status: sellerProfiles.status })
+        .from(sellerProfiles)
+        .where(eq(sellerProfiles.userId, userId))
+        .limit(1);
+    return result[0] || null;
+}
+
+export async function findOrderWithShipment(orderId: number) {
+    const result = await db
+        .select({
+            orderId: orders.id,
+            checkoutId: orders.checkoutId,
+            sellerId: orders.sellerId,
+            shipmentId: orders.shipmentId,
+            orderNumber: orders.orderNumber,
+            shipmentStatusId: shipments.shipmentStatusId,
+            courierName: shipments.courierName,
+            provinceId: shipments.provinceId,
+            cityId: shipments.cityId,
+            shippingAddress: shipments.shippingAddress,
+            checkoutStatusId: checkouts.checkoutStatusId,
+        })
+        .from(orders)
+        .innerJoin(shipments, eq(orders.shipmentId, shipments.id))
+        .innerJoin(checkouts, eq(orders.checkoutId, checkouts.id))
+        .where(eq(orders.id, orderId))
+        .limit(1);
+    return result[0] || null;
+}
+
+export async function createShipmentPickedUp(tx: DBLike, data: {
+    courierName: string | null;
+    provinceId: number;
+    cityId: number;
+    shippingAddress: string;
+    shipmentStatusId: number;
+    shippedAt: Date;
+}) {
+    const result = await tx
+        .insert(shipments)
+        .values(data)
+        .returning({ id: shipments.id });
+    return result[0];
+}
+
+export async function updateOrderShipmentId(tx: DBLike, orderId: number, shipmentId: number) {
+    await tx.update(orders).set({ shipmentId }).where(eq(orders.id, orderId));
+}
+
+export async function updateOrderItemsByOrderId(tx: DBLike, orderId: number, statusId: number) {
+    await tx.update(orderItems).set({ orderItemStatusId: statusId }).where(eq(orderItems.orderId, orderId));
 }

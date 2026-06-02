@@ -54,4 +54,20 @@ export const checkoutController = (app: any) =>
             }
 
             return { success: true, message: 'Pesanan dibatalkan', data: result.data };
+        })
+
+        .put('/:id/orders/:orderId/ship', async ({ params: { id, orderId }, session, set }: any) => {
+            const userId = session.get('userId');
+            if (!userId) {
+                set.status = 401;
+                return { success: false, message: 'Belum login', errorCode: 'ERR-LOG-01' };
+            }
+
+            const result = await checkoutService.confirmShipment(userId, Number(id), Number(orderId));
+            if (result.error) {
+                set.status = result.status || 400;
+                return { success: false, message: result.error };
+            }
+
+            return { success: true, message: 'Pengiriman dikonfirmasi', data: result.data };
         });
