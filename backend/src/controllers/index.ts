@@ -1,5 +1,6 @@
 export { authController } from './auth';
 export { cartController } from './cart';
+export { checkoutController } from './checkout';
 export { sellerController } from './seller';
 export { referenceController } from './reference';
 export { usersController } from './users';
