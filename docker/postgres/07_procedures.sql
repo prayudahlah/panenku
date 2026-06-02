@@ -1,4 +1,6 @@
-CREATE OR REPLACE PROCEDURE public.sp_get_buyer_dashboard(
+CREATE SCHEMA IF NOT EXISTS util;
+
+CREATE OR REPLACE PROCEDURE util.sp_get_buyer_dashboard(
     IN p_user_id BIGINT,
     OUT p_result VARCHAR,
     OUT p_data JSONB,
@@ -53,10 +55,10 @@ BEGIN
             ss.code AS "shipmentStatus",
             s.shipping_address AS "shippingAddress",
             o.created_at AS "createdAt"
-        FROM transaction.checkouts c
-        INNER JOIN transaction.orders o ON o.checkout_id = c.id
+        FROM "transaction".checkouts c
+        INNER JOIN "transaction".orders o ON o.checkout_id = c.id
         LEFT JOIN reference.checkout_statuses cs ON cs.id = c.checkout_status_id
-        LEFT JOIN transaction.shipments s ON s.id = o.shipment_id
+        LEFT JOIN "transaction".shipments s ON s.id = o.shipment_id
         LEFT JOIN reference.shipment_statuses ss ON ss.id = s.shipment_status_id
         WHERE c.buyer_id = p_user_id
           AND cs.code IN ('awaiting_payment', 'paid')
@@ -73,16 +75,32 @@ BEGIN
             cs.code AS "checkoutStatus",
             ps.code AS "paymentStatus",
             c.created_at AS "createdAt"
-        FROM transaction.checkouts c
+        FROM "transaction".checkouts c
         LEFT JOIN reference.checkout_statuses cs ON cs.id = c.checkout_status_id
-        LEFT JOIN transaction.payments p ON p.id = c.payment_id
+        LEFT JOIN "transaction".payments p ON p.id = c.payment_id
         LEFT JOIN reference.payment_statuses ps ON ps.id = p.payment_status_id
         WHERE c.buyer_id = p_user_id
         ORDER BY c.created_at DESC
         LIMIT 5
     ) data_row;
 
-    v_notifications := '[]'::JSONB;
+    SELECT COALESCE(JSONB_AGG(TO_JSONB(data_row)), '[]'::JSONB)
+    INTO v_notifications
+    FROM (
+        SELECT
+            n.id,
+            n.title,
+            n.message,
+            n.type,
+            n.reference_type AS "referenceType",
+            n.reference_id AS "referenceId",
+            n.is_read AS "isRead",
+            n.created_at AS "createdAt"
+        FROM util.notifications n
+        WHERE n.user_id = p_user_id
+        ORDER BY n.created_at DESC
+        LIMIT 5
+    ) data_row;
 
     SELECT COALESCE(JSONB_AGG(TO_JSONB(data_row)), '[]'::JSONB)
     INTO v_active_contracts
@@ -99,7 +117,7 @@ BEGIN
             c.total_shipping AS "totalShipping",
             cs.code AS "contractStatus",
             c.created_at AS "createdAt"
-        FROM transaction.contracts c
+        FROM "transaction".contracts c
         LEFT JOIN master.seller_profiles sp ON sp.user_id = c.seller_id
         LEFT JOIN reference.contract_statuses cs ON cs.id = c.contract_status_id
         WHERE c.buyer_id = p_user_id
@@ -121,7 +139,7 @@ BEGIN
             n.status,
             n.valid_until AS "validUntil",
             n.created_at AS "createdAt"
-        FROM transaction.negotiations n
+        FROM "transaction".negotiations n
         LEFT JOIN master.products p ON p.id = n.product_id
         WHERE n.buyer_id = p_user_id
           AND n.status = 'ongoing'
@@ -148,7 +166,7 @@ END;
 $$;
 
 
-CREATE OR REPLACE PROCEDURE public.sp_get_seller_dashboard(
+CREATE OR REPLACE PROCEDURE util.sp_get_seller_dashboard(
     IN p_user_id BIGINT,
     OUT p_result VARCHAR,
     OUT p_data JSONB,
@@ -204,9 +222,9 @@ BEGIN
 
     SELECT COALESCE(SUM(o.subtotal), 0)
     INTO v_total_revenue
-    FROM transaction.orders o
-    INNER JOIN transaction.checkouts c ON c.id = o.checkout_id
-    LEFT JOIN transaction.payments p ON p.id = c.payment_id
+    FROM "transaction".orders o
+    INNER JOIN "transaction".checkouts c ON c.id = o.checkout_id
+    LEFT JOIN "transaction".payments p ON p.id = c.payment_id
     LEFT JOIN reference.payment_statuses ps ON ps.id = p.payment_status_id
     WHERE o.seller_id = p_user_id
       AND ps.code = 'paid';
@@ -220,13 +238,29 @@ BEGIN
             o.checkout_id AS "checkoutId",
             o.subtotal,
             o.created_at AS "createdAt"
-        FROM transaction.orders o
+        FROM "transaction".orders o
         WHERE o.seller_id = p_user_id
         ORDER BY o.created_at DESC
         LIMIT 5
     ) data_row;
 
-    v_notifications := '[]'::JSONB;
+    SELECT COALESCE(JSONB_AGG(TO_JSONB(data_row)), '[]'::JSONB)
+    INTO v_notifications
+    FROM (
+        SELECT
+            n.id,
+            n.title,
+            n.message,
+            n.type,
+            n.reference_type AS "referenceType",
+            n.reference_id AS "referenceId",
+            n.is_read AS "isRead",
+            n.created_at AS "createdAt"
+        FROM util.notifications n
+        WHERE n.user_id = p_user_id
+        ORDER BY n.created_at DESC
+        LIMIT 5
+    ) data_row;
 
     SELECT COALESCE(JSONB_AGG(TO_JSONB(data_row)), '[]'::JSONB)
     INTO v_active_contracts
@@ -243,7 +277,7 @@ BEGIN
             c.total_shipping AS "totalShipping",
             cs.code AS "contractStatus",
             c.created_at AS "createdAt"
-        FROM transaction.contracts c
+        FROM "transaction".contracts c
         LEFT JOIN master.users u ON u.id = c.buyer_id
         LEFT JOIN reference.contract_statuses cs ON cs.id = c.contract_status_id
         WHERE c.seller_id = p_user_id
@@ -270,7 +304,7 @@ END;
 $$;
 
 
-CREATE OR REPLACE PROCEDURE public.sp_get_admin_dashboard(
+CREATE OR REPLACE PROCEDURE util.sp_get_admin_dashboard(
     IN p_user_id BIGINT,
     OUT p_result VARCHAR,
     OUT p_data JSONB,
@@ -324,7 +358,7 @@ BEGIN
 
     SELECT COUNT(*)
     INTO v_active_partnerships
-    FROM transaction.contracts c
+    FROM "transaction".contracts c
     LEFT JOIN reference.contract_statuses cs ON cs.id = c.contract_status_id
     WHERE cs.code = 'active';
 
@@ -336,12 +370,12 @@ BEGIN
 
     SELECT COUNT(*)
     INTO v_total_checkout
-    FROM transaction.checkouts c;
+    FROM "transaction".checkouts c;
 
     SELECT COUNT(*)
     INTO v_success_checkout
-    FROM transaction.checkouts c
-    LEFT JOIN transaction.payments p ON p.id = c.payment_id
+    FROM "transaction".checkouts c
+    LEFT JOIN "transaction".payments p ON p.id = c.payment_id
     LEFT JOIN reference.payment_statuses ps ON ps.id = p.payment_status_id
     WHERE ps.code = 'paid';
 
@@ -358,7 +392,7 @@ BEGIN
             TO_CHAR(DATE_TRUNC('day', c.created_at), 'YYYY-MM-DD') AS date,
             COUNT(*) AS "totalTransactions",
             COALESCE(SUM(c.total_amount), 0) AS "totalAmount"
-        FROM transaction.checkouts c
+        FROM "transaction".checkouts c
         WHERE c.created_at >= NOW() - INTERVAL '30 days'
         GROUP BY DATE_TRUNC('day', c.created_at)
         ORDER BY DATE_TRUNC('day', c.created_at)
@@ -387,7 +421,7 @@ BEGIN
             pc.name AS "categoryName",
             COUNT(*) AS "totalOrders",
             COALESCE(SUM(oi.subtotal), 0) AS "totalRevenue"
-        FROM transaction.order_items oi
+        FROM "transaction".order_items oi
         INNER JOIN master.products p ON p.id = oi.product_id
         INNER JOIN reference.product_categories pc ON pc.id = p.category_id
         GROUP BY pc.id, pc.name
@@ -403,7 +437,7 @@ BEGIN
             sp.farm_name AS "sellerName",
             COUNT(*) AS "totalOrders",
             COALESCE(SUM(o.subtotal), 0) AS "totalRevenue"
-        FROM transaction.orders o
+        FROM "transaction".orders o
         LEFT JOIN master.seller_profiles sp ON sp.user_id = o.seller_id
         GROUP BY o.seller_id, sp.farm_name
         ORDER BY COALESCE(SUM(o.subtotal), 0) DESC

@@ -3,10 +3,15 @@ import { dashboardService } from '../services';
 export const dashboardController = (app: any) =>
     app
         .get('/buyer', async ({ session, set }: any) => {
-            const userId = Number(session.get('userId'));
+            const userId = session.get('userId');
+
             if (!userId) {
                 set.status = 401;
-                return { success: false, message: 'Belum login', errorCode: 'ERR-LOG-01' };
+                return {
+                    success: false,
+                    message: 'Belum login',
+                    errorCode: 'ERR-LOG-01',
+                };
             }
 
             if (session.get('role') !== 'buyer') {
@@ -18,24 +23,33 @@ export const dashboardController = (app: any) =>
                 };
             }
 
-            const result = await dashboardService.getBuyerDashboard(userId);
+            const result = await dashboardService.getBuyerDashboard(Number(userId));
+
             if (result.error) {
                 set.status = result.status || 400;
                 return {
                     success: false,
                     message: result.error,
-                    errorCode: result.errorCode,
+                    ...(result.errorCode ? { errorCode: result.errorCode } : {}),
                 };
             }
 
-            return { success: true, data: result.data };
+            return {
+                success: true,
+                data: result.data,
+            };
         })
 
         .get('/seller', async ({ session, set }: any) => {
-            const userId = Number(session.get('userId'));
+            const userId = session.get('userId');
+
             if (!userId) {
                 set.status = 401;
-                return { success: false, message: 'Belum login', errorCode: 'ERR-LOG-01' };
+                return {
+                    success: false,
+                    message: 'Belum login',
+                    errorCode: 'ERR-LOG-01',
+                };
             }
 
             if (session.get('role') !== 'seller') {
@@ -47,24 +61,33 @@ export const dashboardController = (app: any) =>
                 };
             }
 
-            const result = await dashboardService.getSellerDashboard(userId);
+            const result = await dashboardService.getSellerDashboard(Number(userId));
+
             if (result.error) {
                 set.status = result.status || 400;
                 return {
                     success: false,
                     message: result.error,
-                    errorCode: result.errorCode,
+                    ...(result.errorCode ? { errorCode: result.errorCode } : {}),
                 };
             }
 
-            return { success: true, data: result.data };
+            return {
+                success: true,
+                data: result.data,
+            };
         })
 
         .get('/admin', async ({ session, set }: any) => {
-            const userId = Number(session.get('userId'));
+            const userId = session.get('userId');
+
             if (!userId) {
                 set.status = 401;
-                return { success: false, message: 'Belum login', errorCode: 'ERR-LOG-01' };
+                return {
+                    success: false,
+                    message: 'Belum login',
+                    errorCode: 'ERR-LOG-01',
+                };
             }
 
             if (session.get('role') !== 'admin') {
@@ -76,15 +99,19 @@ export const dashboardController = (app: any) =>
                 };
             }
 
-            const result = await dashboardService.getAdminDashboard(userId);
+            const result = await dashboardService.getAdminDashboard(Number(userId));
+
             if (result.error) {
                 set.status = result.status || 400;
                 return {
                     success: false,
                     message: result.error,
-                    errorCode: result.errorCode,
+                    ...(result.errorCode ? { errorCode: result.errorCode } : {}),
                 };
             }
 
-            return { success: true, data: result.data };
+            return {
+                success: true,
+                data: result.data,
+            };
         });

@@ -15,15 +15,25 @@ function getStatusFromProcedureResult(result: string) {
     return 400;
 }
 
-function handleProcedureResult(result: DashboardProcedureResult) {
+function handleProcedureResult(result: DashboardProcedureResult | null | undefined) {
+    if (!result) {
+        return {
+            error: 'Gagal mengambil data dashboard',
+            status: 500,
+            errorCode: 'ERR-DASH-01',
+        };
+    }
+
     if (result.result === 'SUCCESS') {
-        return { data: result.data };
+        return {
+            data: result.data,
+        };
     }
 
     return {
         error: result.message || 'Gagal mengambil data dashboard',
         status: getStatusFromProcedureResult(result.result),
-        errorCode: result.result,
+        errorCode: result.result || 'ERR-DASH-01',
     };
 }
 
@@ -33,6 +43,7 @@ export async function getBuyerDashboard(userId: number) {
         return handleProcedureResult(result);
     } catch (error) {
         console.error('[dashboardService.getBuyerDashboard]', error);
+
         return {
             error: 'Gagal mengambil data dashboard pembeli',
             status: 500,
@@ -47,6 +58,7 @@ export async function getSellerDashboard(userId: number) {
         return handleProcedureResult(result);
     } catch (error) {
         console.error('[dashboardService.getSellerDashboard]', error);
+
         return {
             error: 'Gagal mengambil data dashboard penjual',
             status: 500,
@@ -61,6 +73,7 @@ export async function getAdminDashboard(userId: number) {
         return handleProcedureResult(result);
     } catch (error) {
         console.error('[dashboardService.getAdminDashboard]', error);
+
         return {
             error: 'Gagal mengambil data dashboard admin',
             status: 500,
