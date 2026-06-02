@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { checkoutRepo } from '../repositories';
-import type { CheckoutInput, CheckoutResponse } from '../dtos/checkout';
+import type { CheckoutInput, CheckoutResponse, CheckoutItemDetail } from '../dtos/checkout';
 
 type ServiceResult<T> = { data?: T; error?: string; status?: number; errorCode?: string };
 
@@ -106,7 +106,16 @@ export async function checkout(userId: number, body: CheckoutInput): Promise<Ser
         await checkoutRepo.updateCheckoutPaymentId(tx, checkoutRec.id, payment.id);
         await checkoutRepo.clearCartItems(tx, userId);
 
-        return { checkoutId: checkoutRec.id, totalAmount: String(totalAmount), orderCount };
+        const itemDetails: CheckoutItemDetail[] = items.map((item) => ({
+            productId: item.productId,
+            productName: item.productName || 'Unknown',
+            quantity: Number(item.quantity),
+            unitName: item.unitName || '',
+            pricePerUnit: String(item.pricePerUnit),
+            subtotal: String(Number(item.quantity) * Number(item.pricePerUnit)),
+        }));
+
+        return { checkoutId: checkoutRec.id, totalAmount: String(totalAmount), orderCount, items: itemDetails };
     });
 
     return { data: result };
