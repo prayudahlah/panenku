@@ -106,7 +106,7 @@ export async function getCatalogBySellerPublic(
         maxPrice?: number;
         isNegotiable?: boolean;
         sortBy?: string;
-        isAscending?: boolean;
+        sortOrder?: string;
         page?: number;
         limit?: number;
     }
