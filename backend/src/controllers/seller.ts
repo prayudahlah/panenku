@@ -76,9 +76,7 @@ export const sellerController = (app: any) =>
                 maxPrice: query.maxPrice ? Number(query.maxPrice) : undefined,
                 isNegotiable: query.isNegotiable !== undefined ? query.isNegotiable === 'true' : undefined,
                 sortBy: query.sortBy || query.sort_by,
-                isAscending: query.isAscending !== undefined
-                    ? query.isAscending === 'true'
-                    : (query.sort_order === 'asc'),
+                sortOrder: query.sortOrder || query.sort_order || (query.isAscending === 'true' ? 'asc' : undefined),
                 page: query.page ? Number(query.page) : 1,
                 limit: query.limit ? Number(query.limit) : 12,
             });
