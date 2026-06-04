@@ -115,8 +115,9 @@ export async function clearCartItems(tx: DBLike, userId: number) {
     }
 }
 
-export async function findCheckoutById(id: number) {
-    const result = await db
+export async function findCheckoutById(id: number, tx?: DBLike) {
+    const conn = tx || db;
+    const result = await conn
         .select({
             id: checkouts.id,
             buyerId: checkouts.buyerId,
@@ -176,6 +177,7 @@ export async function findOrderWithShipment(orderId: number) {
             cityId: shipments.cityId,
             shippingAddress: shipments.shippingAddress,
             checkoutStatusId: checkouts.checkoutStatusId,
+            buyerId: checkouts.buyerId,
         })
         .from(orders)
         .innerJoin(shipments, eq(orders.shipmentId, shipments.id))
@@ -183,6 +185,13 @@ export async function findOrderWithShipment(orderId: number) {
         .where(eq(orders.id, orderId))
         .limit(1);
     return result[0] || null;
+}
+
+export async function findSellersByCheckoutId(checkoutId: number) {
+    return await db
+        .select({ sellerId: orders.sellerId })
+        .from(orders)
+        .where(eq(orders.checkoutId, checkoutId));
 }
 
 export async function createShipmentPickedUp(tx: DBLike, data: {
@@ -221,4 +230,48 @@ export async function findOrderItemsByCheckout(tx: DBLike, checkoutId: number) {
         .from(orderItems)
         .innerJoin(orders, eq(orderItems.orderId, orders.id))
         .where(eq(orders.checkoutId, checkoutId));
+}
+
+export async function findOrderItemsByOrderId(tx: DBLike, orderId: number) {
+    return await tx
+        .select({
+            productId: orderItems.productId,
+            quantity: orderItems.quantity,
+            pricePerUnit: orderItems.pricePerUnit,
+            subtotal: orderItems.subtotal,
+        })
+        .from(orderItems)
+        .where(eq(orderItems.orderId, orderId));
+}
+
+export async function updateCheckoutTotal(tx: DBLike, checkoutId: number, totalAmount: string) {
+    await tx.update(checkouts).set({ totalAmount }).where(eq(checkouts.id, checkoutId));
+}
+
+export async function findPaymentByCheckoutId(checkoutId: number) {
+    const result = await db
+        .select({ paymentId: checkouts.paymentId })
+        .from(checkouts)
+        .where(eq(checkouts.id, checkoutId))
+        .limit(1);
+    return result[0] || null;
+}
+
+export async function findProductForCheckout(productId: number) {
+    const result = await db
+        .select({
+            productId: products.id,
+            productName: products.name,
+            sellerId: products.sellerId,
+            pricePerUnit: products.pricePerUnit,
+            stockQuantity: products.stockQuantity,
+            productDeletedAt: products.deletedAt,
+            sellerStatus: sellerProfiles.status,
+            unitId: products.unitId,
+        })
+        .from(products)
+        .leftJoin(sellerProfiles, eq(products.sellerId, sellerProfiles.userId))
+        .where(eq(products.id, productId))
+        .limit(1);
+    return result[0] || null;
 }
