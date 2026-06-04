@@ -2,10 +2,10 @@ import { dashboardService } from '../services';
 
 export const dashboardController = (app: any) =>
     app
-        .get('/buyer', async ({ session, set }: any) => {
-            const userId = session.get('userId');
+        .get('/buyer', async ({ session, set, query }: any) => {
+            const sessionUserId = session.get('userId');
 
-            if (!userId) {
+            if (!sessionUserId) {
                 set.status = 401;
                 return {
                     success: false,
@@ -14,16 +14,18 @@ export const dashboardController = (app: any) =>
                 };
             }
 
-            if (session.get('role') !== 'buyer') {
+            const role = session.get('role');
+            if (!['buyer', 'admin', 'super_admin'].includes(role)) {
                 set.status = 403;
                 return {
                     success: false,
-                    message: 'Hanya pembeli yang dapat mengakses dashboard pembeli',
+                    message: 'Hanya pembeli dan admin yang dapat mengakses dashboard pembeli',
                     errorCode: 'ERR-DASH-02',
                 };
             }
 
-            const result = await dashboardService.getBuyerDashboard(Number(userId));
+            const targetUserId = ['admin', 'super_admin'].includes(role) && query.userId ? Number(query.userId) : Number(sessionUserId);
+            const result = await dashboardService.getBuyerDashboard(targetUserId);
 
             if (result.error) {
                 set.status = result.status || 400;
@@ -40,10 +42,10 @@ export const dashboardController = (app: any) =>
             };
         })
 
-        .get('/seller', async ({ session, set }: any) => {
-            const userId = session.get('userId');
+        .get('/seller', async ({ session, set, query }: any) => {
+            const sessionUserId = session.get('userId');
 
-            if (!userId) {
+            if (!sessionUserId) {
                 set.status = 401;
                 return {
                     success: false,
@@ -52,16 +54,18 @@ export const dashboardController = (app: any) =>
                 };
             }
 
-            if (session.get('role') !== 'seller') {
+            const role = session.get('role');
+            if (!['seller', 'admin', 'super_admin'].includes(role)) {
                 set.status = 403;
                 return {
                     success: false,
-                    message: 'Hanya penjual yang dapat mengakses dashboard penjual',
+                    message: 'Hanya penjual dan admin yang dapat mengakses dashboard penjual',
                     errorCode: 'ERR-DASH-02',
                 };
             }
 
-            const result = await dashboardService.getSellerDashboard(Number(userId));
+            const targetUserId = ['admin', 'super_admin'].includes(role) && query.userId ? Number(query.userId) : Number(sessionUserId);
+            const result = await dashboardService.getSellerDashboard(targetUserId);
 
             if (result.error) {
                 set.status = result.status || 400;
@@ -90,7 +94,7 @@ export const dashboardController = (app: any) =>
                 };
             }
 
-            if (session.get('role') !== 'admin') {
+            if (!['admin', 'super_admin'].includes(session.get('role'))) {
                 set.status = 403;
                 return {
                     success: false,

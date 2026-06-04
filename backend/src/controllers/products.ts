@@ -40,16 +40,18 @@ export const productsController = (app: any) =>
                 limit: query.limit ? Number(query.limit) : 12,
             });
 
+            if (result.error) return serviceError(result, set);
+
             const response: any = {
                 success: true,
-                data: result.rows,
+                data: result.data.rows,
                 meta: {
-                    total: result.total,
-                    page: result.page,
-                    limit: result.limit,
+                    total: result.data.total,
+                    page: result.data.page,
+                    limit: result.data.limit,
                 },
             };
-            if (result.rows.length === 0) {
+            if (result.data.rows.length === 0) {
                 response.message = "Tidak ada produk ditemukan"; // AF-1
             }
             return response;
