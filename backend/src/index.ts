@@ -1,4 +1,4 @@
-import { Elysia } from 'elysia';
+import { Elysia, ValidationError } from 'elysia';
 import { swagger } from '@elysiajs/swagger';
 import { cors } from '@elysiajs/cors';
 import { betterSession } from 'elysia-better-session';
@@ -20,6 +20,60 @@ import {
 
 const app = new Elysia()
     .onError(({ code, error, set }) => {
+        if (code === 'VALIDATION' && error instanceof ValidationError) {
+            const valueErrors = error.all ?? [];
+            const firstPath = valueErrors[0]?.path?.replace(/^\//, '') || '';
+
+            const FIELD_MESSAGES: Record<string, string> = {
+                email: 'Format email tidak valid',
+                password: 'Password harus minimal 8 karakter, mengandung huruf besar dan angka',
+                confirm_password: 'Konfirmasi password harus minimal 8 karakter',
+                full_name: 'Nama lengkap harus 4–100 karakter dan hanya huruf',
+                phone: 'Nomor telepon harus 10–13 digit (awalan 0 atau +62)',
+                shippingAddress: 'Alamat pengiriman harus minimal 5 karakter',
+                farmName: 'Nama kebun harus minimal 5 karakter',
+                address: 'Alamat harus minimal 5 karakter',
+                landCertificate: 'Surat tanah wajib diisi',
+                productName: 'Nama produk harus minimal 3 karakter',
+                quantity: 'Kuantitas minimal 1',
+                priceOffer: 'Harga penawaran minimal 1',
+            };
+
+            const FIELD_ERROR_MAP: Record<string, string> = {
+                email: 'ERR-REG-03',
+                password: 'ERR-REG-02',
+                full_name: 'ERR-REG-04',
+                phone: 'ERR-REG-04',
+                confirm_password: 'ERR-REG-04',
+                shippingAddress: 'ERR-CHECKOUT-03',
+            };
+
+            const errorCode = FIELD_ERROR_MAP[firstPath];
+            const message = FIELD_MESSAGES[firstPath] || valueErrors[0]?.message || 'Validasi gagal';
+
+            set.status = 422;
+            return {
+                success: false,
+                message,
+                ...(errorCode && { errorCode }),
+            };
+        }
+
+        const err: any = error;
+        const errorMsg = typeof err === 'string' ? err : err?.message || '';
+        const isTimeout =
+            errorMsg.toLowerCase().includes('timeout') ||
+            errorMsg.toLowerCase().includes('timed out') ||
+            errorMsg.toLowerCase().includes('connection lost') ||
+            err?.code === 'ETIMEDOUT' ||
+            err?.code === 'ECONNRESET';
+
+        if (isTimeout) {
+            console.error(`[${code}] Timeout detected:`, errorMsg);
+            set.status = 503;
+            return { success: false, message: 'Waktu koneksi habis. Silakan coba lagi.', errorCode: 'ERR-TIMEOUT-01' };
+        }
+
         console.error(`[${code}]`, error);
         set.status = 503;
         return { success: false, message: 'Layanan tidak tersedia. Silakan coba lagi.' };
