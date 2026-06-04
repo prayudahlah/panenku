@@ -56,3 +56,8 @@ export async function recordFailedAttempt(email: string, _userId: number | null,
 export async function clearFailedAttempts(email: string) {
     failedAttempts.delete(email);
 }
+
+export async function updatePassword(id: number, passwordHash: string) {
+    const result = await db.update(users).set({ passwordHash }).where(eq(users.id, id)).returning();
+    return result[0];
+}
