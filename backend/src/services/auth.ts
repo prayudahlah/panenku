@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { authRepo } from '../repositories';
 import { auditService } from '../services';
+import { sendResetEmail } from './email';
 import type { RegisterInput, LoginInput, UserResponse } from '../dtos/auth';
 
 const resetTokens = new Map<string, { email: string; expires: Date }>();
@@ -125,6 +126,12 @@ export async function forgotPassword(input: { email: string }): Promise<ServiceR
     resetTokens.set(token, { email: input.email, expires: new Date(Date.now() + 60 * 60 * 1000) });
 
     console.log(`[reset-password] Token for ${input.email}: ${token}`);
+
+    try {
+        await sendResetEmail(input.email, token);
+    } catch (err) {
+        console.error('[reset-password] Gagal kirim email:', err);
+    }
 
     await auditService.log({
         userId: user.id,
