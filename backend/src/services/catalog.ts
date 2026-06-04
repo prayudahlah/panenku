@@ -1,5 +1,6 @@
 import { catalogRepo, sellerRepo } from '../repositories';
 import type { ProductInput } from '../dtos/products';
+import { getTimeoutResult } from '../utils/withTimeout';
 
 type ServiceResult<T> = { data?: T; error?: string; code?: string; status?: number };
 
@@ -60,6 +61,11 @@ async function validateProductPayload(payload: ProductPayload, exceptProductId?:
         return { status: 422, code: 'ERR-PROD-04', error: 'Kategori wajib dipilih' };
     }
 
+    const category = await catalogRepo.findCategoryById(payload.categoryId);
+    if (!category) {
+        return { status: 422, code: 'ERR-PROD-04', error: 'Kategori tidak valid' };
+    }
+
     if (!payload.description) {
         return { status: 422, code: 'ERR-PROD-05', error: 'Deskripsi produk wajib diisi' };
     }
@@ -92,6 +98,11 @@ async function validateProductPayload(payload: ProductPayload, exceptProductId?:
         return { status: 422, code: 'ERR-PROD-11', error: 'Satuan produk wajib dipilih' };
     }
 
+    const unit = await catalogRepo.findUnitById(payload.unitId);
+    if (!unit) {
+        return { status: 422, code: 'ERR-PROD-11', error: 'Satuan produk tidak valid' };
+    }
+
     const isDuplicate = await catalogRepo.isProductNameUsedBySeller({
         sellerId: payload.sellerId,
         name: payload.name,
@@ -115,8 +126,16 @@ export const list = async (filters: {
     sortOrder?: string;
     page?: number;
     limit?: number;
-}) => {
-    return catalogRepo.list(filters);
+}): Promise<ServiceResult<any>> => {
+    try {
+        const data = await catalogRepo.list(filters);
+        return { data };
+    } catch (err: any) {
+        const timeout = getTimeoutResult(err, 'catalog.list');
+        if (timeout) return timeout;
+        console.error('[catalog.list]', err);
+        return { error: 'Terjadi kesalahan pada server', status: 500, code: 'ERR-CAT-02' };
+    }
 };
 
 export const listSellerCatalog = async (filters: {
@@ -212,7 +231,9 @@ export const deleteSellerProduct = async ({
 
         if (!data) return { status: 500, code: 'ERR-DEL-06', error: 'Gagal menghapus produk' };
         return { data };
-    } catch (error) {
+    } catch (err: any) {
+        const timeout = getTimeoutResult(err, 'catalog.deleteSellerProduct');
+        if (timeout) return timeout;
         return { status: 500, code: 'ERR-DEL-06', error: 'Terjadi kesalahan database saat soft delete' };
     }
 };

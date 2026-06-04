@@ -1,5 +1,6 @@
 import { authRepo, sellerRepo, catalogRepo } from '../repositories';
 import type { CreateSellerProfileInput } from '../dtos/seller';
+import { getTimeoutResult } from '../utils/withTimeout';
 
 type ServiceResult<T> = {
     data?: T;
@@ -12,7 +13,6 @@ const ERR = {
     CAT_01: 'ERR-CAT-01',
     CAT_02: 'ERR-CAT-02',
     CAT_03: 'ERR-CAT-03',
-    TIMEOUT: 'ERR-TIMEOUT-01',
 } as const;
 
 export async function register(
@@ -25,6 +25,14 @@ export async function register(
     if (!user) return { error: 'User tidak ditemukan', status: 404 };
     if (user.role !== 'buyer')
         return { error: 'Hanya buyer yang bisa daftar jadi penjual', status: 403 };
+
+    if (!input.farmName || !input.cityId || !input.provinceId || !input.landCertificate) {
+        return { error: 'Field wajib (provinsi, kota, alamat, nama_kebun, surat_tanah) belum diisi', status: 422, code: 'ERR-SELL-04' };
+    }
+    if (!input.address || input.address.trim().length < 5) {
+        return { error: 'Alamat tidak valid', status: 422, code: 'ERR-SELL-02' };
+    }
+
     await sellerRepo.create({
         userId,
         farmName: input.farmName,
@@ -58,8 +66,10 @@ export async function getPublicProfile(userId: number): Promise<ServiceResult<an
     let profile;
     try {
         profile = await sellerRepo.getPublicProfileByUserId(userId);
-    } catch (error) {
-        console.error(error);
+    } catch (err: any) {
+        const timeout = getTimeoutResult(err, 'seller.getPublicProfile');
+        if (timeout) return { ...timeout, code: 'ERR-TIMEOUT-01' };
+        console.error(err);
         return { error: 'Terjadi kesalahan pada server', code: ERR.CAT_02, status: 500 };
     }
     if (!profile) {
@@ -69,13 +79,15 @@ export async function getPublicProfile(userId: number): Promise<ServiceResult<an
         return { error: 'Penjual ini ditangguhkan', code: ERR.CAT_03, status: 403 };
     }
     if (profile.status !== 'active') {
-        return { error: 'Penjual ini tidak aktif', code: ERR.CAT_01, status: 403 };
+        return { error: 'Penjual ini tidak aktif', code: ERR.CAT_01, status: 404 };
     }
     let activeProductCount;
     try {
         activeProductCount = await sellerRepo.countActiveProductsByUserId(userId);
-    } catch (error) {
-        console.error(error);
+    } catch (err: any) {
+        const timeout = getTimeoutResult(err, 'seller.getPublicProfile');
+        if (timeout) return { ...timeout, code: 'ERR-TIMEOUT-01' };
+        console.error(err);
         return { error: 'Terjadi kesalahan pada server', code: ERR.CAT_02, status: 500 };
     }
     return {
@@ -114,8 +126,10 @@ export async function getCatalogBySellerPublic(
     let profile;
     try {
         profile = await sellerRepo.getPublicProfileByUserId(userId);
-    } catch (error) {
-        console.error(error);
+    } catch (err: any) {
+        const timeout = getTimeoutResult(err, 'seller.getCatalogBySellerPublic');
+        if (timeout) return { ...timeout, code: 'ERR-TIMEOUT-01' };
+        console.error(err);
         return { error: 'Terjadi kesalahan pada server', code: ERR.CAT_02, status: 500 };
     }
     if (!profile) {
@@ -125,13 +139,15 @@ export async function getCatalogBySellerPublic(
         return { error: 'Penjual ini ditangguhkan', code: ERR.CAT_03, status: 403 };
     }
     if (profile.status !== 'active') {
-        return { error: 'Penjual ini tidak aktif', code: ERR.CAT_01, status: 403 };
+        return { error: 'Penjual ini tidak aktif', code: ERR.CAT_01, status: 404 };
     }
     let catalogData;
     try {
         catalogData = await catalogRepo.listBySeller({ sellerId: userId, ...filters });
-    } catch (error) {
-        console.error(error);
+    } catch (err: any) {
+        const timeout = getTimeoutResult(err, 'seller.getCatalogBySellerPublic');
+        if (timeout) return { ...timeout, code: 'ERR-TIMEOUT-01' };
+        console.error(err);
         return { error: 'Terjadi kesalahan pada server', code: ERR.CAT_02, status: 500 };
     }
     const message = catalogData.rows.length === 0 ? 'Penjual belum memiliki produk' : undefined;

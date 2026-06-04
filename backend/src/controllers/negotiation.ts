@@ -10,7 +10,7 @@ export const negotiationController = (app: any) =>
             const result = await negotiationService.list(userId, session.get('role'));
             if (result.error) {
                 set.status = result.status || 400;
-                return { success: false, message: result.error };
+                return { success: false, message: result.error, ...(result.errorCode ? { errorCode: result.errorCode } : {}) };
             }
             return { success: true, data: result.data };
         })
@@ -22,7 +22,7 @@ export const negotiationController = (app: any) =>
             const result = await negotiationService.getDetail(Number(id), userId, session.get('role'));
             if (result.error) {
                 set.status = result.status || 400;
-                return { success: false, message: result.error };
+                return { success: false, message: result.error, ...(result.errorCode ? { errorCode: result.errorCode } : {}) };
             }
             return { success: true, data: result.data };
         })
@@ -35,7 +35,7 @@ export const negotiationController = (app: any) =>
             const result = await negotiationService.initiate(userId, body);
             if (result.error) {
                 set.status = result.status || 400;
-                return { success: false, message: result.error };
+                return { success: false, message: result.error, ...(result.errorCode ? { errorCode: result.errorCode } : {}) };
             }
             return { success: true, data: result.data };
         }, { body: CreateNegotiationRequest })
@@ -48,7 +48,7 @@ export const negotiationController = (app: any) =>
             const result = await negotiationService.sellerRespond(userId, Number(id), body);
             if (result.error) {
                 set.status = result.status || 400;
-                return { success: false, message: result.error };
+                return { success: false, message: result.error, ...(result.errorCode ? { errorCode: result.errorCode } : {}) };
             }
             return { success: true, data: result.data };
         }, { body: SellerRespondRequest })
@@ -61,7 +61,7 @@ export const negotiationController = (app: any) =>
             const result = await negotiationService.buyerRespond(userId, Number(id), body);
             if (result.error) {
                 set.status = result.status || 400;
-                return { success: false, message: result.error };
+                return { success: false, message: result.error, ...(result.errorCode ? { errorCode: result.errorCode } : {}) };
             }
             return { success: true, data: result.data };
         }, { body: BuyerRespondRequest });
