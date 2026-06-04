@@ -135,7 +135,7 @@ export default function LocationPicker({ provinces, cities, onConfirm, height = 
                     </span>
                 )}
             </div>
-            <p className="text-xs text-gray-400">Klik peta untuk menandai lokasi, seret pin untuk menyesuaikan</p>
+            <p className="text-xs text-gray-400"><i>Klik peta untuk menandai lokasi, seret pin untuk menyesuaikan</i></p>
 
             {location && match && (
                 <div className="border border-gray-200 rounded-lg p-3 space-y-2 bg-white">
