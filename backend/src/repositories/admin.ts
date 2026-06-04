@@ -66,3 +66,8 @@ export async function findById(id: number) {
     const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
     return result[0] || null;
 }
+
+export async function deleteUser(id: number) {
+    const result = await db.delete(users).where(eq(users.id, id)).returning();
+    return result[0];
+}
