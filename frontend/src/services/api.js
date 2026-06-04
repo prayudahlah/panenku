@@ -56,6 +56,7 @@ export const audit = {
 
 export const products = {
   list: (params) => fetchApi(`/products?${new URLSearchParams(params)}`),
+  getById: (id) => fetchApi(`/products/${id}`),
 };
 
 export const panenApi = {
@@ -84,4 +85,18 @@ export const negotiations = {
   getById: (id) => fetchApi(`/negotiations/${id}`),
   sellerRespond: (id, data) => fetchApi(`/negotiations/${id}/seller`, { method: 'PATCH', body: JSON.stringify(data) }),
   buyerRespond: (id, data) => fetchApi(`/negotiations/${id}/buyer`, { method: 'PATCH', body: JSON.stringify(data) }),
+};
+
+export const cart = {
+  addItem: (data) => fetchApi('/cart/items', { method: 'POST', body: JSON.stringify(data) }),
+  view: () => fetchApi('/cart/items'),
+  updateItem: (id, data) => fetchApi(`/cart/items/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  removeItem: (id) => fetchApi(`/cart/items/${id}`, { method: 'DELETE' }),
+};
+
+export const checkout = {
+  direct: (data) => fetchApi('/checkouts/direct', { method: 'POST', body: JSON.stringify(data) }),
+  create: (data) => fetchApi('/checkouts', { method: 'POST', body: JSON.stringify(data) }),
+  pay: (id) => fetchApi(`/checkouts/${id}/pay`, { method: 'POST' }),
+  cancel: (id) => fetchApi(`/checkouts/${id}/cancel`, { method: 'POST' }),
 };
