@@ -1,15 +1,12 @@
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, User, Phone, ArrowLeft, Sprout, ShieldCheck, TrendingUp } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Lock, Eye, EyeOff, ArrowLeft, Sprout, ShieldCheck, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { fetchApi } from '../services/api';
 
-const registerSchema = z.object({
-    full_name: z.string().min(4, 'Nama lengkap minimal 4 karakter').max(100, 'Nama lengkap maksimal 100 karakter').regex(/^[A-Za-z\s]+$/, 'Nama lengkap hanya huruf dan spasi'),
-    email: z.email({ message: 'Email tidak valid' }),
-    phone: z.string().min(10, 'Nomor telepon minimal 10 digit').max(13, 'Nomor telepon maksimal 13 digit'),
+const resetSchema = z.object({
     password: z.string().min(8, 'Kata sandi minimal 8 karakter').regex(/[A-Z]/, 'Kata sandi harus mengandung huruf besar').regex(/\d/, 'Kata sandi harus mengandung angka'),
     confirm_password: z.string().min(1, 'Konfirmasi kata sandi wajib diisi'),
 }).refine((data) => data.password === data.confirm_password, {
@@ -17,32 +14,49 @@ const registerSchema = z.object({
     path: ['confirm_password'],
 });
 
-const Register = () => {
-    const { register: doRegister } = useAuth();
+const ResetPassword = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const token = searchParams.get('token');
+
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [apiError, setApiError] = useState('');
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
-        resolver: zodResolver(registerSchema)
+        resolver: zodResolver(resetSchema),
     });
 
     const onSubmit = async (data) => {
         setApiError('');
-        const json = await doRegister(data);
-        if (json.success) navigate('/');
-        else setApiError(json.message || 'Registrasi gagal');
+        const json = await fetchApi('/auth/reset-password', {
+            method: 'POST',
+            body: JSON.stringify({ token, password: data.password, confirm_password: data.confirm_password }),
+        });
+        if (json.success) navigate('/login');
+        else setApiError(json.message || 'Gagal mereset password');
     };
 
     const inputClass = (error) =>
         `w-full pl-10 pr-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-green transition ${error ? 'border-red-500' : 'border-gray-300'
         }`;
 
+    if (!token) {
+        return (
+            <div className="min-h-screen bg-neutral-stone flex items-center justify-center">
+                <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full mx-4 text-center">
+                    <h2 className="text-xl font-bold mb-2">Token tidak ditemukan</h2>
+                    <p className="text-gray-500 text-sm mb-4">Link reset password tidak valid.</p>
+                    <Link to="/forgot-password" className="text-primary-green font-medium hover:underline">Minta link baru</Link>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-neutral-stone flex items-center justify-center relative">
             <Link
-                to="/"
+                to="/login"
                 className="fixed top-6 left-6 flex items-center gap-1 text-sm text-gray-600 hover:text-primary-green transition font-medium"
             >
                 <ArrowLeft size={16} />
@@ -55,43 +69,25 @@ const Register = () => {
                         <h1 className="text-3xl font-bold mb-3">Panenku</h1>
                         <p className="text-base text-white/80">Platform tempat jual beli hasil panen langsung dari petani.</p>
                     </div>
-
                     <div className="mt-10 flex gap-2 text-sm font-medium">
-                        <div className='p-3 rounded-lg flex items-center justify-center'>
-                            <Sprout size={20} />
-                        </div>
-                        <div>
-                            <h3 className='text-white/90'>Langsung Dari Petani</h3>
-                            <p className='text-white/80'>Rasakan kesegaran hasil panen langsung dari petani.</p>
-                        </div>
+                        <div className='p-3 rounded-lg flex items-center justify-center'><Sprout size={20} /></div>
+                        <div><h3 className='text-white/90'>Langsung Dari Petani</h3><p className='text-white/80'>Rasakan kesegaran hasil panen langsung dari petani.</p></div>
                     </div>
-
                     <div className="mt-8 flex gap-2 text-sm font-medium">
-                        <div className='p-3 rounded-lg flex items-center justify-center'>
-                            <ShieldCheck size={20} />
-                        </div>
-                        <div>
-                            <h3 className='text-white/90'>Terpercaya & Transparan</h3>
-                            <p className='text-white/80'>Sistem yang transparan dari panen hingga pengiriman.</p>
-                        </div>
+                        <div className='p-3 rounded-lg flex items-center justify-center'><ShieldCheck size={20} /></div>
+                        <div><h3 className='text-white/90'>Terpercaya & Transparan</h3><p className='text-white/80'>Sistem yang transparan dari panen hingga pengiriman.</p></div>
                     </div>
-
                     <div className="mt-8 flex gap-2 text-sm font-medium">
-                        <div className='p-3 rounded-lg flex items-center justify-center'>
-                            <TrendingUp size={20} />
-                        </div>
-                        <div>
-                            <h3 className='text-white/90'>Harga Terbaik</h3>
-                            <p className='text-white/80'>Dapatkan harga pasar yang kompetitif dan adil.</p>
-                        </div>
+                        <div className='p-3 rounded-lg flex items-center justify-center'><TrendingUp size={20} /></div>
+                        <div><h3 className='text-white/90'>Harga Terbaik</h3><p className='text-white/80'>Dapatkan harga pasar yang kompetitif dan adil.</p></div>
                     </div>
                 </div>
 
                 <div className="w-full lg:w-3/5 bg-white p-8 flex items-center justify-center py-16">
                     <div className="w-full max-w-sm space-y-6">
                         <div className="space-y-1">
-                            <h2 className="text-2xl font-bold">Daftar</h2>
-                            <p className="text-gray-500 text-sm">Buat akun baru untuk memulai</p>
+                            <h2 className="text-2xl font-bold">Reset Password</h2>
+                            <p className="text-gray-500 text-sm">Masukkan kata sandi baru</p>
                         </div>
 
                         {apiError && (
@@ -102,34 +98,7 @@ const Register = () => {
 
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                             <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-gray-700">Nama Lengkap</label>
-                                <div className="relative">
-                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                    <input {...register('full_name')} type="text" placeholder="Nama lengkap" className={inputClass(errors.full_name)} />
-                                </div>
-                                {errors.full_name && <p className="text-red-500 text-xs">{errors.full_name.message}</p>}
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-gray-700">Email</label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                    <input {...register('email')} type="email" placeholder="contoh@email.com" className={inputClass(errors.email)} />
-                                </div>
-                                {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-gray-700">Nomor Telepon</label>
-                                <div className="relative">
-                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                    <input {...register('phone')} type="tel" placeholder="08xxxxxxxxxx" className={inputClass(errors.phone)} />
-                                </div>
-                                {errors.phone && <p className="text-red-500 text-xs">{errors.phone.message}</p>}
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-gray-700">Kata Sandi</label>
+                                <label className="text-sm font-medium text-gray-700">Kata Sandi Baru</label>
                                 <div className="relative">
                                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                     <input
@@ -167,15 +136,12 @@ const Register = () => {
                                 disabled={isSubmitting}
                                 className="w-full py-2.5 bg-primary-green text-white rounded-lg font-medium hover:bg-primary-green-800 transition disabled:opacity-50"
                             >
-                                {isSubmitting ? 'Memproses...' : 'Daftar'}
+                                {isSubmitting ? 'Memproses...' : 'Reset Password'}
                             </button>
                         </form>
 
                         <p className="text-center text-sm text-gray-500">
-                            Sudah punya akun?{' '}
-                            <Link to="/login" className="text-primary-green font-medium hover:underline">
-                                Masuk
-                            </Link>
+                            <Link to="/login" className="text-primary-green font-medium hover:underline">Kembali ke login</Link>
                         </p>
                     </div>
                 </div>
@@ -184,4 +150,4 @@ const Register = () => {
     );
 };
 
-export default Register;
+export default ResetPassword;

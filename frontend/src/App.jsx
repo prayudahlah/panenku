@@ -8,6 +8,8 @@ import RoleGuard from './components/RoleGuard';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import SellerSetup from './pages/SellerSetup';
 import Transactions from './pages/Transactions';
 import Cart from './pages/Cart';
@@ -61,6 +63,8 @@ const App = () => {
                     </Route>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
                 </Routes>
             </BrowserRouter>
             </NotificationProvider>
