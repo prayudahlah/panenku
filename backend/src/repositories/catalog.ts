@@ -7,6 +7,8 @@ import {
     orderItems,
     orderItemStatuses,
     auditLogs,
+    cities,
+    provinces,
 } from '../db/schema';
 import { and, eq, count, sql, desc, asc, isNull, ilike, inArray, ne, or, type SQL } from 'drizzle-orm';
 
@@ -422,6 +424,39 @@ export async function findActiveProductById(productId: number) {
     const result = await db
         .select()
         .from(products)
+        .where(and(eq(products.id, productId), isNull(products.deletedAt)))
+        .limit(1);
+
+    return result[0] || null;
+}
+
+export async function findProductDetailById(productId: number) {
+    const result = await db
+        .select({
+            id: products.id,
+            name: products.name,
+            description: products.description,
+            pricePerUnit: products.pricePerUnit,
+            unitId: products.unitId,
+            unitName: units.name,
+            minOrderQty: products.minOrderQty,
+            stockQuantity: products.stockQuantity,
+            isNegotiable: products.isNegotiable,
+            categoryId: products.categoryId,
+            categoryName: productCategories.name,
+            sellerId: products.sellerId,
+            farmName: sellerProfiles.farmName,
+            address: sellerProfiles.address,
+            cityName: cities.name,
+            provinceName: provinces.name,
+            createdAt: products.createdAt,
+        })
+        .from(products)
+        .innerJoin(productCategories, eq(products.categoryId, productCategories.id))
+        .innerJoin(units, eq(products.unitId, units.id))
+        .innerJoin(sellerProfiles, eq(products.sellerId, sellerProfiles.userId))
+        .leftJoin(cities, eq(sellerProfiles.cityId, cities.id))
+        .leftJoin(provinces, eq(sellerProfiles.provinceId, provinces.id))
         .where(and(eq(products.id, productId), isNull(products.deletedAt)))
         .limit(1);
 
