@@ -1,4 +1,4 @@
-import { RegisterRequest, LoginRequest } from '../dtos/auth';
+import { RegisterRequest, LoginRequest, ForgotPasswordRequest, ResetPasswordRequest } from '../dtos/auth';
 import { authService } from '../services';
 
 export const authController = (app: any) =>
@@ -38,7 +38,11 @@ export const authController = (app: any) =>
                 set.status = 401;
                 return { success: false, message: 'Belum login', errorCode: 'ERR-LOGOUT-01' };
             }
-            session.destroy();
+            try {
+                session.destroy();
+            } catch (error) {
+                console.error('[logout] Gagal menghapus sesi:', error);
+            }
             return { success: true, message: 'Logout berhasil' };
         })
 
@@ -56,4 +60,22 @@ export const authController = (app: any) =>
             }
 
             return { success: true, data: result.data };
-        });
+        })
+
+        .post('/forgot-password', async ({ body, set }: any) => {
+            const result = await authService.forgotPassword(body);
+            if (result.error) {
+                set.status = result.status || 400;
+                return { success: false, message: result.error };
+            }
+            return { success: true, message: result.data!.message };
+        }, { body: ForgotPasswordRequest })
+
+        .post('/reset-password', async ({ body, set }: any) => {
+            const result = await authService.resetPassword(body);
+            if (result.error) {
+                set.status = result.status || 400;
+                return { success: false, message: result.error, errorCode: result.errorCode };
+            }
+            return { success: true, message: result.data!.message };
+        }, { body: ResetPasswordRequest });
