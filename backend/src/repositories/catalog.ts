@@ -35,6 +35,24 @@ const BLOCKING_ORDER_STATUS_MESSAGE: Record<string, string> = {
     shipped: 'Produk tidak dapat dihapus karena masih ada pesanan yang sedang dikirim',
 };
 
+export async function findCategoryById(categoryId: number) {
+    const result = await db
+        .select({ id: productCategories.id })
+        .from(productCategories)
+        .where(eq(productCategories.id, categoryId))
+        .limit(1);
+    return result[0] || null;
+}
+
+export async function findUnitById(unitId: number) {
+    const result = await db
+        .select({ id: units.id, name: units.name })
+        .from(units)
+        .where(eq(units.id, unitId))
+        .limit(1);
+    return result[0] || null;
+}
+
 function getStockStatus(stockValue: unknown) {
     const stock = Number(stockValue ?? 0);
     if (stock <= 0) return 'habis';
