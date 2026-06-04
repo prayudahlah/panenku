@@ -6,13 +6,15 @@ import * as notificationService from './notification';
 import * as auditService from './audit';
 import type { CreateNegotiationInput, SellerRespondInput, BuyerRespondInput } from '../dtos/negotiation';
 
+type ServiceResult<T> = { data?: T; error?: string; status?: number; errorCode?: string };
+
 export async function initiate(userId: number, body: CreateNegotiationInput) {
     const product = await negotiationRepo.findProductById(body.productId);
     if (!product) return { error: 'Produk tidak ditemukan', status: 404 };
     if (!product.isNegotiable) return { error: 'Produk tidak dapat dinegosiasikan', status: 422 };
 
     const minQty = Number(product.minOrderQty) || 0;
-    if (body.quantityOffer < minQty) return { error: 'Kuantitas di bawah minimum pembelian', status: 422 };
+    if (body.quantityOffer < minQty) return { error: 'Kuantitas di bawah minimum pembelian', status: 422, errorCode: 'ERR-NEGO-01' };
 
     const unit = await negotiationRepo.findUnitById(body.unitId);
     if (!unit) return { error: 'Satuan tidak valid', status: 422 };
@@ -83,20 +85,22 @@ export async function sellerRespond(userId: number, negotiationId: number, body:
 
     if (nego.sellerId !== userId) return { error: 'Hanya penjual pemilik produk yang dapat merespon', status: 403 };
 
-    if (nego.status === 'canceled') return { error: 'Negosiasi telah dibatalkan oleh pembeli', status: 410 };
+    if (nego.status === 'canceled') return { error: 'Negosiasi telah dibatalkan oleh pembeli', status: 410, errorCode: 'ERR-NEGO-03' };
 
-    if (nego.status === 'expired') return { error: 'Waktu negosiasi telah berakhir', status: 410 };
+    if (nego.status === 'expired') return { error: 'Waktu negosiasi telah berakhir', status: 410, errorCode: 'ERR-NEGO-04' };
     if (new Date(nego.validUntil) < new Date()) {
         await negotiationRepo.updateNegotiation(db, negotiationId, { status: 'expired' });
+        notificationService.create(nego.buyerId, 'Negosiasi Berakhir', 'Waktu negosiasi telah habis', 'negotiation', 'negotiation', negotiationId);
+        notificationService.create(nego.sellerId, 'Negosiasi Berakhir', 'Waktu negosiasi telah habis', 'negotiation', 'negotiation', negotiationId);
         await auditService.log({ userId, action: 'negotiation.expired', entityType: 'negotiation', entityId: negotiationId });
-        return { error: 'Waktu negosiasi telah berakhir', status: 410 };
+        return { error: 'Waktu negosiasi telah berakhir', status: 410, errorCode: 'ERR-NEGO-04' };
     }
 
     if (nego.status !== 'ongoing') return { error: 'Negosiasi tidak dalam status aktif', status: 409 };
 
     const latestChat = await negotiationRepo.findLatestChat(negotiationId);
     if (!latestChat || latestChat.turnOwner !== 'buyer') {
-        return { error: 'Menunggu respons dari pembeli', status: 403 };
+        return { error: 'Menunggu respons dari pembeli', status: 403, errorCode: 'ERR-NEGO-02' };
     }
 
     if (body.action === 'counter') {
@@ -169,13 +173,15 @@ export async function buyerRespond(userId: number, negotiationId: number, body: 
 
     if (nego.buyerId !== userId) return { error: 'Hanya pembeli pengaju tawaran yang dapat merespon', status: 403 };
 
-    if (nego.status === 'canceled') return { error: 'Negosiasi telah dibatalkan', status: 410 };
+    if (nego.status === 'canceled') return { error: 'Negosiasi telah dibatalkan', status: 410, errorCode: 'ERR-NEGO-03' };
 
-    if (nego.status === 'expired') return { error: 'Waktu negosiasi telah berakhir', status: 410 };
+    if (nego.status === 'expired') return { error: 'Waktu negosiasi telah berakhir', status: 410, errorCode: 'ERR-NEGO-04' };
     if (new Date(nego.validUntil) < new Date()) {
         await negotiationRepo.updateNegotiation(db, negotiationId, { status: 'expired' });
+        notificationService.create(nego.buyerId, 'Negosiasi Berakhir', 'Waktu negosiasi telah habis', 'negotiation', 'negotiation', negotiationId);
+        notificationService.create(nego.sellerId, 'Negosiasi Berakhir', 'Waktu negosiasi telah habis', 'negotiation', 'negotiation', negotiationId);
         await auditService.log({ userId, action: 'negotiation.expired', entityType: 'negotiation', entityId: negotiationId });
-        return { error: 'Waktu negosiasi telah berakhir', status: 410 };
+        return { error: 'Waktu negosiasi telah berakhir', status: 410, errorCode: 'ERR-NEGO-04' };
     }
 
     if (nego.status !== 'ongoing') return { error: 'Negosiasi tidak dalam status aktif', status: 409 };
@@ -222,7 +228,7 @@ export async function buyerRespond(userId: number, negotiationId: number, body: 
 
     const latestChat = await negotiationRepo.findLatestChat(negotiationId);
     if (!latestChat || latestChat.turnOwner !== 'seller') {
-        return { error: 'Menunggu respons dari penjual', status: 403 };
+        return { error: 'Menunggu respons dari penjual', status: 403, errorCode: 'ERR-NEGO-05' };
     }
 
     const newTurnOrder = latestChat.turnOrder + 1;
