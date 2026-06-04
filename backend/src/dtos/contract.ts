@@ -29,7 +29,7 @@ export type CreateContractInput = {
     addressId: number;
     startDate: string;
     endDate: string;
-    frequency: 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'custom';
+    frequency: 'daily' | 'weekly' | 'monthly' | 'custom';
     schedules: Array<{
         deliveryDay?: string;
         deliveryDate?: string;
