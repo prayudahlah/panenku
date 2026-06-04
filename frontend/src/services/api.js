@@ -1,12 +1,25 @@
 import { API_URL } from '../constants';
 
-export async function fetchApi(path, options = {}) {
-  const res = await fetch(`${API_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
-    ...options,
-    credentials: 'include',
-  });
-  return res.json();
+export async function fetchApi(path, options = {}, timeoutMs = 10000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(`${API_URL}${path}`, {
+      headers: { 'Content-Type': 'application/json', ...options.headers },
+      ...options,
+      credentials: 'include',
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    return res.json();
+  } catch (err) {
+    clearTimeout(timer);
+    if (err.name === 'AbortError') {
+      return { success: false, message: 'Waktu permintaan habis, silakan coba lagi', errorCode: 'ERR-TIMEOUT-01' };
+    }
+    return { success: false, message: 'Terjadi kesalahan jaringan' };
+  }
 }
 
 export const auth = {

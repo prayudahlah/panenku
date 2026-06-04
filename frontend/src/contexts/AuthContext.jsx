@@ -22,8 +22,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const register = async (data) => {
-        const { confirm_password, ...payload } = data;
-        const json = await auth.register(payload);
+        const json = await auth.register(data);
         if (json.success) setUser(json.data);
         return json;
     };
