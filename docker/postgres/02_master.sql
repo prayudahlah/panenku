@@ -77,3 +77,23 @@ CREATE TABLE IF NOT EXISTS master.products (
     CONSTRAINT fk_prod_unit FOREIGN KEY (unit_id)
         REFERENCES reference.units (id)
 );
+
+-- 4. User Addresses
+CREATE TABLE IF NOT EXISTS master.user_addresses (
+    id          BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    user_id     BIGINT      NOT NULL,
+    label       VARCHAR(50) NOT NULL,
+    province_id BIGINT      NOT NULL,
+    city_id     BIGINT      NOT NULL,
+    address     TEXT        NOT NULL,
+    is_default  BOOLEAN     NOT NULL DEFAULT FALSE,
+    deleted_at  TIMESTAMP            DEFAULT NULL,
+    created_at  TIMESTAMP            DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_ua_user FOREIGN KEY (user_id)
+        REFERENCES master.users (id),
+    CONSTRAINT fk_ua_province FOREIGN KEY (province_id)
+        REFERENCES reference.provinces (id),
+    CONSTRAINT fk_ua_city FOREIGN KEY (city_id)
+        REFERENCES reference.cities (id)
+);
