@@ -1,4 +1,5 @@
 import { dashboardRepo } from '../repositories';
+import { getTimeoutResult } from '../utils/withTimeout';
 
 type DashboardProcedureResult = {
     result: string;
@@ -41,8 +42,10 @@ export async function getBuyerDashboard(userId: number) {
     try {
         const result = await dashboardRepo.getBuyerDashboard(userId);
         return handleProcedureResult(result);
-    } catch (error) {
-        console.error('[dashboardService.getBuyerDashboard]', error);
+    } catch (err: any) {
+        const timeout = getTimeoutResult(err, 'dashboard.getBuyerDashboard');
+        if (timeout) return timeout;
+        console.error('[dashboardService.getBuyerDashboard]', err);
 
         return {
             error: 'Gagal mengambil data dashboard pembeli',
@@ -56,8 +59,10 @@ export async function getSellerDashboard(userId: number) {
     try {
         const result = await dashboardRepo.getSellerDashboard(userId);
         return handleProcedureResult(result);
-    } catch (error) {
-        console.error('[dashboardService.getSellerDashboard]', error);
+    } catch (err: any) {
+        const timeout = getTimeoutResult(err, 'dashboard.getSellerDashboard');
+        if (timeout) return timeout;
+        console.error('[dashboardService.getSellerDashboard]', err);
 
         return {
             error: 'Gagal mengambil data dashboard penjual',
@@ -71,8 +76,10 @@ export async function getAdminDashboard(userId: number) {
     try {
         const result = await dashboardRepo.getAdminDashboard(userId);
         return handleProcedureResult(result);
-    } catch (error) {
-        console.error('[dashboardService.getAdminDashboard]', error);
+    } catch (err: any) {
+        const timeout = getTimeoutResult(err, 'dashboard.getAdminDashboard');
+        if (timeout) return timeout;
+        console.error('[dashboardService.getAdminDashboard]', err);
 
         return {
             error: 'Gagal mengambil data dashboard admin',
