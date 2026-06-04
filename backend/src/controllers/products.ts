@@ -57,6 +57,16 @@ export const productsController = (app: any) =>
             return response;
         })
 
+        // FSD-04.1: GET /products/:id - detail produk publik
+        .get('/:id', async ({ params: { id }, set }: any) => {
+            const result = await catalogService.getProductById(Number(id));
+            if (result.error) {
+                set.status = result.status || 400;
+                return { success: false, message: result.error, errorCode: result.code };
+            }
+            return { success: true, data: result.data };
+        })
+
         .post('/', async ({ body, session, set }: any) => {
             const userId = session.get('userId');
             if (!userId) return authError(set);

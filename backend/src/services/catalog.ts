@@ -148,6 +148,21 @@ export const listSellerCatalog = async (filters: {
     return catalogRepo.listSellerCatalog(filters);
 };
 
+export const getProductById = async (productId: number): Promise<ServiceResult<any>> => {
+    try {
+        const product = await catalogRepo.findProductDetailById(productId);
+        if (!product) {
+            return { status: 404, code: 'ERR-CAT-01', error: 'Produk tidak ditemukan' };
+        }
+        return { data: product };
+    } catch (err: any) {
+        const timeout = getTimeoutResult(err, 'catalog.getProductById');
+        if (timeout) return timeout;
+        console.error('[catalog.getProductById]', err);
+        return { status: 500, code: 'ERR-CAT-02', error: 'Terjadi kesalahan pada server' };
+    }
+};
+
 export const createSellerProduct = async (sellerId: number, input: ProductInput): Promise<ServiceResult<any>> => {
     const sellerValidation = await validateActiveSeller(sellerId);
     if (sellerValidation.error) return sellerValidation;
