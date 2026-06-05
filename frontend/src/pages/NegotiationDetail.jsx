@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { formatNumber, formatDateTime } from '../utils/format';
+import { formatNumber } from '../utils/format';
 import { useAuth } from '../contexts/AuthContext';
 import { negotiations } from '../services/api';
+import NegotiationTimeline from '../components/NegotiationTimeline';
 import Modal from '../components/Modal';
 
 const statusBadge = {
@@ -30,6 +31,7 @@ export default function NegotiationDetail() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [acting, setActing] = useState(false);
+    const [formResult, setFormResult] = useState(null);
 
     const [showCounter, setShowCounter] = useState(false);
     const [counterPrice, setCounterPrice] = useState('');
@@ -53,6 +55,7 @@ export default function NegotiationDetail() {
 
     const doAction = async (action, extra = {}) => {
         setActing(true);
+        setFormResult(null);
         const role = user?.role;
         let json;
         if (role === 'seller') {
@@ -63,9 +66,18 @@ export default function NegotiationDetail() {
         setActing(false);
         if (json.success) {
             setShowCounter(false);
+            if (action === 'cancel') {
+                setFormResult({ type: 'success', message: 'Negosiasi dibatalkan.' });
+            } else if (action === 'accept') {
+                setFormResult({ type: 'success', message: 'Penawaran diterima!' });
+            } else if (action === 'reject') {
+                setFormResult({ type: 'success', message: 'Penawaran ditolak.' });
+            } else {
+                setFormResult({ type: 'success', message: 'Tawaran balik dikirim!' });
+            }
             fetchData();
         } else {
-            alert(json.message || 'Gagal');
+            setFormResult({ type: 'error', message: json.message || 'Gagal' });
         }
     };
 
@@ -100,109 +112,113 @@ export default function NegotiationDetail() {
                 <ArrowLeft size={16} /> Kembali
             </button>
 
-            <div className="bg-white rounded-xl border p-6 mb-6">
-                <div className="flex items-start justify-between mb-2">
-                    <h1 className="text-2xl font-bold">{nego.productName}</h1>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${statusBadge[nego.status] || 'bg-gray-100 text-gray-600'}`}>
-                        {statusLabel[nego.status] || nego.status}
-                    </span>
-                </div>
-                <p className="text-sm text-gray-500">
-                    Negosiasi Rp {formatNumber(nego.agreedPriceOffer)} &middot; {formatNumber(nego.agreedQuantityOffer)} {nego.unitName}
-                </p>
-                {nego.sellerName && <p className="text-sm text-gray-400 mt-1">Penjual: {nego.sellerName}</p>}
+            <div className="flex items-start justify-between mt-4 mb-2">
+                <h1 className="text-2xl font-bold">{nego.productName}</h1>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${statusBadge[nego.status] || 'bg-gray-100 text-gray-600'}`}>
+                    {statusLabel[nego.status] || nego.status}
+                </span>
+            </div>
+            <p className="text-sm text-gray-500">
+                Negosiasi Rp {formatNumber(nego.agreedPriceOffer)} &middot; {formatNumber(nego.agreedQuantityOffer)} {nego.unitName}
+            </p>
+            {nego.sellerName && <p className="text-sm text-gray-400 mt-1">Penjual: {nego.sellerName}</p>}
+
+            <hr className="border-gray-200 my-6" />
+
+            <h2 className="font-bold mb-4">Riwayat Negosiasi</h2>
+            <div className="max-h-64 overflow-y-auto pl-2">
+                <NegotiationTimeline
+                    chats={nego.chats}
+                    isOngoing={isOngoing}
+                    currentUserId={user?.id}
+                    buyerId={nego.buyerId}
+                    sellerId={nego.sellerId}
+                    buyerName={nego.buyerName}
+                    sellerName={nego.sellerName}
+                />
             </div>
 
-            <div className="bg-white rounded-xl border p-6 mb-6">
-                <h2 className="font-bold mb-4">Riwayat Negosiasi</h2>
-                {nego.chats.length === 0 ? (
-                    <p className="text-gray-400 text-sm">Belum ada percakapan.</p>
-                ) : (
-                    <div className="space-y-4">
-                        {nego.chats.map((chat) => {
-                            const isBuyerMsg = chat.turnOwner === 'buyer';
-                            return (
-                                <div key={chat.id} className={`flex ${isBuyerMsg ? 'justify-start' : 'justify-end'}`}>
-                                    <div className={`max-w-[70%] rounded-xl p-4 ${isBuyerMsg ? 'bg-green-50 border border-green-200' : 'bg-secondary-brown-100 border border-secondary-brown-200'}`}>
-                                        <p className="text-sm font-medium mb-1">
-                                            {isBuyerMsg ? 'Pembeli' : 'Penjual'} &middot; Tawaran #{chat.turnOrder}
-                                        </p>
-                                        <p className="text-base font-bold text-primary-green">
-                                            Rp {formatNumber(chat.offerPrice)}
-                                        </p>
-                                        <p className="text-sm text-gray-600 mt-1">{formatNumber(chat.quantityOffer)} {chat.unitName}</p>
-                                        <p className="text-xs text-gray-400 mt-2">{formatDateTime(chat.createdAt)}</p>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
+            {formResult && (
+                <div className={`mt-6 p-3 rounded-lg text-sm ${formResult.type === 'success' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-600'}`}>
+                    {formResult.message}
+                </div>
+            )}
 
             {canSellerAct && (
-                <div className="bg-white rounded-xl border p-6">
+                <>
+                    <hr className="border-gray-200 my-6" />
                     <h2 className="font-bold mb-4">Aksi Anda</h2>
                     <div className="flex gap-3">
-                        <button onClick={() => doAction('accept')} disabled={acting} className="flex-1 py-2 bg-green-600 text-white rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50">
+                        <button onClick={() => doAction('accept')} disabled={acting} className="flex-1 py-2 bg-primary-green text-white rounded-lg font-medium hover:bg-primary-green/90 transition disabled:opacity-50">
                             {acting ? 'Memproses...' : 'Terima'}
                         </button>
-                        <button onClick={() => setShowCounter(true)} disabled={acting} className="flex-1 py-2 bg-primary-green text-white rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50">
+                        <button onClick={() => setShowCounter(true)} disabled={acting} className="flex-1 py-2 bg-white border border-primary-green text-primary-green rounded-lg font-medium hover:bg-green-50 transition disabled:opacity-50">
                             Tawar Balik
                         </button>
-                        <button onClick={() => doAction('reject')} disabled={acting} className="flex-1 py-2 bg-red-600 text-white rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50">
+                        <button onClick={() => doAction('reject')} disabled={acting} className="flex-1 py-2 bg-red-500 text-white rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50">
                             {acting ? 'Memproses...' : 'Tolak'}
                         </button>
                     </div>
-                </div>
+                </>
             )}
 
             {canBuyerAct && (
-                <div className="bg-white rounded-xl border p-6">
+                <>
+                    <hr className="border-gray-200 my-6" />
                     <h2 className="font-bold mb-4">Aksi Anda</h2>
                     <div className="flex gap-3">
-                        <button onClick={() => doAction('accept')} disabled={acting} className="flex-1 py-2 bg-green-600 text-white rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50">
+                        <button onClick={() => doAction('accept')} disabled={acting} className="flex-1 py-2 bg-primary-green text-white rounded-lg font-medium hover:bg-primary-green/90 transition disabled:opacity-50">
                             {acting ? 'Memproses...' : 'Setuju'}
                         </button>
-                        <button onClick={() => setShowCounter(true)} disabled={acting} className="flex-1 py-2 bg-primary-green text-white rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50">
-                            Tawar Balik
+                        <button onClick={() => setShowCounter(true)} disabled={acting} className="flex-1 py-2 bg-white border border-primary-green text-primary-green rounded-lg font-medium hover:bg-green-50 transition disabled:opacity-50">
+                            Tawar Lagi
                         </button>
-                        <button onClick={() => doAction('cancel')} disabled={acting} className="flex-1 py-2 bg-red-600 text-white rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50">
+                        <button onClick={() => doAction('cancel')} disabled={acting} className="flex-1 py-2 bg-red-500 text-white rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50">
                             {acting ? 'Memproses...' : 'Batalkan'}
                         </button>
                     </div>
-                </div>
+                </>
             )}
 
             {canBuyerCancel && !canBuyerAct && nego.status !== 'accepted' && (
-                <div className="bg-white rounded-xl border p-6">
-                    <button onClick={() => doAction('cancel')} disabled={acting} className="w-full py-2 bg-red-600 text-white rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50">
+                <>
+                    <hr className="border-gray-200 my-6" />
+                    <h2 className="font-bold mb-4">Aksi Anda</h2>
+                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700 mb-4">
+                        Menunggu respon penjual...
+                    </div>
+                    <button onClick={() => doAction('cancel')} disabled={acting} className="w-full py-2 bg-red-500 text-white rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50">
                         {acting ? 'Memproses...' : 'Batalkan Negosiasi'}
                     </button>
-                </div>
+                </>
             )}
 
             {nego.status !== 'ongoing' && (
-                <div className="bg-white rounded-xl border p-6 text-center">
-                    <p className="text-gray-500">Negosiasi ini sudah {statusLabel[nego.status] || nego.status}.</p>
-                </div>
+                <>
+                    <hr className="border-gray-200 my-6" />
+                    <p className="text-gray-500 text-center">Negosiasi ini sudah {statusLabel[nego.status] || nego.status}.</p>
+                </>
             )}
 
             <Modal isOpen={showCounter} onClose={() => setShowCounter(false)} title="Tawar Balik">
                 <form onSubmit={handleCounter} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium mb-1">Harga Tawar (Rp)</label>
-                        <input type="number" value={counterPrice} onChange={(e) => setCounterPrice(e.target.value)} placeholder={String(Number(nego.agreedPriceOffer))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green" required />
+                        <label className="text-xs font-medium text-gray-500">Harga Tawar per {nego.unitName} (Rp)</label>
+                        <input type="number" value={counterPrice} onChange={(e) => setCounterPrice(e.target.value)} placeholder={String(Number(nego.agreedPriceOffer))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green mt-1" required />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-1">Kuantitas ({nego.unitName})</label>
-                        <input type="number" value={counterQty} onChange={(e) => setCounterQty(e.target.value)} placeholder={String(Number(nego.agreedQuantityOffer))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green" required />
+                        <label className="text-xs font-medium text-gray-500">Kuantitas ({nego.unitName})</label>
+                        <input type="number" value={counterQty} onChange={(e) => setCounterQty(e.target.value)} placeholder={String(Number(nego.agreedQuantityOffer))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green mt-1" required />
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-t border-gray-100">
+                        <span className="text-xs text-gray-500">Subtotal</span>
+                        <span className="text-sm font-bold text-gray-900">Rp {formatNumber((Number(counterPrice) || 0) * Number(counterQty))}</span>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-1">Catatan (opsional)</label>
-                        <textarea value={counterDesc} onChange={(e) => setCounterDesc(e.target.value)} rows={3} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green" />
+                        <label className="text-xs font-medium text-gray-500">Catatan (opsional)</label>
+                        <textarea value={counterDesc} onChange={(e) => setCounterDesc(e.target.value)} rows={4} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green mt-1" />
                     </div>
-                    <button type="submit" disabled={acting} className="w-full py-2 bg-primary-green text-white rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50">
+                    <button type="submit" disabled={acting} className="w-full py-2 bg-primary-green text-white rounded-lg font-medium hover:bg-primary-green/90 transition disabled:opacity-50">
                         {acting ? 'Mengirim...' : 'Kirim Tawaran Balik'}
                     </button>
                 </form>
