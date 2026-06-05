@@ -1,5 +1,6 @@
 import { db } from '../db';
 import { eq, and, isNull, sql, desc } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 import { products, negotiations, negotiationChats, units, users } from '../db/schema';
 
 type DBLike = typeof db;
@@ -140,6 +141,9 @@ export async function findNegotiationsByUser(userId: number, role: 'buyer' | 'se
 }
 
 export async function findNegotiationDetail(id: number) {
+    const sellerUsers = alias(users, 'seller');
+    const buyerUsers = alias(users, 'buyer');
+
     const nego = await db
         .select({
             id: negotiations.id,
@@ -154,12 +158,14 @@ export async function findNegotiationDetail(id: number) {
             validUntil: negotiations.validUntil,
             status: negotiations.status,
             createdAt: negotiations.createdAt,
-            sellerName: users.fullName,
+            sellerName: sellerUsers.fullName,
+            buyerName: buyerUsers.fullName,
         })
         .from(negotiations)
         .leftJoin(products, eq(negotiations.productId, products.id))
         .leftJoin(units, eq(negotiations.agreedUnitId, units.id))
-        .leftJoin(users, eq(negotiations.sellerId, users.id))
+        .leftJoin(sellerUsers, eq(negotiations.sellerId, sellerUsers.id))
+        .leftJoin(buyerUsers, eq(negotiations.buyerId, buyerUsers.id))
         .where(eq(negotiations.id, id))
         .limit(1);
 
