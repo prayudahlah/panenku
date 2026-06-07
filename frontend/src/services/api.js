@@ -1,5 +1,10 @@
 import { API_URL } from '../constants';
 
+function buildQuery(params = {}) {
+  const query = new URLSearchParams(params).toString();
+  return query ? `?${query}` : '';
+}
+
 export async function fetchApi(path, options = {}, timeoutMs = 10000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -40,27 +45,32 @@ export const references = {
 export const seller = {
   register: (data) => fetchApi('/sellers/register', { method: 'POST', body: JSON.stringify(data) }),
   getMyProfile: () => fetchApi('/sellers/profiles/me'),
+  getCatalog: (params = {}) => fetchApi(`/sellers/catalog${buildQuery(params)}`),
+  catalog: (params = {}) => fetchApi(`/sellers/catalog${buildQuery(params)}`),
 };
 
 export const admin = {
   listUsers: () => fetchApi('/users'),
   updateUserStatus: (id, status) => fetchApi(`/users/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
   listSellers: () => fetchApi('/sellers'),
-  listProducts: (sellerId) => fetchApi(`/products?sellerId=${sellerId}`),
+  listProducts: (sellerId) => fetchApi(`/products?${new URLSearchParams({ sellerId })}`),
   takedownProduct: (id) => fetchApi(`/products/${id}/takedown`, { method: 'PATCH' }),
 };
 
 export const audit = {
-  list: (params) => fetchApi(`/audit-logs?${new URLSearchParams(params)}`),
+  list: (params) => fetchApi(`/audit-logs${buildQuery(params)}`),
 };
 
 export const products = {
-  list: (params) => fetchApi(`/products?${new URLSearchParams(params)}`),
+  list: (params = {}) => fetchApi(`/products${buildQuery(params)}`),
   getById: (id) => fetchApi(`/products/${id}`),
+  create: (data) => fetchApi('/products', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id, data) => fetchApi(`/products/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  takedown: (id) => fetchApi(`/products/${id}/takedown`, { method: 'PATCH' }),
 };
 
 export const panenApi = {
-  list: (params) => fetchApi(`/panen?${new URLSearchParams(params)}`),
+  list: (params) => fetchApi(`/panen${buildQuery(params)}`),
   create: (data) => fetchApi('/panen', { method: 'POST', body: JSON.stringify(data) }),
   getById: (id) => fetchApi(`/panen/${id}`),
   update: (id, data) => fetchApi(`/panen/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
