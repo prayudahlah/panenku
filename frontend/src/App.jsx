@@ -29,6 +29,8 @@ import NegotiationDetail from './pages/NegotiationDetail';
 import ContractNew from './pages/ContractNew';
 import ContractDetail from './pages/ContractDetail';
 
+import Checkout from './pages/Checkout';
+
 const App = () => {
     return (
         <AuthProvider>
@@ -44,6 +46,7 @@ const App = () => {
                             <Route element={<ProtectedRoute />}>
                                 <Route path="transactions" element={<Transactions />} />
                                 <Route path="cart" element={<Cart />} />
+                                <Route path="checkout" element={<Checkout />} />
                                 <Route path="notifications" element={<Notifications />} />
                                 <Route path="negotiations" element={<Negotiations />} />
                                 <Route path="negotiations/:id" element={<NegotiationDetail />} />
