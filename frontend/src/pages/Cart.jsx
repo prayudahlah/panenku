@@ -179,7 +179,14 @@ export default function Cart() {
                         {/* Cart Items List */}
                         <div className="space-y-4">
                             {cartItems.map((item) => (
-                                <div key={item.cartItemId} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm relative flex flex-col gap-4">
+                                <div key={item.cartItemId} className={`bg-white rounded-2xl p-6 border border-gray-100 shadow-sm relative flex flex-col gap-4 ${item.isAvailable ? '' : 'opacity-60'}`}>
+                                    {!item.isAvailable && (
+                                        <div className="absolute top-4 left-4 z-10">
+                                            <span className="bg-red-500 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-md">
+                                                Produk Tidak Tersedia
+                                            </span>
+                                        </div>
+                                    )}
                                     {/* Remove button */}
                                     <button
                                         onClick={() => handleRemoveItem(item.cartItemId)}
@@ -194,13 +201,13 @@ export default function Cart() {
                                         <img
                                             src={productPlaceholder}
                                             alt={item.productName}
-                                            className="w-20 h-20 rounded-xl object-cover border border-gray-100 shrink-0"
+                                            className={`w-20 h-20 rounded-xl object-cover border border-gray-100 shrink-0 ${item.isAvailable ? '' : 'grayscale'}`}
                                         />
                                         <div className="min-w-0 pr-8">
-                                            <h3 className="text-lg font-bold text-gray-900 truncate">
+                                            <h3 className={`text-lg font-bold truncate ${item.isAvailable ? 'text-gray-900' : 'text-gray-400 line-through'}`}>
                                                 {item.productName}
                                             </h3>
-                                            {item.farmName && (
+                                            {item.isAvailable && item.farmName && (
                                                 <p className="text-xs text-gray-400 mt-1">
                                                     Asal : {item.cityName || item.provinceName || 'Indonesia'}, {item.address}, {item.farmName}
                                                 </p>
@@ -214,8 +221,8 @@ export default function Cart() {
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                                         <div>
                                             <span className="text-xs text-gray-400 uppercase font-semibold block tracking-wider">Harga</span>
-                                            <p className="font-bold text-gray-800 mt-1">
-                                                Rp {formatNumber(item.pricePerUnit)} <span className="text-xs text-gray-400 font-normal">/ {item.unitName}</span>
+                                            <p className={`font-bold mt-1 ${item.isAvailable ? 'text-gray-800' : 'text-gray-400'}`}>
+                                                {item.isAvailable ? <>Rp {formatNumber(item.pricePerUnit)} <span className="text-xs text-gray-400 font-normal">/ {item.unitName}</span></> : '—'}
                                             </p>
                                         </div>
 
@@ -224,7 +231,7 @@ export default function Cart() {
                                             <div className="flex items-center gap-2 mt-1">
                                                 <button
                                                     onClick={() => handleQuantityChange(item.cartItemId, item.quantity, item.stockQuantity, item.minOrderQty, false)}
-                                                    disabled={item.quantity <= Number(item.minOrderQty)}
+                                                    disabled={!item.isAvailable || item.quantity <= Number(item.minOrderQty)}
                                                     className="w-7 h-7 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
                                                 >
                                                     <Minus size={14} />
@@ -234,7 +241,7 @@ export default function Cart() {
                                                 </span>
                                                 <button
                                                     onClick={() => handleQuantityChange(item.cartItemId, item.quantity, item.stockQuantity, item.minOrderQty, true)}
-                                                    disabled={item.quantity >= Number(item.stockQuantity)}
+                                                    disabled={!item.isAvailable || item.quantity >= Number(item.stockQuantity)}
                                                     className="w-7 h-7 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
                                                 >
                                                     <Plus size={14} />
@@ -246,13 +253,19 @@ export default function Cart() {
                                         <div>
                                             <span className="text-xs text-gray-400 uppercase font-semibold block tracking-wider">Dapat Nego?</span>
                                             <div className="mt-1">
-                                                {item.isNegotiable ? (
-                                                    <span className="inline-block bg-primary-green-100/50 text-primary-green px-2 py-0.5 rounded text-xs font-bold uppercase">
-                                                        Yes
-                                                    </span>
+                                                {item.isAvailable ? (
+                                                    item.isNegotiable ? (
+                                                        <span className="inline-block bg-primary-green-100/50 text-primary-green px-2 py-0.5 rounded text-xs font-bold uppercase">
+                                                            Yes
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-block bg-red-50 text-red-600 px-2 py-0.5 rounded text-xs font-bold uppercase">
+                                                            No
+                                                        </span>
+                                                    )
                                                 ) : (
-                                                    <span className="inline-block bg-red-50 text-red-600 px-2 py-0.5 rounded text-xs font-bold uppercase">
-                                                        No
+                                                    <span className="inline-block bg-gray-100 text-gray-400 px-2 py-0.5 rounded text-xs font-bold uppercase">
+                                                        —
                                                     </span>
                                                 )}
                                             </div>
@@ -260,14 +273,14 @@ export default function Cart() {
 
                                         <div>
                                             <span className="text-xs text-gray-400 uppercase font-semibold block tracking-wider">Subtotal</span>
-                                            <p className="font-bold text-primary-green mt-1 text-base">
-                                                Rp {formatNumber(item.subtotal)}
+                                            <p className={`font-bold mt-1 text-base ${item.isAvailable ? 'text-primary-green' : 'text-gray-400'}`}>
+                                                {item.isAvailable ? `Rp ${formatNumber(item.subtotal)}` : '—'}
                                             </p>
                                         </div>
                                     </div>
 
                                     {/* Nego Action */}
-                                    {item.isNegotiable && (
+                                    {item.isAvailable && item.isNegotiable && (
                                         <div className="flex justify-end pt-2">
                                             <button
                                                 onClick={() => handleOpenNego(item)}
