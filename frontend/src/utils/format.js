@@ -17,3 +17,12 @@ export function formatDecimal(num) {
     if (num == null || isNaN(num)) return '0,00';
     return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
 }
+
+export function formatCurrency(num) {
+    if (num == null || isNaN(num)) return 'Rp 0';
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        maximumFractionDigits: 0,
+    }).format(num);
+}
