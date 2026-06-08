@@ -1,6 +1,7 @@
 import { db } from '../db';
 import { eq, and, isNull, asc } from 'drizzle-orm';
 import { carts, cartItems, products, sellerProfiles, units } from '../db/schema';
+import { cities, provinces } from '../db/schema/reference';
 
 type DBLike = typeof db;
 
@@ -117,11 +118,22 @@ export async function findCartWithItems(userId: number) {
             productName: products.name,
             pricePerUnit: products.pricePerUnit,
             productDeletedAt: products.deletedAt,
+            stockQuantity: products.stockQuantity,
+            minOrderQty: products.minOrderQty,
+            isNegotiable: products.isNegotiable,
+            sellerId: products.sellerId,
+            farmName: sellerProfiles.farmName,
+            address: sellerProfiles.address,
+            cityName: cities.name,
+            provinceName: provinces.name,
         })
         .from(carts)
         .innerJoin(cartItems, eq(carts.id, cartItems.cartId))
         .leftJoin(products, eq(cartItems.productId, products.id))
         .leftJoin(units, eq(cartItems.unitId, units.id))
+        .leftJoin(sellerProfiles, eq(products.sellerId, sellerProfiles.userId))
+        .leftJoin(cities, eq(sellerProfiles.cityId, cities.id))
+        .leftJoin(provinces, eq(sellerProfiles.provinceId, provinces.id))
         .where(eq(carts.userId, userId))
         .orderBy(asc(cartItems.addedAt));
     return result;
