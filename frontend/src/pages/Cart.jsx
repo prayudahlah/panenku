@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { cart as cartApi, products as productsApi, userAddresses, checkout as checkoutApi } from '../services/api';
+import { cart as cartApi } from '../services/api';
 import { formatNumber } from '../utils/format';
-import { Trash2, Minus, Plus, Loader, Handshake, AlertTriangle, ShoppingBag, X, Check, CreditCard, ChevronRight } from 'lucide-react';
+import { Trash2, Minus, Plus, Loader, Handshake, AlertTriangle, ShoppingBag } from 'lucide-react';
 import productPlaceholder from '../assets/product_placeholder.webp';
 import NegotiationModal from '../components/NegotiationModal';
-import AddressPicker from '../components/AddressPicker';
 
 export default function Cart() {
     const { user } = useAuth();
@@ -20,67 +19,13 @@ export default function Cart() {
     const [negoProduct, setNegoProduct] = useState(null);
     const [negoModalOpen, setNegoModalOpen] = useState(false);
 
-    // States for Checkout Modal
-    const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
-    const [addressesList, setAddressesList] = useState([]);
-    const [selectedAddressId, setSelectedAddressId] = useState(null);
-    const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState(1); // default Transfer Bank
-    const [courierName, setCourierName] = useState('Kurir Panenku');
-    const [checkoutSubmitting, setCheckoutSubmitting] = useState(false);
-    const [checkoutError, setCheckoutError] = useState('');
-    const [checkoutSuccess, setCheckoutSuccess] = useState(false);
-
-    const paymentMethods = [
-        { id: 1, name: 'Transfer Bank' },
-        { id: 2, name: 'QRIS' },
-        { id: 3, name: 'Virtual Account' },
-        { id: 4, name: 'GoPay' },
-        { id: 5, name: 'OVO' },
-        { id: 6, name: 'Dana' },
-        { id: 7, name: 'Debit Online' },
-    ];
-
     const loadCart = async () => {
         setLoading(true);
         setError(null);
         try {
             const res = await cartApi.view();
             if (res.success) {
-                const rawItems = res.data?.items || [];
-                // Fetch product details in parallel to obtain location & isNegotiable info
-                const detailedItems = await Promise.all(
-                    rawItems.map(async (item) => {
-                        try {
-                            const prodRes = await productsApi.getById(item.productId);
-                            if (prodRes.success) {
-                                const p = prodRes.data;
-                                return {
-                                    ...item,
-                                    isNegotiable: p.isNegotiable,
-                                    farmName: p.farmName,
-                                    address: p.address,
-                                    cityName: p.cityName,
-                                    provinceName: p.provinceName,
-                                    stockQuantity: p.stockQuantity,
-                                    minOrderQty: p.minOrderQty,
-                                };
-                            }
-                        } catch (err) {
-                            console.error(`Error loading product details for #${item.productId}:`, err);
-                        }
-                        return {
-                            ...item,
-                            isNegotiable: false,
-                            farmName: '',
-                            address: '',
-                            cityName: '',
-                            provinceName: '',
-                            stockQuantity: 9999,
-                            minOrderQty: 1,
-                        };
-                    })
-                );
-                setCartItems(detailedItems);
+                setCartItems(res.data?.items || []);
             } else {
                 setError(res.message || 'Gagal memuat keranjang belanja');
             }
@@ -96,19 +41,6 @@ export default function Cart() {
             loadCart();
         }
     }, [user]);
-
-    // Load addresses for parent mapping when checkout modal is open
-    useEffect(() => {
-        if (checkoutModalOpen) {
-            userAddresses.list().then((json) => {
-                if (json.success) {
-                    setAddressesList(json.data);
-                    const def = json.data.find((a) => a.isDefault) || json.data[0];
-                    if (def) setSelectedAddressId(def.id);
-                }
-            });
-        }
-    }, [checkoutModalOpen]);
 
     const handleQuantityChange = async (itemId, currentQty, stock, minOrder, increment) => {
         let newQty = increment ? currentQty + 1 : currentQty - 1;
@@ -177,48 +109,6 @@ export default function Cart() {
     const handleNegoSuccess = () => {
         setNegoModalOpen(false);
         loadCart();
-    };
-
-    const handleCheckoutSubmit = async (e) => {
-        e.preventDefault();
-        setCheckoutError('');
-        
-        if (!selectedAddressId) {
-            setCheckoutError('Silakan pilih alamat pengiriman Anda.');
-            return;
-        }
-
-        const addressObj = addressesList.find((a) => a.id === selectedAddressId);
-        if (!addressObj) {
-            setCheckoutError('Alamat yang dipilih tidak valid.');
-            return;
-        }
-
-        setCheckoutSubmitting(true);
-        try {
-            const res = await checkoutApi.create({
-                shippingAddress: addressObj.address,
-                provinceId: addressObj.provinceId,
-                cityId: addressObj.cityId,
-                paymentMethodId: Number(selectedPaymentMethodId),
-                courierName: courierName || undefined,
-            });
-
-            if (res.success) {
-                setCheckoutSuccess(true);
-                setTimeout(() => {
-                    setCheckoutModalOpen(false);
-                    setCheckoutSuccess(false);
-                    navigate('/transactions');
-                }, 2000);
-            } else {
-                setCheckoutError(res.message || 'Gagal memproses checkout.');
-            }
-        } catch {
-            setCheckoutError('Terjadi kesalahan jaringan.');
-        } finally {
-            setCheckoutSubmitting(false);
-        }
     };
 
     const totalAmount = cartItems.reduce((acc, item) => acc + (item.isAvailable ? Number(item.subtotal) : 0), 0);
@@ -402,13 +292,12 @@ export default function Cart() {
                                 </span>
                             </div>
 
-                            <button
-                                onClick={() => setCheckoutModalOpen(true)}
+                            <Link
+                                to="/checkout"
                                 className="w-full py-4 bg-primary-green text-white rounded-xl font-bold hover:bg-primary-green/90 shadow-sm hover:shadow-lg transition flex items-center justify-center gap-2 group text-base"
                             >
                                 Checkout Keranjang
-                                <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 )}
@@ -422,106 +311,6 @@ export default function Cart() {
                 onSuccess={handleNegoSuccess}
             />
 
-            {/* Checkout Dialog Modal */}
-            {checkoutModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="fixed inset-0 bg-black/50" onClick={() => !checkoutSubmitting && setCheckoutModalOpen(false)} />
-                    <div className="bg-white rounded-2xl shadow-xl max-w-xl w-full relative overflow-hidden z-10">
-                        <div className="flex items-center justify-between p-5 border-b border-gray-100">
-                            <h2 className="text-lg font-bold text-primary-green flex items-center gap-2">
-                                <CreditCard size={20} /> Checkout Pemesanan
-                            </h2>
-                            <button
-                                onClick={() => !checkoutSubmitting && setCheckoutModalOpen(false)}
-                                className="p-1 hover:bg-gray-100 rounded-lg transition text-gray-400 hover:text-gray-600"
-                                disabled={checkoutSubmitting}
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleCheckoutSubmit} className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
-                            {checkoutError && (
-                                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm flex items-center gap-2">
-                                    <AlertTriangle size={16} /> {checkoutError}
-                                </div>
-                            )}
-
-                            {checkoutSuccess && (
-                                <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm flex items-center gap-2 justify-center font-bold animate-pulse">
-                                    <Check size={18} /> Checkout Berhasil! Mengalihkan ke transaksi...
-                                </div>
-                            )}
-
-                            {/* Address Picker Section */}
-                            <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase block tracking-wider mb-2">Alamat Pengiriman</label>
-                                <AddressPicker
-                                    value={selectedAddressId}
-                                    onChange={setSelectedAddressId}
-                                    disabled={checkoutSubmitting}
-                                />
-                            </div>
-
-                            {/* Courier Input */}
-                            <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase block tracking-wider mb-1.5">Kurir Pengiriman</label>
-                                <input
-                                    type="text"
-                                    value={courierName}
-                                    onChange={(e) => setCourierName(e.target.value)}
-                                    placeholder="Contoh: Kurir Panenku, JNT, GoSend"
-                                    className="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
-                                    disabled={checkoutSubmitting}
-                                />
-                            </div>
-
-                            {/* Payment Methods Grid */}
-                            <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase block tracking-wider mb-3">Metode Pembayaran</label>
-                                <div className="grid grid-cols-2 gap-3">
-                                    {paymentMethods.map((pm) => {
-                                        const selected = selectedPaymentMethodId === pm.id;
-                                        return (
-                                            <button
-                                                type="button"
-                                                key={pm.id}
-                                                onClick={() => setSelectedPaymentMethodId(pm.id)}
-                                                disabled={checkoutSubmitting}
-                                                className={`border p-3 rounded-xl text-left text-sm transition font-medium flex justify-between items-center ${
-                                                    selected
-                                                        ? 'border-primary-green bg-green-50/50 text-primary-green'
-                                                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                                                }`}
-                                            >
-                                                {pm.name}
-                                                {selected && <div className="w-2.5 h-2.5 bg-primary-green rounded-full" />}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-
-                            {/* Review summary inside modal */}
-                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex justify-between items-baseline">
-                                <span className="text-sm text-gray-500 font-semibold">Total Tagihan</span>
-                                <span className="text-xl font-bold text-primary-green">
-                                    Rp {formatNumber(totalAmount)}
-                                </span>
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={checkoutSubmitting || checkoutSuccess}
-                                className="w-full py-3.5 bg-primary-green text-white rounded-xl font-bold hover:bg-primary-green/90 shadow-md transition disabled:opacity-50 flex items-center justify-center gap-2"
-                            >
-                                {checkoutSubmitting && <Loader size={18} className="animate-spin" />}
-                                {checkoutSubmitting ? 'Memproses Checkout...' : 'Bayar & Pesan Sekarang'}
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
