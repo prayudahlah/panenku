@@ -1,21 +1,9 @@
 import { db } from '../db';
 import { cartRepo } from '../repositories';
-import type { AddCartItemInput, CartItemResponse } from '../dtos/cart';
+import type { AddCartItemInput, CartItemResponse, CartViewItem } from '../dtos/cart';
 import { getTimeoutResult } from '../utils/withTimeout';
 
 type ServiceResult<T> = { data?: T; error?: string; status?: number; errorCode?: string };
-
-type CartViewItem = {
-    cartItemId: number;
-    productId: number;
-    productName: string;
-    isAvailable: boolean;
-    quantity: number;
-    unitId: number;
-    unitName: string;
-    pricePerUnit: string;
-    subtotal: number;
-};
 
 type CartViewResponse = {
     cartId: number | null;
@@ -115,6 +103,14 @@ export async function viewCart(userId: number): Promise<ServiceResult<CartViewRe
                 unitName: row.unitName!,
                 pricePerUnit: isAvailable ? row.pricePerUnit! : '0',
                 subtotal,
+                sellerId: Number(row.sellerId),
+                farmName: row.farmName ?? '',
+                address: row.address ?? '',
+                cityName: row.cityName ?? '',
+                provinceName: row.provinceName ?? '',
+                stockQuantity: row.stockQuantity ?? '0',
+                minOrderQty: row.minOrderQty ?? '1',
+                isNegotiable: row.isNegotiable ?? false,
             };
         });
 

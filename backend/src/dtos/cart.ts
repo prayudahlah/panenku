@@ -30,3 +30,23 @@ export type CartItemResponse = {
     unitName: string;
     pricePerUnit: string;
 };
+
+export type CartViewItem = {
+    cartItemId: number;
+    productId: number;
+    productName: string;
+    isAvailable: boolean;
+    quantity: number;
+    unitId: number;
+    unitName: string;
+    pricePerUnit: string;
+    subtotal: number;
+    sellerId: number;
+    farmName: string;
+    address: string;
+    cityName: string;
+    provinceName: string;
+    stockQuantity: string;
+    minOrderQty: string;
+    isNegotiable: boolean;
+};
