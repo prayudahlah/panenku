@@ -31,8 +31,6 @@ const menus = {
         { label: 'Produk Saya', icon: Wheat, path: '/shop/products' },
     ],
     admin: [{ label: 'Dashboard Admin', icon: Shield, path: '/admin' }],
-    super_admin: [{ label: 'Dashboard Admin', icon: Shield, path: '/admin' }],
-    superadmin: [{ label: 'Dashboard Admin', icon: Shield, path: '/admin' }],
 };
 
 export default function UserDropdown() {
@@ -49,7 +47,8 @@ export default function UserDropdown() {
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    const role = String(user?.role || '').toLowerCase();
+    const rawRole = String(user?.role || '').toLowerCase();
+    const role = ['super_admin', 'superadmin'].includes(rawRole) ? 'admin' : rawRole;
     const items = menus[role] || [];
 
     return (

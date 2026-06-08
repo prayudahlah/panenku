@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     Activity,
-    BarChart3,
     Download,
     Handshake,
     RotateCcw,
@@ -10,33 +9,9 @@ import {
     Users,
 } from 'lucide-react';
 import { dashboard } from '../services/api';
+import { formatCurrency, formatNumber, formatDateTime } from '../utils/format';
 
 const getArray = (value) => (Array.isArray(value) ? value : []);
-
-function formatMoney(value) {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        maximumFractionDigits: 0,
-    }).format(Number(value || 0));
-}
-
-function formatNumber(value) {
-    return new Intl.NumberFormat('id-ID').format(Number(value || 0));
-}
-
-function formatDateTime(value) {
-    if (!value) return '-';
-    const parsed = new Date(value);
-    if (Number.isNaN(parsed.getTime())) return '-';
-    return new Intl.DateTimeFormat('id-ID', {
-        day: 'numeric',
-        month: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    }).format(parsed);
-}
 
 function downloadCsv(filename, rows) {
     if (!rows || rows.length === 0) return;
@@ -147,7 +122,7 @@ function GrowthChart({ growth, days }) {
                             <div
                                 className="w-full rounded-t-sm bg-primary-green transition-all group-hover:opacity-80"
                                 style={{ height }}
-                                title={`${item.label} · ${formatMoney(item.totalAmount)} · ${formatNumber(item.totalTransactions)} transaksi`}
+                                title={`${item.label} · ${formatCurrency(item.totalAmount)} · ${formatNumber(item.totalTransactions)} transaksi`}
                             />
                             <span className="text-xs text-gray-400">{item.label}</span>
                         </div>
@@ -161,7 +136,7 @@ function GrowthChart({ growth, days }) {
                 </div>
                 <div>
                     <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Revenue</p>
-                    <p className="mt-1 text-lg font-extrabold text-gray-950">{formatMoney(totalRevenue)}</p>
+                    <p className="mt-1 text-lg font-extrabold text-gray-950">{formatCurrency(totalRevenue)}</p>
                 </div>
             </div>
         </div>
@@ -186,7 +161,7 @@ export default function AdminPage() {
     const [error, setError] = useState('');
     const [range, setRange] = useState(30);
 
-    const loadDashboard = async () => {
+    const loadDashboard = useCallback(async () => {
         setLoading(true);
         setError('');
         try {
@@ -198,7 +173,7 @@ export default function AdminPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         loadDashboard();
@@ -363,7 +338,7 @@ export default function AdminPage() {
                                 {categoryLeaderboard.map((item) => (
                                     <tr key={item.categoryId || item.categoryName} className="border-b border-gray-100 last:border-b-0">
                                         <td className="py-4 font-bold text-gray-900">{item.categoryName}</td>
-                                        <td className="py-4 text-gray-700">{formatMoney(item.totalRevenue)}</td>
+                                        <td className="py-4 text-gray-700">{formatCurrency(item.totalRevenue)}</td>
                                         <td className="py-4 text-gray-700">{formatNumber(item.totalOrders)}</td>
                                     </tr>
                                 ))}
@@ -406,7 +381,7 @@ export default function AdminPage() {
                                                 <span className="font-bold text-gray-900">{item.sellerName}</span>
                                             </div>
                                         </td>
-                                        <td className="py-4 text-gray-700">{formatMoney(item.totalRevenue)}</td>
+                                        <td className="py-4 text-gray-700">{formatCurrency(item.totalRevenue)}</td>
                                         <td className="py-4 text-gray-700">{formatNumber(item.totalOrders)}</td>
                                     </tr>
                                 ))}

@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    ArrowRight,
     Bell,
     CalendarDays,
     ChevronRight,
@@ -11,23 +10,9 @@ import {
     Wallet,
 } from 'lucide-react';
 import { dashboard } from '../services/api';
+import { formatCurrency, formatDate } from '../utils/format';
 
 const getArray = (value) => (Array.isArray(value) ? value : []);
-
-function formatMoney(value) {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        maximumFractionDigits: 0,
-    }).format(Number(value || 0));
-}
-
-function formatDate(value) {
-    if (!value) return '-';
-    const parsed = new Date(value);
-    if (Number.isNaN(parsed.getTime())) return '-';
-    return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'numeric', year: 'numeric' }).format(parsed);
-}
 
 function formatShortDate(value) {
     if (!value) return '-';
@@ -72,7 +57,7 @@ function SellerRevenueBars({ history }) {
                         <div
                             className="w-full rounded-t-sm bg-white/45 transition-all group-hover:bg-white/70"
                             style={{ height }}
-                            title={`${formatShortDate(item.day)} · ${formatMoney(item.total)}`}
+                            title={`${formatShortDate(item.day)} · ${formatCurrency(item.total)}`}
                         />
                         <span className="absolute -bottom-6 hidden text-[10px] text-white/70 group-hover:block">{formatShortDate(item.day)}</span>
                     </div>
@@ -113,7 +98,16 @@ function navigateByReference(navigate, item) {
 }
 
 function ContractCard({ contract }) {
-    const progress = Math.min(Number(contract.progress || contract.fulfillment || 50), 100);
+    const progress = (() => {
+        if (!contract?.startDate || !contract?.endDate) return 0;
+        const start = new Date(contract.startDate);
+        const end = new Date(contract.endDate);
+        const now = new Date();
+        const total = end - start;
+        if (total <= 0) return 0;
+        const elapsed = now - start;
+        return Math.min(Math.round((elapsed / total) * 100), 100);
+    })();
 
     return (
         <article className="relative overflow-hidden rounded-2xl bg-[#eeeee9] p-8 shadow-sm">
@@ -150,9 +144,9 @@ export default function DashboardSeller() {
     const [error, setError] = useState('');
     const [showAllNotifications, setShowAllNotifications] = useState(false);
     const [showAllContracts, setShowAllContracts] = useState(false);
-    const [showHistory, setShowHistory] = useState(false);
+    const [showFullHistory, setShowFullHistory] = useState(false);
 
-    const loadDashboard = async () => {
+    const loadDashboard = useCallback(async () => {
         setLoading(true);
         setError('');
         try {
@@ -164,7 +158,7 @@ export default function DashboardSeller() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         loadDashboard();
@@ -175,6 +169,7 @@ export default function DashboardSeller() {
     const history = useMemo(() => getArray(data.sellerHistory), [data]);
     const visibleNotifications = showAllNotifications ? notifications : notifications.slice(0, 2);
     const visibleContracts = showAllContracts ? contracts : contracts.slice(0, 1);
+    const visibleHistory = showFullHistory ? history : history.slice(0, 3);
 
     if (loading) {
         return (
@@ -200,7 +195,7 @@ export default function DashboardSeller() {
                             <Wallet size={18} />
                             <span className="font-medium">Pendapatan Bulan Ini</span>
                         </div>
-                        <h1 className="text-4xl font-extrabold md:text-5xl">{formatMoney(data.totalRevenue)}</h1>
+                        <h1 className="text-4xl font-extrabold md:text-5xl">{formatCurrency(data.totalRevenue)}</h1>
                         <p className="mt-3 text-sm text-white/80">↗ Data dihitung dari transaksi berstatus paid</p>
                     </div>
                     <SellerRevenueBars history={history} />
@@ -270,45 +265,37 @@ export default function DashboardSeller() {
             </section>
 
             <section className="mt-8">
-                <div className="mb-4 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-2 text-primary-green">
-                        <Package size={20} />
-                        <h2 className="text-xl font-extrabold">Riwayat Penjualan Terakhir</h2>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => setShowHistory((value) => !value)}
-                        className="inline-flex items-center gap-2 text-sm font-bold text-secondary-brown transition hover:text-primary-green"
-                    >
-                        {showHistory ? 'Sembunyikan' : 'Lihat Riwayat'} <ArrowRight size={15} />
-                    </button>
-                </div>
+                <SectionHeader
+                    icon={Package}
+                    title="Riwayat Penjualan Terakhir"
+                    actionText={history.length > 3 ? 'Lihat Semua' : undefined}
+                    expanded={showFullHistory}
+                    onAction={history.length > 3 ? () => setShowFullHistory((value) => !value) : undefined}
+                />
 
-                {showHistory && (
-                    history.length === 0 ? (
-                        <EmptyCard>Belum ada riwayat penjualan.</EmptyCard>
-                    ) : (
-                        <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-                            <table className="w-full text-left text-sm">
-                                <thead className="bg-gray-50 text-xs uppercase tracking-wider text-gray-400">
-                                    <tr>
-                                        <th className="px-5 py-4">Order</th>
-                                        <th className="px-5 py-4">Tanggal</th>
-                                        <th className="px-5 py-4">Subtotal</th>
+                {visibleHistory.length === 0 ? (
+                    <EmptyCard>Belum ada riwayat penjualan.</EmptyCard>
+                ) : (
+                    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+                        <table className="w-full text-left text-sm">
+                            <thead className="bg-gray-50 text-xs uppercase tracking-wider text-gray-400">
+                                <tr>
+                                    <th className="px-5 py-4">Order</th>
+                                    <th className="px-5 py-4">Tanggal</th>
+                                    <th className="px-5 py-4">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {visibleHistory.map((item) => (
+                                    <tr key={item.orderId || item.id} className="border-t border-gray-100">
+                                        <td className="px-5 py-4 font-bold text-gray-900">{item.orderNumber || `ORD-${item.orderId || item.id}`}</td>
+                                        <td className="px-5 py-4 text-gray-500">{formatDate(item.createdAt)}</td>
+                                        <td className="px-5 py-4 font-bold text-primary-green">{formatCurrency(item.subtotal || item.totalAmount)}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {history.slice(0, 10).map((item) => (
-                                        <tr key={item.orderId || item.id} className="border-t border-gray-100">
-                                            <td className="px-5 py-4 font-bold text-gray-900">{item.orderNumber || `ORD-${item.orderId || item.id}`}</td>
-                                            <td className="px-5 py-4 text-gray-500">{formatDate(item.createdAt)}</td>
-                                            <td className="px-5 py-4 font-bold text-primary-green">{formatMoney(item.subtotal || item.totalAmount)}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </section>
         </main>
