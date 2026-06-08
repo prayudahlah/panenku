@@ -249,8 +249,10 @@ export default function ProductList() {
         const price = Number(form.pricePerUnit);
 
         if (form.name.trim().length < 3) nextErrors.name = 'Nama produk minimal 3 karakter';
+        if (form.name.trim().length > 100) nextErrors.name = 'Nama produk maksimal 100 karakter';
         if (!form.categoryId) nextErrors.categoryId = 'Kategori wajib dipilih';
         if (form.description.trim().length < 10) nextErrors.description = 'Deskripsi minimal 10 karakter';
+        if (form.description.trim().length > 1000) nextErrors.description = 'Deskripsi maksimal 1000 karakter';
         if (!form.unitId) nextErrors.unitId = 'Satuan wajib dipilih';
 
         if (form.stockQuantity === '') {
