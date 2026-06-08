@@ -88,10 +88,10 @@ export const negotiations = {
 };
 
 export const cart = {
-  addItem: (data) => fetchApi('/cart/items', { method: 'POST', body: JSON.stringify(data) }),
-  view: () => fetchApi('/cart/items'),
-  updateItem: (id, data) => fetchApi(`/cart/items/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-  removeItem: (id) => fetchApi(`/cart/items/${id}`, { method: 'DELETE' }),
+  addItem: (data) => fetchApi('/carts/items', { method: 'POST', body: JSON.stringify(data) }),
+  view: () => fetchApi('/carts/items'),
+  updateItem: (id, data) => fetchApi(`/carts/items/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  removeItem: (id) => fetchApi(`/carts/items/${id}`, { method: 'DELETE' }),
 };
 
 export const checkout = {
