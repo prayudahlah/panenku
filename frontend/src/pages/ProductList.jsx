@@ -19,8 +19,8 @@ const emptyForm = {
 };
 
 function getArrayPayload(json, key) {
-    if (Array.isArray(json?.data)) return json.data;
     if (Array.isArray(json?.data?.[key])) return json.data[key];
+    if (Array.isArray(json?.data)) return json.data;
     return [];
 }
 
@@ -30,7 +30,7 @@ function getParentId(category) {
 
 function hasNoParent(category) {
     const parentId = getParentId(category);
-    return parentId === null || parentId === undefined || parentId === '';
+    return parentId === null || parentId === undefined || parentId === '' || parentId === 0;
 }
 
 function buildCategoryGroups(categories) {
@@ -299,6 +299,14 @@ export default function ProductList() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validate()) return;
+
+        const originalStock = selected?.stockQuantity ?? selected?.stock_quantity;
+        const newStock = Number(form.stockQuantity);
+        if (isEditMode && originalStock !== undefined && originalStock !== null && newStock < Number(originalStock)) {
+            if (!window.confirm('Anda akan mengurangi stok. Pastikan tidak ada pesanan aktif yang terpengaruh. Lanjutkan?')) {
+                return;
+            }
+        }
 
         setSaving(true);
         setApiError('');
@@ -623,7 +631,7 @@ export default function ProductList() {
                                 <Trash2 size={26} />
                             </div>
                             <h2 className="text-2xl font-bold mb-3">Hapus Produk ini?</h2>
-                            <p className="text-gray-500 mb-5">Produk akan dihapus dari katalog Panenku dan tidak tampil untuk pembeli.</p>
+                            <p className="text-gray-500 mb-5">Apakah Anda yakin ingin menghapus produk &quot;{deleteTarget.productName || deleteTarget.name}&quot;? Tindakan ini tidak dapat dibatalkan.</p>
 
                             <div className="bg-neutral-stone-base rounded-xl p-4 flex items-center gap-3 text-left mb-6">
                                 <ProductIcon status={deleteTarget.status} />
