@@ -93,8 +93,21 @@ export const checkoutController = (app: any) =>
             return { success: true, message: 'Pengiriman dikonfirmasi', data: result.data };
         })
 
-        .put('/:id/orders/:orderId/cancel', async ({ params: { id, orderId }, session, set }: any) => {
+        .get('/:id/status', async ({ params: { id }, session, set }: any) => {
             const userId = session.get('userId');
+            if (!userId) {
+                set.status = 401;
+                return { success: false, message: 'Belum login', errorCode: 'ERR-LOG-01' };
+            }
+            const result = await checkoutService.getStatus(userId, Number(id));
+            if (result.error) {
+                set.status = result.status || 400;
+                return { success: false, message: result.error };
+            }
+            return { success: true, data: result.data };
+        })
+
+        .put('/:id/orders/:orderId/cancel', async ({ params: { id, orderId }, session, set }: any) => {            const userId = session.get('userId');
             if (!userId) {
                 set.status = 401;
                 return { success: false, message: 'Belum login', errorCode: 'ERR-LOG-01' };

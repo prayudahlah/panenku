@@ -153,7 +153,7 @@ export async function checkout(userId: number, body: CheckoutInput): Promise<Ser
     notificationService.create(
         userId,
         'Pesanan Menunggu Pembayaran',
-        `Pesanan #${result.checkoutId} telah dibuat. Total: Rp ${Number(result.totalAmount).toLocaleString('id-ID')}. Segera konfirmasi pembayaran Anda.`,
+        `Pesanan #${result.checkoutId} telah dibuat. Total: Rp ${Number(result.totalAmount).toLocaleString('id-ID')}.`,
         'checkout_payment',
         'checkout',
         result.checkoutId,
@@ -252,7 +252,7 @@ export async function directCheckout(userId: number, body: DirectCheckoutInput):
     notificationService.create(
         userId,
         'Pesanan Menunggu Pembayaran',
-        `Pesanan #${result.checkoutId} telah dibuat. Total: Rp ${Number(result.totalAmount).toLocaleString('id-ID')}. Segera konfirmasi pembayaran Anda.`,
+        `Pesanan #${result.checkoutId} telah dibuat. Total: Rp ${Number(result.totalAmount).toLocaleString('id-ID')}.`,
         'checkout_payment',
         'checkout',
         result.checkoutId,
@@ -373,6 +373,22 @@ export async function confirmShipment(
     );
 
     return { data: result };
+}
+
+export async function getStatus(userId: number, checkoutId: number): Promise<ServiceResult<{ checkoutId: number; statusCode: string; isAwaitingPayment: boolean }>> {
+    const checkout = await checkoutRepo.findCheckoutById(checkoutId);
+    if (!checkout) return { error: 'Checkout tidak ditemukan', status: 404 };
+    if (checkout.buyerId !== userId) return { error: 'Akses ditolak', status: 403 };
+
+    const statusRow = await checkoutRepo.findCheckoutStatus(checkout.checkoutStatusId);
+    const statusCode = statusRow?.code ?? '';
+    return {
+        data: {
+            checkoutId,
+            statusCode,
+            isAwaitingPayment: statusCode === 'awaiting_payment',
+        },
+    };
 }
 
 export async function sellerCancelOrder(
