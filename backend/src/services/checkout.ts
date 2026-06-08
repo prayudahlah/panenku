@@ -149,6 +149,16 @@ export async function checkout(userId: number, body: CheckoutInput): Promise<Ser
         );
     }
 
+    // FSD-06.2: notifikasi ke pembeli sendiri sebagai trigger konfirmasi pembayaran
+    notificationService.create(
+        userId,
+        'Pesanan Menunggu Pembayaran',
+        `Pesanan #${result.checkoutId} telah dibuat. Total: Rp ${Number(result.totalAmount).toLocaleString('id-ID')}. Segera konfirmasi pembayaran Anda.`,
+        'checkout_payment',
+        'checkout',
+        result.checkoutId,
+    );
+
     return { data: result };
 }
 
@@ -234,6 +244,16 @@ export async function directCheckout(userId: number, body: DirectCheckoutInput):
         'Pesanan Baru',
         `Pembeli memesan ${qty} ${product.productName}`,
         'checkout',
+        'checkout',
+        result.checkoutId,
+    );
+
+    // FSD-06.2: notifikasi ke pembeli sendiri
+    notificationService.create(
+        userId,
+        'Pesanan Menunggu Pembayaran',
+        `Pesanan #${result.checkoutId} telah dibuat. Total: Rp ${Number(result.totalAmount).toLocaleString('id-ID')}. Segera konfirmasi pembayaran Anda.`,
+        'checkout_payment',
         'checkout',
         result.checkoutId,
     );
