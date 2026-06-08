@@ -31,42 +31,52 @@ const App = () => {
     return (
         <AuthProvider>
             <NotificationProvider>
-            <BrowserRouter>
-                <Routes>
-                    <Route element={<MainLayout />}>
-                        <Route index element={<Home />} />
-                        <Route path="catalog" element={<Catalog />} />
-                        <Route path="product/:id" element={<ProductDetail />} />
-                        <Route element={<ProtectedRoute />}>
-                            <Route path="transactions" element={<Transactions />} />
-                            <Route path="cart" element={<Cart />} />
-                            <Route path="notifications" element={<Notifications />} />
-                            <Route path="negotiations" element={<Negotiations />} />
-                            <Route path="negotiations/:id" element={<NegotiationDetail />} />
-                            <Route path="shop/new" element={<SellerSetup />} />
-                            <Route path="shop" element={<TokoSetting />} />
-                            <Route path="shop/dashboard" element={<DashboardSeller />} />
-                            <Route path="products" element={<ProductList />} />
-                            <Route path="contracts/new" element={<ContractNew />} />
-                            <Route path="contracts/:id" element={<ContractDetail />} />
-                        </Route>
-                    </Route>
-                    <Route element={<ProtectedRoute />}>
-                        <Route element={<RoleGuard roles={['admin']} />}>
-                            <Route path="admin" element={<AdminLayout />}>
-                                <Route index element={<Navigate to="users" replace />} />
-                                <Route path="users" element={<Users />} />
-                                <Route path="products" element={<Products />} />
-                                <Route path="audit" element={<AuditLogs />} />
+                <BrowserRouter>
+                    <Routes>
+                        <Route element={<MainLayout />}>
+                            <Route index element={<Home />} />
+                            <Route path="catalog" element={<Catalog />} />
+                            <Route path="product/:id" element={<ProductDetail />} />
+
+                            <Route element={<ProtectedRoute />}>
+                                <Route path="transactions" element={<Transactions />} />
+                                <Route path="cart" element={<Cart />} />
+                                <Route path="notifications" element={<Notifications />} />
+                                <Route path="negotiations" element={<Negotiations />} />
+                                <Route path="negotiations/:id" element={<NegotiationDetail />} />
+                                <Route path="shop/new" element={<SellerSetup />} />
+                                <Route path="contracts/new" element={<ContractNew />} />
+                                <Route path="contracts/:id" element={<ContractDetail />} />
+
+                                <Route element={<RoleGuard roles={['seller']} />}>
+                                    <Route path="shop" element={<TokoSetting />} />
+                                    <Route path="shop/dashboard" element={<DashboardSeller />} />
+
+                                    <Route path="products" element={<Navigate to="/shop/products" replace />} />
+                                    <Route path="shop/products" element={<ProductList />} />
+                                    <Route path="shop/products/create" element={<ProductList />} />
+                                    <Route path="shop/products/:id/edit" element={<ProductList />} />
+                                </Route>
                             </Route>
                         </Route>
-                    </Route>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/reset-password" element={<ResetPassword />} />
-                </Routes>
-            </BrowserRouter>
+
+                        <Route element={<ProtectedRoute />}>
+                            <Route element={<RoleGuard roles={['admin']} />}>
+                                <Route path="admin" element={<AdminLayout />}>
+                                    <Route index element={<Navigate to="users" replace />} />
+                                    <Route path="users" element={<Users />} />
+                                    <Route path="products" element={<Products />} />
+                                    <Route path="audit" element={<AuditLogs />} />
+                                </Route>
+                            </Route>
+                        </Route>
+
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
+                    </Routes>
+                </BrowserRouter>
             </NotificationProvider>
         </AuthProvider>
     );

@@ -15,7 +15,7 @@ const menus = {
         { label: 'Transaksi Saya', icon: Package, path: '/transactions' },
         { label: 'Keranjang', icon: ShoppingCart, path: '/cart' },
         { label: 'Toko Saya', icon: Store, path: '/shop' },
-        { label: 'Produk Saya', icon: Wheat, path: '/products' },
+        { label: 'Produk Saya', icon: Wheat, path: '/shop/products' },
         { label: 'Dashboard Penjualan', icon: LayoutDashboard, path: '/shop/dashboard' },
     ],
     admin: [
