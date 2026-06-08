@@ -127,6 +127,7 @@ export const checkout = {
   create: (data) => fetchApi('/checkouts', { method: 'POST', body: JSON.stringify(data) }),
   pay: (id) => fetchApi(`/checkouts/${id}/pay`, { method: 'PUT' }),
   cancel: (id) => fetchApi(`/checkouts/${id}/cancel`, { method: 'PUT' }),
+  getStatus: (id) => fetchApi(`/checkouts/${id}/status`),
 };
 
 export const dashboard = {
