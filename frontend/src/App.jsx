@@ -13,9 +13,11 @@ import ResetPassword from './pages/ResetPassword';
 import SellerSetup from './pages/SellerSetup';
 import Transactions from './pages/Transactions';
 import Cart from './pages/Cart';
+import DashboardBuyer from './pages/DashboardBuyer';
 import DashboardSeller from './pages/DashboardSeller';
 import ProductList from './pages/ProductList';
 import TokoSetting from './pages/TokoSetting';
+import AdminPage from './pages/AdminPage';
 import Users from './pages/admin/Users';
 import Products from './pages/admin/Products';
 import AuditLogs from './pages/admin/AuditLogs';
@@ -37,6 +39,7 @@ const App = () => {
                             <Route index element={<Home />} />
                             <Route path="catalog" element={<Catalog />} />
                             <Route path="product/:id" element={<ProductDetail />} />
+                            <Route path="products/:id" element={<ProductDetail />} />
 
                             <Route element={<ProtectedRoute />}>
                                 <Route path="transactions" element={<Transactions />} />
@@ -48,10 +51,13 @@ const App = () => {
                                 <Route path="contracts/new" element={<ContractNew />} />
                                 <Route path="contracts/:id" element={<ContractDetail />} />
 
+                                <Route element={<RoleGuard roles={['buyer']} />}>
+                                    <Route path="dashboard" element={<DashboardBuyer />} />
+                                </Route>
+
                                 <Route element={<RoleGuard roles={['seller']} />}>
                                     <Route path="shop" element={<TokoSetting />} />
                                     <Route path="shop/dashboard" element={<DashboardSeller />} />
-
                                     <Route path="products" element={<Navigate to="/shop/products" replace />} />
                                     <Route path="shop/products" element={<ProductList />} />
                                     <Route path="shop/products/create" element={<ProductList />} />
@@ -61,9 +67,10 @@ const App = () => {
                         </Route>
 
                         <Route element={<ProtectedRoute />}>
-                            <Route element={<RoleGuard roles={['admin']} />}>
+                            <Route element={<RoleGuard roles={['admin', 'super_admin', 'superadmin']} />}>
                                 <Route path="admin" element={<AdminLayout />}>
-                                    <Route index element={<Navigate to="users" replace />} />
+                                    <Route index element={<AdminPage />} />
+                                    <Route path="dashboard" element={<Navigate to="/admin" replace />} />
                                     <Route path="users" element={<Users />} />
                                     <Route path="products" element={<Products />} />
                                     <Route path="audit" element={<AuditLogs />} />
