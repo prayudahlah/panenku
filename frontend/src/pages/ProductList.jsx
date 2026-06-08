@@ -1,23 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, Edit3, ImagePlus, Package, Plus, Trash2, Upload, XCircle } from 'lucide-react';
 import { products, references, seller } from '../services/api';
 import { formatNumber } from '../utils/format';
 
 const PAGE_LIMIT = 10;
 const MAX_STOCK = 99999999;
-
-const MAIN_CATEGORY_NAMES = [
-    'Biji-bijian & Serealia',
-    'Buah-buahan',
-    'Bunga',
-    'Hasil Hutan Non-Kayu',
-    'Kacang-kacangan',
-    'Pakan Ternak',
-    'Rempah-rempah & Bumbu',
-    'Sayuran',
-    'Tanaman Perkebunan',
-    'Umbi-umbian',
-];
 
 const emptyForm = {
     name: '',
@@ -30,31 +18,64 @@ const emptyForm = {
     isNegotiable: false,
 };
 
-function getPayloadArray(json, key) {
+function getArrayPayload(json, key) {
     if (Array.isArray(json?.data)) return json.data;
     if (Array.isArray(json?.data?.[key])) return json.data[key];
     return [];
 }
 
-function normalizeText(value) {
-    return String(value || '').trim().toLowerCase();
-}
-
 function getParentId(category) {
-    return category?.parentId ?? category?.parent_id ?? category?.parentCategoryId ?? category?.parent_category_id;
+    return category?.parentId ?? category?.parent_id ?? category?.parentCategoryId ?? category?.parent_category_id ?? null;
 }
 
-function getMainCategories(categoryData) {
-    const mainNameSet = new Set(MAIN_CATEGORY_NAMES.map(normalizeText));
-    const orderMap = new Map(MAIN_CATEGORY_NAMES.map((name, index) => [normalizeText(name), index]));
+function hasNoParent(category) {
+    const parentId = getParentId(category);
+    return parentId === null || parentId === undefined || parentId === '';
+}
 
-    return categoryData
-        .filter((category) => {
-            const parentId = getParentId(category);
-            const hasNoParent = parentId === null || parentId === undefined || parentId === '';
-            return hasNoParent && mainNameSet.has(normalizeText(category.name));
-        })
-        .sort((a, b) => orderMap.get(normalizeText(a.name)) - orderMap.get(normalizeText(b.name)));
+function buildCategoryGroups(categories) {
+    const idSetWithChildren = new Set(
+        categories
+            .map((category) => getParentId(category))
+            .filter((parentId) => parentId !== null && parentId !== undefined && parentId !== '')
+            .map((parentId) => Number(parentId))
+    );
+
+    const parentById = new Map(categories.map((category) => [Number(category.id), category]));
+
+    const leafCategories = categories.filter((category) => !idSetWithChildren.has(Number(category.id)));
+    const rootLeaf = leafCategories.filter((category) => hasNoParent(category));
+    const childLeaf = leafCategories.filter((category) => !hasNoParent(category));
+
+    const groups = [];
+
+    if (rootLeaf.length) {
+        groups.push({
+            label: 'Kategori Utama',
+            options: rootLeaf.sort((a, b) => a.name.localeCompare(b.name)),
+        });
+    }
+
+    const groupedByParent = childLeaf.reduce((acc, category) => {
+        const parent = parentById.get(Number(getParentId(category)));
+        const label = parent?.name || 'Lainnya';
+
+        if (!acc[label]) acc[label] = [];
+        acc[label].push(category);
+
+        return acc;
+    }, {});
+
+    Object.keys(groupedByParent)
+        .sort((a, b) => a.localeCompare(b))
+        .forEach((label) => {
+            groups.push({
+                label,
+                options: groupedByParent[label].sort((a, b) => a.name.localeCompare(b.name)),
+            });
+        });
+
+    return groups;
 }
 
 const statusStyle = {
@@ -94,20 +115,31 @@ function Field({ label, error, children }) {
 }
 
 export default function ProductList() {
-    const [mode, setMode] = useState('list');
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { id: productId } = useParams();
+
+    const isCreateMode = location.pathname.endsWith('/create');
+    const isEditMode = Boolean(productId);
+    const isFormMode = isCreateMode || isEditMode;
+
     const [data, setData] = useState([]);
     const [summary, setSummary] = useState({ tersedia: 0, menipis: 0, habis: 0 });
     const [meta, setMeta] = useState({ page: 1, limit: PAGE_LIMIT, total: 0 });
+
     const [categories, setCategories] = useState([]);
     const [units, setUnits] = useState([]);
     const [form, setForm] = useState(emptyForm);
     const [selected, setSelected] = useState(null);
     const [deleteTarget, setDeleteTarget] = useState(null);
+
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [apiError, setApiError] = useState('');
     const [errors, setErrors] = useState({});
-    const [page, setPage] = useState(1);
+
+    const categoryGroups = useMemo(() => buildCategoryGroups(categories), [categories]);
 
     const loadCatalog = async () => {
         setLoading(true);
@@ -124,28 +156,86 @@ export default function ProductList() {
                 setApiError(json.message || 'Gagal memuat katalog produk');
             }
         } catch (error) {
-            setApiError('Gagal memuat katalog produk');
+            setApiError('Layanan tidak tersedia. Silakan coba lagi.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const loadReferences = async () => {
+        try {
+            const [categoryJson, unitJson] = await Promise.all([
+                references.getProductCategories(),
+                references.getUnits(),
+            ]);
+
+            if (categoryJson.success) {
+                setCategories(getArrayPayload(categoryJson, 'categories'));
+            }
+
+            if (unitJson.success) {
+                setUnits(getArrayPayload(unitJson, 'units'));
+            }
+        } catch (error) {
+            setApiError('Gagal memuat data referensi produk.');
+        }
+    };
+
+    const loadProductDetail = async (id) => {
+        setLoading(true);
+        setApiError('');
+        setErrors({});
+
+        try {
+            const json = await products.getById(id);
+
+            if (!json.success) {
+                setApiError(json.message || 'Gagal mengambil detail produk');
+                return;
+            }
+
+            const detail = json.data || {};
+            setSelected(detail);
+            setForm({
+                name: detail.name || detail.productName || '',
+                categoryId: detail.categoryId || detail.category_id || '',
+                description: detail.description || '',
+                unitId: detail.unitId || detail.unit_id || '',
+                minOrderQty: detail.minOrderQty || detail.min_order_qty || '1',
+                pricePerUnit: detail.pricePerUnit || detail.price_per_unit || '',
+                stockQuantity: detail.stockQuantity || detail.stock_quantity || '',
+                isNegotiable: Boolean(detail.isNegotiable ?? detail.is_negotiable),
+            });
+        } catch (error) {
+            setApiError('Layanan tidak tersedia. Silakan coba lagi.');
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        loadCatalog();
-    }, [page]);
+        loadReferences();
+    }, []);
 
     useEffect(() => {
-        references.getProductCategories().then((json) => {
-            if (json.success) {
-                const categoryData = getPayloadArray(json, 'categories');
-                setCategories(getMainCategories(categoryData));
-            }
-        });
+        if (!isFormMode) {
+            loadCatalog();
+        }
+    }, [isFormMode, page]);
 
-        references.getUnits().then((json) => {
-            if (json.success) setUnits(getPayloadArray(json, 'units'));
-        });
-    }, []);
+    useEffect(() => {
+        if (isCreateMode) {
+            setForm(emptyForm);
+            setSelected(null);
+            setErrors({});
+            setApiError('');
+            setLoading(false);
+        }
+
+        if (isEditMode) {
+            loadProductDetail(productId);
+        }
+    }, [isCreateMode, isEditMode, productId]);
 
     const updateForm = (field, value) => {
         setForm((prev) => ({ ...prev, [field]: value }));
@@ -165,19 +255,21 @@ export default function ProductList() {
 
         if (form.stockQuantity === '') {
             nextErrors.stockQuantity = 'Stok wajib diisi';
+        } else if (Number.isNaN(stock)) {
+            nextErrors.stockQuantity = 'Stok harus berupa angka';
         } else if (stock < 0) {
             nextErrors.stockQuantity = 'Stok tidak boleh negatif';
         } else if (stock > MAX_STOCK) {
             nextErrors.stockQuantity = `Stok maksimal ${formatNumber(MAX_STOCK)}`;
         }
 
-        if (form.minOrderQty === '' || minOrder <= 0) {
+        if (form.minOrderQty === '' || Number.isNaN(minOrder) || minOrder <= 0) {
             nextErrors.minOrderQty = 'Minimal pembelian harus lebih dari 0';
-        } else if (form.stockQuantity !== '' && minOrder > stock) {
+        } else if (form.stockQuantity !== '' && !Number.isNaN(stock) && minOrder > stock) {
             nextErrors.minOrderQty = 'Minimal pembelian tidak boleh melebihi stok';
         }
 
-        if (form.pricePerUnit === '' || price <= 0) {
+        if (form.pricePerUnit === '' || Number.isNaN(price) || price <= 0) {
             nextErrors.pricePerUnit = 'Harga harus lebih dari 0';
         }
 
@@ -196,56 +288,12 @@ export default function ProductList() {
         isNegotiable: Boolean(form.isNegotiable),
     });
 
-    const openCreate = () => {
-        setMode('create');
-        setSelected(null);
-        setForm(emptyForm);
-        setApiError('');
-        setErrors({});
-    };
-
-    const openEdit = async (product) => {
-        setApiError('');
-        setErrors({});
-        setSelected(product);
-        setMode('edit');
-
-        try {
-            const json = await products.getById(product.id);
-            const detail = json.success ? json.data : product;
-
-            setForm({
-                name: detail.name || detail.productName || '',
-                categoryId: detail.categoryId || '',
-                description: detail.description || '',
-                unitId: detail.unitId || '',
-                minOrderQty: detail.minOrderQty || '1',
-                pricePerUnit: detail.pricePerUnit || '',
-                stockQuantity: detail.stockQuantity || '',
-                isNegotiable: Boolean(detail.isNegotiable),
-            });
-        } catch (error) {
-            setApiError('Gagal mengambil detail produk.');
-
-            setForm({
-                name: product.name || product.productName || '',
-                categoryId: product.categoryId || '',
-                description: product.description || '',
-                unitId: product.unitId || '',
-                minOrderQty: product.minOrderQty || '1',
-                pricePerUnit: product.pricePerUnit || '',
-                stockQuantity: product.stockQuantity || '',
-                isNegotiable: Boolean(product.isNegotiable),
-            });
-        }
-    };
-
     const backToList = () => {
-        setMode('list');
-        setSelected(null);
         setForm(emptyForm);
+        setSelected(null);
         setApiError('');
         setErrors({});
+        navigate('/shop/products');
     };
 
     const handleSubmit = async (e) => {
@@ -256,13 +304,13 @@ export default function ProductList() {
         setApiError('');
 
         try {
-            const json = mode === 'edit'
-                ? await products.update(selected.id, getPayload())
+            const json = isEditMode
+                ? await products.update(productId, getPayload())
                 : await products.create(getPayload());
 
             if (json.success) {
                 backToList();
-                loadCatalog();
+                setPage(1);
             } else {
                 setApiError(json.message || 'Produk gagal disimpan');
             }
@@ -299,7 +347,7 @@ export default function ProductList() {
 
     const totalPages = Math.max(Math.ceil((meta.total || 0) / (meta.limit || PAGE_LIMIT)), 1);
 
-    if (mode !== 'list') {
+    if (isFormMode) {
         return (
             <div className="max-w-5xl mx-auto px-4 py-10">
                 <button onClick={backToList} className="flex items-center gap-1 text-sm text-gray-500 hover:text-primary-green mb-6">
@@ -307,159 +355,173 @@ export default function ProductList() {
                 </button>
 
                 <div className="mb-8">
-                    <p className="text-xs text-gray-400 mb-2">Katalog › {mode === 'edit' ? 'Perbarui Data Produk' : 'Tambah Produk Baru'}</p>
-                    <h1 className="text-3xl font-bold text-primary-green">{mode === 'edit' ? 'Perbarui Data Produk' : 'Tambah Produk Baru'}</h1>
+                    <p className="text-xs text-gray-400 mb-2">Katalog › {isEditMode ? 'Perbarui Data Produk' : 'Tambah Produk Baru'}</p>
+                    <h1 className="text-3xl font-bold text-primary-green">{isEditMode ? 'Perbarui Data Produk' : 'Tambah Produk Baru'}</h1>
                     <p className="text-secondary-brown text-sm mt-2">
-                        {mode === 'edit' ? 'Perbarui detail produk Anda dengan akurat.' : 'Lengkapi informasi produk untuk menarik pembeli.'}
+                        {isEditMode ? 'Perbarui detail produk Anda dengan akurat.' : 'Lengkapi informasi produk untuk menarik pembeli.'}
                     </p>
                 </div>
 
                 {apiError && <div className="mb-5 p-3 rounded-lg bg-red-50 text-red-600 text-sm border border-red-100">{apiError}</div>}
 
-                <form onSubmit={handleSubmit} className="grid lg:grid-cols-[1fr_320px] gap-6">
-                    <div className="space-y-6">
-                        <div className="bg-white rounded-xl shadow-sm border p-6 space-y-4">
-                            <h2 className="text-sm font-bold text-secondary-brown uppercase tracking-wide">Identitas Produk</h2>
+                {loading && isEditMode ? (
+                    <div className="bg-white rounded-xl border p-8 text-gray-400">Memuat detail produk...</div>
+                ) : (
+                    <form onSubmit={handleSubmit} className="grid lg:grid-cols-[1fr_320px] gap-6">
+                        <div className="space-y-6">
+                            <div className="bg-white rounded-xl shadow-sm border p-6 space-y-4">
+                                <h2 className="text-sm font-bold text-secondary-brown uppercase tracking-wide">Identitas Produk</h2>
 
-                            <Field label="Nama Produk" error={errors.name}>
-                                <input
-                                    value={form.name}
-                                    onChange={(e) => updateForm('name', e.target.value)}
-                                    className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
-                                    placeholder="Contoh: Sawi Hijau"
-                                />
-                            </Field>
-
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <Field label="Kategori" error={errors.categoryId}>
-                                    <select
-                                        value={form.categoryId}
-                                        onChange={(e) => updateForm('categoryId', e.target.value)}
-                                        className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
-                                    >
-                                        <option value="">Pilih kategori</option>
-                                        {categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-                                    </select>
-                                </Field>
-
-                                <Field label="Harga Dapat Dinegosiasikan?">
-                                    <select
-                                        value={form.isNegotiable ? 'true' : 'false'}
-                                        onChange={(e) => updateForm('isNegotiable', e.target.value === 'true')}
-                                        className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
-                                    >
-                                        <option value="true">Ya</option>
-                                        <option value="false">Tidak</option>
-                                    </select>
-                                </Field>
-                            </div>
-
-                            <Field label="Deskripsi Produk" error={errors.description}>
-                                <textarea
-                                    value={form.description}
-                                    onChange={(e) => updateForm('description', e.target.value)}
-                                    rows={4}
-                                    className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
-                                    placeholder="Tulis deskripsi singkat produk..."
-                                />
-                            </Field>
-                        </div>
-
-                        <div className="bg-white rounded-xl shadow-sm border p-6 space-y-4">
-                            <h2 className="text-sm font-bold text-secondary-brown uppercase tracking-wide">Commercial Details</h2>
-
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <Field label="Satuan" error={errors.unitId}>
-                                    <select
-                                        value={form.unitId}
-                                        onChange={(e) => updateForm('unitId', e.target.value)}
-                                        className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
-                                    >
-                                        <option value="">Pilih satuan</option>
-                                        {units.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-                                    </select>
-                                </Field>
-
-                                <Field label="Total Stok" error={errors.stockQuantity}>
+                                <Field label="Nama Produk" error={errors.name}>
                                     <input
-                                        type="number"
-                                        min="0"
-                                        step="any"
-                                        max={MAX_STOCK}
-                                        value={form.stockQuantity}
-                                        onChange={(e) => updateForm('stockQuantity', e.target.value)}
+                                        value={form.name}
+                                        onChange={(e) => updateForm('name', e.target.value)}
                                         className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
-                                    />
-                                </Field>
-                            </div>
-
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <Field label="Minimal Pembelian" error={errors.minOrderQty}>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        step="any"
-                                        value={form.minOrderQty}
-                                        onChange={(e) => updateForm('minOrderQty', e.target.value)}
-                                        className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
+                                        placeholder="Contoh: Sawi Hijau"
                                     />
                                 </Field>
 
-                                <Field label="Harga Jual Per Satuan" error={errors.pricePerUnit}>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        step="any"
-                                        value={form.pricePerUnit}
-                                        onChange={(e) => updateForm('pricePerUnit', e.target.value)}
-                                        className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
-                                        placeholder="0"
-                                    />
-                                </Field>
-                            </div>
-                        </div>
-                    </div>
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <Field label="Kategori" error={errors.categoryId}>
+                                        <select
+                                            value={form.categoryId}
+                                            onChange={(e) => updateForm('categoryId', e.target.value)}
+                                            className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
+                                        >
+                                            <option value="">Pilih kategori</option>
+                                            {categoryGroups.map((group) => (
+                                                <optgroup key={group.label} label={group.label}>
+                                                    {group.options.map((item) => (
+                                                        <option key={item.id} value={item.id}>{item.name}</option>
+                                                    ))}
+                                                </optgroup>
+                                            ))}
+                                        </select>
+                                        <p className="text-[11px] text-gray-400">
+                                            Pilih subkategori produk yang paling sesuai.
+                                        </p>
+                                    </Field>
 
-                    <div className="space-y-5">
-                        <div className="bg-neutral-stone-container rounded-xl p-6">
-                            <h2 className="text-sm font-bold text-secondary-brown uppercase tracking-wide mb-4">Galeri Produk</h2>
-                            <div className="border-2 border-dashed border-gray-300 rounded-xl min-h-[180px] flex flex-col items-center justify-center text-center px-4">
-                                <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-primary-green mb-3">
-                                    <Upload size={22} />
+                                    <Field label="Harga Dapat Dinegosiasikan?">
+                                        <select
+                                            value={form.isNegotiable ? 'true' : 'false'}
+                                            onChange={(e) => updateForm('isNegotiable', e.target.value === 'true')}
+                                            className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
+                                        >
+                                            <option value="true">Ya</option>
+                                            <option value="false">Tidak</option>
+                                        </select>
+                                    </Field>
                                 </div>
-                                <p className="font-bold text-primary-green text-sm">Upload High-Res Photos</p>
-                                <p className="text-xs text-gray-500 mt-1">Preview saja, backend belum menyediakan upload gambar produk.</p>
+
+                                <Field label="Deskripsi Produk" error={errors.description}>
+                                    <textarea
+                                        value={form.description}
+                                        onChange={(e) => updateForm('description', e.target.value)}
+                                        rows={4}
+                                        className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
+                                        placeholder="Tulis deskripsi singkat produk..."
+                                    />
+                                </Field>
                             </div>
-                            <div className="grid grid-cols-3 gap-2 mt-3">
-                                {[1, 2, 3, 4, 5, 6].map((item) => (
-                                    <div key={item} className="aspect-square rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400">
-                                        <ImagePlus size={16} />
+
+                            <div className="bg-white rounded-xl shadow-sm border p-6 space-y-4">
+                                <h2 className="text-sm font-bold text-secondary-brown uppercase tracking-wide">Commercial Details</h2>
+
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <Field label="Satuan" error={errors.unitId}>
+                                        <select
+                                            value={form.unitId}
+                                            onChange={(e) => updateForm('unitId', e.target.value)}
+                                            className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
+                                        >
+                                            <option value="">Pilih satuan</option>
+                                            {units.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                                        </select>
+                                    </Field>
+
+                                    <Field label="Total Stok" error={errors.stockQuantity}>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="any"
+                                            max={MAX_STOCK}
+                                            value={form.stockQuantity}
+                                            onChange={(e) => updateForm('stockQuantity', e.target.value)}
+                                            className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
+                                            placeholder="0"
+                                        />
+                                    </Field>
+                                </div>
+
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <Field label="Minimal Pembelian" error={errors.minOrderQty}>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            step="any"
+                                            value={form.minOrderQty}
+                                            onChange={(e) => updateForm('minOrderQty', e.target.value)}
+                                            className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
+                                        />
+                                    </Field>
+
+                                    <Field label="Harga Jual Per Satuan" error={errors.pricePerUnit}>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            step="any"
+                                            value={form.pricePerUnit}
+                                            onChange={(e) => updateForm('pricePerUnit', e.target.value)}
+                                            className="w-full bg-neutral-stone-container rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
+                                            placeholder="0"
+                                        />
+                                    </Field>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-5">
+                            <div className="bg-neutral-stone-container rounded-xl p-6">
+                                <h2 className="text-sm font-bold text-secondary-brown uppercase tracking-wide mb-4">Galeri Produk</h2>
+                                <div className="border-2 border-dashed border-gray-300 rounded-xl min-h-[180px] flex flex-col items-center justify-center text-center px-4">
+                                    <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-primary-green mb-3">
+                                        <Upload size={22} />
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {mode === 'edit' && (
-                            <div className="bg-secondary-brown-100 rounded-xl p-6 text-center">
-                                <p className="text-xs uppercase font-semibold text-secondary-brown mb-5">Status Produk</p>
-                                <p className="font-bold">Status: Aktif</p>
-                                <p className="text-sm">Tersedia untuk dijual</p>
-                                <div className="inline-flex items-center gap-2 bg-white rounded-full px-3 py-1 mt-5 text-xs text-primary-green font-medium">
-                                    <CheckCircle size={14} /> Terbit
+                                    <p className="font-bold text-primary-green text-sm">Upload High-Res Photos</p>
+                                    <p className="text-xs text-gray-500 mt-1">Preview saja, backend belum menyediakan upload gambar produk.</p>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2 mt-3">
+                                    {[1, 2, 3, 4, 5, 6].map((item) => (
+                                        <div key={item} className="aspect-square rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400">
+                                            <ImagePlus size={16} />
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
-                        )}
-                    </div>
 
-                    <div className="lg:col-span-2 flex justify-end gap-3 pt-4">
-                        <button type="button" onClick={backToList} className="px-6 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
-                            Batal
-                        </button>
-                        <button disabled={saving} type="submit" className="px-8 py-2.5 bg-primary-green text-white text-sm font-bold rounded-lg hover:bg-primary-green-800 disabled:opacity-60">
-                            {saving ? 'Menyimpan...' : mode === 'edit' ? 'Simpan Perubahan' : 'Publish to Marketplace'}
-                        </button>
-                    </div>
-                </form>
+                            {isEditMode && (
+                                <div className="bg-secondary-brown-100 rounded-xl p-6 text-center">
+                                    <p className="text-xs uppercase font-semibold text-secondary-brown mb-5">Status Produk</p>
+                                    <p className="font-bold">Status: Aktif</p>
+                                    <p className="text-sm">Tersedia untuk dijual</p>
+                                    <div className="inline-flex items-center gap-2 bg-white rounded-full px-3 py-1 mt-5 text-xs text-primary-green font-medium">
+                                        <CheckCircle size={14} /> Terbit
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="lg:col-span-2 flex justify-end gap-3 pt-4">
+                            <button type="button" onClick={backToList} className="px-6 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
+                                Batal
+                            </button>
+                            <button disabled={saving} type="submit" className="px-8 py-2.5 bg-primary-green text-white text-sm font-bold rounded-lg hover:bg-primary-green-800 disabled:opacity-60">
+                                {saving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Publish to Marketplace'}
+                            </button>
+                        </div>
+                    </form>
+                )}
             </div>
         );
     }
@@ -478,7 +540,7 @@ export default function ProductList() {
                         <span><b className="text-yellow-700">● {summary.menipis || 0}</b><br />Menipis</span>
                         <span><b className="text-red-700">● {summary.habis || 0}</b><br />Habis</span>
                     </div>
-                    <button onClick={openCreate} className="flex items-center gap-2 bg-primary-green text-white px-5 py-3 rounded-xl text-sm font-bold hover:bg-primary-green-800">
+                    <button onClick={() => navigate('/shop/products/create')} className="flex items-center gap-2 bg-primary-green text-white px-5 py-3 rounded-xl text-sm font-bold hover:bg-primary-green-800">
                         <Plus size={18} /> Tambah Produk
                     </button>
                 </div>
@@ -523,13 +585,13 @@ export default function ProductList() {
                                         {formatNumber(item.stockQuantity)} {item.unit}
                                     </td>
                                     <td className="py-4 px-6">
-                                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold ${statusStyle[item.status]}`}>
+                                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold ${statusStyle[item.status] || 'bg-gray-50 text-gray-600'}`}>
                                             ● {statusLabel[item.status] || item.status}
                                         </span>
                                     </td>
                                     <td className="py-4 px-6">
                                         <div className="flex items-center gap-3">
-                                            <button onClick={() => openEdit(item)} className="text-secondary-brown hover:text-primary-green" title="Edit produk">
+                                            <button onClick={() => navigate(`/shop/products/${item.id}/edit`)} className="text-secondary-brown hover:text-primary-green" title="Edit produk">
                                                 <Edit3 size={18} />
                                             </button>
                                             <button onClick={() => setDeleteTarget(item)} className="text-red-500 hover:text-red-700" title="Hapus produk">

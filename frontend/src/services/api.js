@@ -58,7 +58,7 @@ export const admin = {
 };
 
 export const audit = {
-  list: (params) => fetchApi(`/audit-logs${buildQuery(params)}`),
+  list: (params = {}) => fetchApi(`/audit-logs${buildQuery(params)}`),
 };
 
 export const products = {
@@ -70,7 +70,7 @@ export const products = {
 };
 
 export const panenApi = {
-  list: (params) => fetchApi(`/panen${buildQuery(params)}`),
+  list: (params = {}) => fetchApi(`/panen${buildQuery(params)}`),
   create: (data) => fetchApi('/panen', { method: 'POST', body: JSON.stringify(data) }),
   getById: (id) => fetchApi(`/panen/${id}`),
   update: (id, data) => fetchApi(`/panen/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
@@ -109,4 +109,10 @@ export const checkout = {
   create: (data) => fetchApi('/checkouts', { method: 'POST', body: JSON.stringify(data) }),
   pay: (id) => fetchApi(`/checkouts/${id}/pay`, { method: 'POST' }),
   cancel: (id) => fetchApi(`/checkouts/${id}/cancel`, { method: 'POST' }),
+};
+
+export const dashboard = {
+  buyer: () => fetchApi('/dashboard/buyer'),
+  seller: () => fetchApi('/dashboard/seller'),
+  admin: () => fetchApi('/dashboard/admin'),
 };
