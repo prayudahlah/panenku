@@ -1,26 +1,38 @@
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LogOut, Store, Wheat, LayoutDashboard, ShoppingCart, Package, Shield, UserPlus, MessageCircle } from 'lucide-react';
+import {
+    LayoutDashboard,
+    LogOut,
+    MessageCircle,
+    Package,
+    Shield,
+    ShoppingCart,
+    Store,
+    User,
+    UserPlus,
+    Wheat,
+} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const menus = {
     buyer: [
+        { label: 'Dashboard Transaksi', icon: LayoutDashboard, path: '/dashboard' },
         { label: 'Negosiasi', icon: MessageCircle, path: '/negotiations' },
         { label: 'Transaksi Saya', icon: Package, path: '/transactions' },
         { label: 'Keranjang', icon: ShoppingCart, path: '/cart' },
         { label: 'Daftar Jadi Penjual', icon: UserPlus, path: '/shop/new' },
     ],
     seller: [
+        { label: 'Dashboard Penjualan', icon: LayoutDashboard, path: '/shop/dashboard' },
         { label: 'Negosiasi', icon: MessageCircle, path: '/negotiations' },
         { label: 'Transaksi Saya', icon: Package, path: '/transactions' },
         { label: 'Keranjang', icon: ShoppingCart, path: '/cart' },
         { label: 'Toko Saya', icon: Store, path: '/shop' },
         { label: 'Produk Saya', icon: Wheat, path: '/shop/products' },
-        { label: 'Dashboard Penjualan', icon: LayoutDashboard, path: '/shop/dashboard' },
     ],
-    admin: [
-        { label: 'Admin', icon: Shield, path: '/admin' },
-    ],
+    admin: [{ label: 'Dashboard Admin', icon: Shield, path: '/admin' }],
+    super_admin: [{ label: 'Dashboard Admin', icon: Shield, path: '/admin' }],
+    superadmin: [{ label: 'Dashboard Admin', icon: Shield, path: '/admin' }],
 };
 
 export default function UserDropdown() {
@@ -30,43 +42,57 @@ export default function UserDropdown() {
     const ref = useRef(null);
 
     useEffect(() => {
-        const handler = (e) => {
-            if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+        const handler = (event) => {
+            if (ref.current && !ref.current.contains(event.target)) setOpen(false);
         };
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    const items = menus[user?.role] || [];
+    const role = String(user?.role || '').toLowerCase();
+    const items = menus[role] || [];
 
     return (
         <div className="relative" ref={ref}>
             <button
-                onClick={() => setOpen(!open)}
-                className="flex items-center gap-2 hover:bg-gray-100 rounded-lg p-1.5 transition"
+                type="button"
+                onClick={() => setOpen((value) => !value)}
+                className="flex items-center gap-2 rounded-lg p-1.5 transition hover:bg-gray-100"
             >
-                <div className="w-8 h-8 rounded-full bg-primary-green flex items-center justify-center">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-green">
                     <User size={16} className="text-white" />
                 </div>
-                <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate">{user?.fullName}</span>
+                <span className="max-w-[120px] truncate text-sm font-medium text-gray-700">{user?.fullName || user?.full_name || user?.email}</span>
             </button>
 
             {open && (
-                <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-xl shadow-lg border py-3 z-50">
-                    {items.map((item) => (
-                        <button
-                            key={item.path}
-                            onClick={() => { setOpen(false); navigate(item.path); }}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-                        >
-                            <item.icon size={18} className="text-gray-400" />
-                            {item.label}
-                        </button>
-                    ))}
-                    <div className="border-t my-1" />
+                <div className="absolute right-0 top-full z-50 mt-1 w-60 overflow-hidden rounded-xl border bg-white py-3 shadow-lg">
+                    {items.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                            <button
+                                key={item.path}
+                                type="button"
+                                onClick={() => {
+                                    setOpen(false);
+                                    navigate(item.path);
+                                }}
+                                className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition hover:bg-gray-50"
+                            >
+                                <Icon size={18} className="text-gray-400" />
+                                {item.label}
+                            </button>
+                        );
+                    })}
+                    <div className="my-1 border-t" />
                     <button
-                        onClick={() => { setOpen(false); logout(); navigate('/'); }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition"
+                        type="button"
+                        onClick={async () => {
+                            setOpen(false);
+                            await logout();
+                            navigate('/');
+                        }}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-500 transition hover:bg-red-50"
                     >
                         <LogOut size={18} />
                         Logout

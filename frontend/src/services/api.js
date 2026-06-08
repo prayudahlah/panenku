@@ -1,8 +1,15 @@
 import { API_URL } from '../constants';
 
 function buildQuery(params = {}) {
-  const query = new URLSearchParams(params).toString();
-  return query ? `?${query}` : '';
+  const query = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === '') return;
+    query.set(key, value);
+  });
+
+  const queryString = query.toString();
+  return queryString ? `?${queryString}` : '';
 }
 
 export async function fetchApi(path, options = {}, timeoutMs = 10000) {
@@ -16,8 +23,20 @@ export async function fetchApi(path, options = {}, timeoutMs = 10000) {
       credentials: 'include',
       signal: controller.signal,
     });
+
     clearTimeout(timer);
-    return res.json();
+
+    const text = await res.text();
+    if (!text) return { success: res.ok };
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      return {
+        success: false,
+        message: text || 'Response server tidak valid',
+      };
+    }
   } catch (err) {
     clearTimeout(timer);
     if (err.name === 'AbortError') {
@@ -52,7 +71,7 @@ export const admin = {
   listUsers: () => fetchApi('/users'),
   updateUserStatus: (id, status) => fetchApi(`/users/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
   listSellers: () => fetchApi('/sellers'),
-  listProducts: (sellerId) => fetchApi(`/products?${new URLSearchParams({ sellerId })}`),
+  listProducts: (sellerId) => fetchApi(`/products${buildQuery({ sellerId })}`),
   takedownProduct: (id) => fetchApi(`/products/${id}/takedown`, { method: 'PATCH' }),
 };
 
