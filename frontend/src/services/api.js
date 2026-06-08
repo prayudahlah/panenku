@@ -46,7 +46,6 @@ export const seller = {
   register: (data) => fetchApi('/sellers/register', { method: 'POST', body: JSON.stringify(data) }),
   getMyProfile: () => fetchApi('/sellers/profiles/me'),
   getCatalog: (params = {}) => fetchApi(`/sellers/catalog${buildQuery(params)}`),
-  catalog: (params = {}) => fetchApi(`/sellers/catalog${buildQuery(params)}`),
 };
 
 export const admin = {
