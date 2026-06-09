@@ -24,17 +24,23 @@ const emptyDashboard = {
 
 const statusLabel = {
   paid: 'Dibayar',
-  pending: 'Menunggu Pembayaran',
   unpaid: 'Belum Dibayar',
+  awaiting_payment: 'Menunggu Pembayaran',
+  pending: 'Tertunda',
   completed: 'Selesai',
   cancelled: 'Dibatalkan',
   shipped: 'Dikirim',
   picked_up: 'Dijemput',
+  out_for_delivery: 'Dalam Pengiriman',
+  partially_delivered: 'Dikirim Sebagian',
   delivered: 'Terkirim',
   active: 'Aktif',
   accepted: 'Disetujui',
   rejected: 'Ditolak',
   negotiation: 'Negosiasi',
+  refunded: 'Dikembalikan',
+  expired: 'Kadaluwarsa',
+  failed: 'Gagal',
 };
 
 function normalizeDashboard(payload) {
@@ -56,24 +62,29 @@ function getOrderTitle(order) {
   return 'Pesanan';
 }
 
+const STATUS_ORDER_PRIORITY = ['checkoutStatus', 'shipmentStatus'];
+const STATUS_TXN_PRIORITY = ['paymentStatus', 'checkoutStatus', 'shipmentStatus'];
+
 function getOrderStatus(order) {
-  return (
-    statusLabel[order?.shipmentStatus] ||
-    statusLabel[order?.checkoutStatus] ||
-    order?.shipmentStatus ||
-    order?.checkoutStatus ||
-    'Diproses'
-  );
+  for (const key of STATUS_ORDER_PRIORITY) {
+    const label = statusLabel[order?.[key]];
+    if (label) return label;
+  }
+  for (const key of STATUS_ORDER_PRIORITY) {
+    if (order?.[key]) return order[key];
+  }
+  return 'Diproses';
 }
 
 function getTransactionStatus(transaction) {
-  return (
-    statusLabel[transaction?.paymentStatus] ||
-    statusLabel[transaction?.checkoutStatus] ||
-    transaction?.paymentStatus ||
-    transaction?.checkoutStatus ||
-    '-'
-  );
+  for (const key of STATUS_TXN_PRIORITY) {
+    const label = statusLabel[transaction?.[key]];
+    if (label) return label;
+  }
+  for (const key of STATUS_TXN_PRIORITY) {
+    if (transaction?.[key]) return transaction[key];
+  }
+  return '-';
 }
 
 function SectionTitle({ icon: Icon, title, actionText, onAction, expanded }) {
@@ -134,7 +145,7 @@ function OrderCard({ order }) {
 }
 
 function NotificationItem({ item, onClick }) {
-  const isOrder = item?.type === 'order';
+  const isOrder = ['order', 'checkout', 'checkout_payment'].includes(item?.type);
   const isContract = item?.type === 'contract';
 
   return (
@@ -198,11 +209,13 @@ function TransactionHistory({ transactions, showAll, onToggle }) {
 
               <div>
                 <h3 className="text-[15px] font-bold leading-tight text-slate-900">
-                  Transaksi #{trx.checkoutId || trx.id || index + 1}
+                  {trx.orderNumber
+                    ? `Pesanan ${trx.orderNumber}`
+                    : `Transaksi #${trx.checkoutId || trx.id || index + 1}`}
                 </h3>
 
                 <p className="mt-1 text-[13px] leading-5 text-slate-500">
-                  {formatDate(trx.createdAt)} · {formatCurrency(trx.totalAmount)}
+                  {formatDate(trx.createdAt)} · {formatCurrency(trx.subtotal || trx.totalAmount)}
                 </p>
 
                 <p className="mt-1 text-[12px] font-bold text-secondary-brown">
@@ -258,9 +271,9 @@ function NegotiationCard({ negotiation }) {
           {statusLabel.negotiation}
         </span>
 
-        {negotiation?.price ? (
+        {negotiation?.agreedPriceOffer ? (
           <span className="text-[14px] font-bold text-secondary-brown">
-            {formatCurrency(negotiation.price)}
+            {formatCurrency(negotiation.agreedPriceOffer)}
           </span>
         ) : null}
       </div>

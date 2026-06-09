@@ -93,7 +93,7 @@ function navigateByReference(navigate, item) {
 
     if (type === 'negotiation' && id) navigate(`/negotiations/${id}`);
     else if (type === 'contract' && id) navigate(`/contracts/${id}`);
-    else if (type === 'order' || type === 'checkout') navigate('/transactions');
+    else if (['order', 'checkout', 'checkout_payment'].includes(type)) navigate('/transactions');
     else navigate('/notifications');
 }
 
@@ -232,8 +232,8 @@ export default function DashboardSeller() {
                                 onClick={() => navigateByReference(navigate, item)}
                                 className="group flex w-full items-center gap-4 rounded-2xl border border-gray-100 bg-white p-4 text-left shadow-sm transition hover:border-primary-green"
                             >
-                                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${item.type === 'order' ? 'bg-orange-100 text-secondary-brown' : 'bg-green-100 text-primary-green'}`}>
-                                    {item.type === 'order' ? <Package size={18} /> : <Bell size={18} />}
+                                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${['order', 'checkout', 'checkout_payment'].includes(item.type) ? 'bg-orange-100 text-secondary-brown' : 'bg-green-100 text-primary-green'}`}>
+                                    {['order', 'checkout', 'checkout_payment'].includes(item.type) ? <Package size={18} /> : <Bell size={18} />}
                                 </span>
                                 <span className="min-w-0 flex-1">
                                     <span className="block font-bold text-gray-900">{item.title || 'Notifikasi'}</span>
