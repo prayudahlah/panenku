@@ -71,16 +71,23 @@ BEGIN
     FROM (
         SELECT
             c.id AS "checkoutId",
+            o.id AS "orderId",
+            o.order_number AS "orderNumber",
+            o.subtotal AS "subtotal",
             c.total_amount AS "totalAmount",
             cs.code AS "checkoutStatus",
             ps.code AS "paymentStatus",
-            c.created_at AS "createdAt"
+            ss.code AS "shipmentStatus",
+            o.created_at AS "createdAt"
         FROM "transaction".checkouts c
+        INNER JOIN "transaction".orders o ON o.checkout_id = c.id
         LEFT JOIN reference.checkout_statuses cs ON cs.id = c.checkout_status_id
         LEFT JOIN "transaction".payments p ON p.id = c.payment_id
         LEFT JOIN reference.payment_statuses ps ON ps.id = p.payment_status_id
+        LEFT JOIN "transaction".shipments s ON s.id = o.shipment_id
+        LEFT JOIN reference.shipment_statuses ss ON ss.id = s.shipment_status_id
         WHERE c.buyer_id = p_user_id
-        ORDER BY c.created_at DESC
+        ORDER BY o.created_at DESC
         LIMIT 5
     ) data_row;
 
@@ -134,6 +141,7 @@ BEGIN
             n.seller_id AS "sellerId",
             n.product_id AS "productId",
             p.name AS "productName",
+            sp.farm_name AS "sellerName",
             n.agreed_price_offer AS "agreedPriceOffer",
             n.agreed_quantity_offer AS "agreedQuantityOffer",
             n.status,
@@ -141,6 +149,7 @@ BEGIN
             n.created_at AS "createdAt"
         FROM "transaction".negotiations n
         LEFT JOIN master.products p ON p.id = n.product_id
+        LEFT JOIN master.seller_profiles sp ON sp.user_id = n.seller_id
         WHERE n.buyer_id = p_user_id
           AND n.status = 'ongoing'
         ORDER BY n.created_at DESC
@@ -402,7 +411,7 @@ BEGIN
             COUNT(*) AS "totalTransactions",
             COALESCE(SUM(c.total_amount), 0) AS "totalAmount"
         FROM "transaction".checkouts c
-        WHERE c.created_at >= NOW() - INTERVAL '30 days'
+        WHERE c.created_at >= NOW() - INTERVAL '90 days'
         GROUP BY DATE_TRUNC('day', c.created_at)
         ORDER BY DATE_TRUNC('day', c.created_at)
     ) data_row;
