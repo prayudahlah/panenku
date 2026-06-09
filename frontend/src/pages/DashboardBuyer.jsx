@@ -24,6 +24,7 @@ const emptyDashboard = {
 
 const statusLabel = {
   paid: 'Dibayar',
+  awaiting_payment: 'Menunggu Pembayaran',
   pending: 'Menunggu Pembayaran',
   unpaid: 'Belum Dibayar',
   completed: 'Selesai',
@@ -35,6 +36,7 @@ const statusLabel = {
   accepted: 'Disetujui',
   rejected: 'Ditolak',
   negotiation: 'Negosiasi',
+  confirmed: 'Dikonfirmasi',
 };
 
 function normalizeDashboard(payload) {
@@ -107,6 +109,17 @@ function EmptyState({ message }) {
   );
 }
 
+function getOrderBadgeStyle(order) {
+  const status = order?.checkoutStatus;
+  if (status === 'paid') return 'bg-green-50 text-green-700';
+  if (status === 'cancelled') return 'bg-red-50 text-red-600';
+  if (status === 'awaiting_payment') return 'bg-yellow-50 text-yellow-700';
+  const shipStatus = order?.shipmentStatus;
+  if (shipStatus === 'shipped' || shipStatus === 'picked_up') return 'bg-blue-50 text-blue-600';
+  if (shipStatus === 'delivered') return 'bg-green-50 text-green-700';
+  return 'bg-gray-100 text-gray-500';
+}
+
 function OrderCard({ order }) {
   return (
     <article className="min-h-36 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:border-primary-green/25 hover:shadow-md">
@@ -115,7 +128,7 @@ function OrderCard({ order }) {
           {getOrderTitle(order)}
         </h3>
 
-        <span className="shrink-0 rounded-xl bg-blue-50 px-3 py-1.5 text-[12px] font-bold text-blue-600">
+        <span className={`shrink-0 rounded-xl px-3 py-1.5 text-[12px] font-bold ${getOrderBadgeStyle(order)}`}>
           {getOrderStatus(order)}
         </span>
       </div>
@@ -356,6 +369,16 @@ const DashboardBuyer = () => {
 
   useEffect(() => {
     loadDashboard();
+  }, [loadDashboard]);
+
+  // Reload otomatis kalau ada aksi pembayaran dari halaman Notifikasi
+  useEffect(() => {
+    let channel;
+    try {
+      channel = new BroadcastChannel('panenku_checkout');
+      channel.onmessage = () => loadDashboard();
+    } catch {}
+    return () => { try { channel?.close(); } catch {} };
   }, [loadDashboard]);
 
   const activeOrders = useMemo(

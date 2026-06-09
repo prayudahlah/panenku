@@ -38,6 +38,8 @@ function CheckoutAction({ notif, onDone }) {
         if (json.success) {
             setResult('paid');
             onDone(notif.id);
+            // Beritahu dashboard untuk reload
+            try { new BroadcastChannel('panenku_checkout').postMessage('refresh'); } catch {}
         } else {
             const msg = json.message || '';
             if (ALREADY_PROCESSED_MSGS.some((s) => msg.toLowerCase().includes(s))) {
@@ -57,6 +59,8 @@ function CheckoutAction({ notif, onDone }) {
         if (json.success) {
             setResult('cancelled');
             onDone(notif.id);
+            // Beritahu dashboard untuk reload
+            try { new BroadcastChannel('panenku_checkout').postMessage('refresh'); } catch {}
         } else {
             const msg = json.message || '';
             if (ALREADY_PROCESSED_MSGS.some((s) => msg.toLowerCase().includes(s))) {

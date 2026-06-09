@@ -237,8 +237,17 @@ BEGIN
             o.order_number AS "orderNumber",
             o.checkout_id AS "checkoutId",
             o.subtotal,
-            o.created_at AS "createdAt"
+            o.created_at AS "createdAt",
+            oi.order_item_status_id AS "orderItemStatusId",
+            c.checkout_status_id AS "checkoutStatusId"
         FROM "transaction".orders o
+        INNER JOIN "transaction".checkouts c ON c.id = o.checkout_id
+        LEFT JOIN LATERAL (
+            SELECT order_item_status_id
+            FROM transaction.order_items
+            WHERE order_id = o.id
+            LIMIT 1
+        ) oi ON true
         WHERE o.seller_id = p_user_id
         ORDER BY o.created_at DESC
         LIMIT 5
