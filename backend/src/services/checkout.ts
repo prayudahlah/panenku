@@ -293,6 +293,15 @@ export async function pay(userId: number, checkoutId: number): Promise<ServiceRe
         );
     }
 
+    notificationService.create(
+        checkout.buyerId,
+        'Pembayaran Berhasil',
+        `Pesanan #${checkoutId} berhasil dibayar`,
+        'checkout_payment',
+        'checkout',
+        checkoutId,
+    );
+
     return { data: { checkoutId, status: 'paid' } };
 }
 
