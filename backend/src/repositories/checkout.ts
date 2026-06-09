@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { eq, and, isNull, inArray, sql } from 'drizzle-orm';
-import { carts, cartItems, products, sellerProfiles, units, checkouts, orders, orderItems, payments, shipments } from '../db/schema';
+import { carts, cartItems, products, sellerProfiles, units, checkouts, orders, orderItems, payments, shipments, checkoutStatuses } from '../db/schema';
 
 type DBLike = typeof db;
 
@@ -253,6 +253,15 @@ export async function findPaymentByCheckoutId(checkoutId: number) {
         .select({ paymentId: checkouts.paymentId })
         .from(checkouts)
         .where(eq(checkouts.id, checkoutId))
+        .limit(1);
+    return result[0] || null;
+}
+
+export async function findCheckoutStatus(checkoutStatusId: number) {
+    const result = await db
+        .select({ code: checkoutStatuses.code })
+        .from(checkoutStatuses)
+        .where(eq(checkoutStatuses.id, checkoutStatusId))
         .limit(1);
     return result[0] || null;
 }

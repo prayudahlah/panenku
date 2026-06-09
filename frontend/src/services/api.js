@@ -125,8 +125,11 @@ export const cart = {
 export const checkout = {
   direct: (data) => fetchApi('/checkouts/direct', { method: 'POST', body: JSON.stringify(data) }),
   create: (data) => fetchApi('/checkouts', { method: 'POST', body: JSON.stringify(data) }),
-  pay: (id) => fetchApi(`/checkouts/${id}/pay`, { method: 'POST' }),
-  cancel: (id) => fetchApi(`/checkouts/${id}/cancel`, { method: 'POST' }),
+  pay: (id) => fetchApi(`/checkouts/${id}/pay`, { method: 'PUT' }),
+  cancel: (id) => fetchApi(`/checkouts/${id}/cancel`, { method: 'PUT' }),
+  getStatus: (id) => fetchApi(`/checkouts/${id}/status`),
+  shipOrder: (checkoutId, orderId) => fetchApi(`/checkouts/${checkoutId}/orders/${orderId}/ship`, { method: 'PUT' }),
+  cancelOrder: (checkoutId, orderId) => fetchApi(`/checkouts/${checkoutId}/orders/${orderId}/cancel`, { method: 'PUT' }),
 };
 
 export const dashboard = {

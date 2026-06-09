@@ -9,7 +9,7 @@ import {
     RotateCcw,
     Wallet,
 } from 'lucide-react';
-import { dashboard } from '../services/api';
+import { dashboard, checkout } from '../services/api';
 import { formatCurrency, formatDate } from '../utils/format';
 
 const getArray = (value) => (Array.isArray(value) ? value : []);
@@ -145,6 +145,8 @@ export default function DashboardSeller() {
     const [showAllNotifications, setShowAllNotifications] = useState(false);
     const [showAllContracts, setShowAllContracts] = useState(false);
     const [showFullHistory, setShowFullHistory] = useState(false);
+    const [actionLoading, setActionLoading] = useState({});
+    const [completedActions, setCompletedActions] = useState({});
 
     const loadDashboard = useCallback(async () => {
         setLoading(true);
@@ -160,9 +162,60 @@ export default function DashboardSeller() {
         }
     }, []);
 
+    // -------------------------------------------------------------------
+    // Order actions (shipping & cancel) – FSD 06.3 implementation
+    // -------------------------------------------------------------------
+    const handleShipOrder = async (order) => {
+        const orderId = order.orderId || order.id;
+        const checkoutId = order.checkoutId; // assume present
+        if (!checkoutId) {
+            setError('Tidak ada checkoutId untuk pesanan ini.');
+            return;
+        }
+        setActionLoading((prev) => ({ ...prev, [orderId]: true }));
+        try {
+            const res = await checkout.shipOrder(checkoutId, orderId);
+            if (res?.success === false) {
+    const msg = res.errorCode === 'ERR-LOG-01' ? 'Akses Ditolak' : (res.message || 'Gagal mengirim pesanan');
+    throw new Error(msg);
+}
+            await loadDashboard();
+            setCompletedActions((prev) => ({ ...prev, [orderId]: 'shipped' }));
+        } catch (err) {
+            setError(err.message || 'Error mengirim pesanan');
+        } finally {
+            setActionLoading((prev) => ({ ...prev, [orderId]: false }));
+        }
+    };
+
+    const handleCancelOrder = async (order) => {
+        const orderId = order.orderId || order.id;
+        const checkoutId = order.checkoutId;
+        if (!checkoutId) {
+            setError('Tidak ada checkoutId untuk pesanan ini.');
+            return;
+        }
+        setActionLoading((prev) => ({ ...prev, [orderId]: true }));
+        try {
+            const res = await checkout.cancelOrder(checkoutId, orderId);
+            if (res?.success === false) {
+    const msg = res.errorCode === 'ERR-LOG-01' ? 'Akses Ditolak' : (res.message || 'Gagal membatalkan pesanan');
+    throw new Error(msg);
+}
+            await loadDashboard();
+            setCompletedActions((prev) => ({ ...prev, [orderId]: 'cancelled' }));
+        } catch (err) {
+            setError(err.message || 'Error membatalkan pesanan');
+        } finally {
+            setActionLoading((prev) => ({ ...prev, [orderId]: false }));
+        }
+    };
+
     useEffect(() => {
         loadDashboard();
     }, []);
+
+
 
     const notifications = useMemo(() => getArray(data.notifications), [data]);
     const contracts = useMemo(() => getArray(data.activeContracts), [data]);
@@ -283,6 +336,7 @@ export default function DashboardSeller() {
                                     <th className="px-5 py-4">Order</th>
                                     <th className="px-5 py-4">Tanggal</th>
                                     <th className="px-5 py-4">Subtotal</th>
+                                    <th className="px-5 py-4">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -291,6 +345,41 @@ export default function DashboardSeller() {
                                         <td className="px-5 py-4 font-bold text-gray-900">{item.orderNumber || `ORD-${item.orderId || item.id}`}</td>
                                         <td className="px-5 py-4 text-gray-500">{formatDate(item.createdAt)}</td>
                                         <td className="px-5 py-4 font-bold text-primary-green">{formatCurrency(item.subtotal || item.totalAmount)}</td>
+                                        <td className="px-5 py-4">
+                                            {(() => {
+                                                const id = item.orderId || item.id;
+                                                const statusFromBackend = item.orderItemStatusId;
+                                                const checkoutStatus = item.checkoutStatusId;
+                                                const isAwaitingPayment = checkoutStatus === 4;
+                                                const isCheckoutCancelled = checkoutStatus === 2;
+                                                const isShipped = statusFromBackend === 4 || completedActions[id] === 'shipped';
+                                                const isItemCancelled = statusFromBackend === 5 || completedActions[id] === 'cancelled';
+                                                if (isAwaitingPayment) return <span className="text-xs font-medium text-amber-600">Menunggu Konfirmasi Pembayaran</span>;
+                                                if (isCheckoutCancelled) return <span className="text-xs font-medium text-gray-500">Pesanan Dibatalkan oleh Pembeli</span>;
+                                                if (isShipped) return <span className="text-xs font-medium text-green-600">Pesanan Sudah Dikirim</span>;
+                                                if (isItemCancelled) return <span className="text-xs font-medium text-red-500">Pesanan Dibatalkan</span>;
+                                                return (
+                                                <div className="space-x-2">
+                                                    <button
+                                                        type="button"
+                                                        disabled={actionLoading[item.orderId || item.id]}
+                                                        onClick={() => handleShipOrder(item)}
+                                                        className="rounded-md bg-primary-green px-3 py-1 text-xs font-medium text-white hover:bg-primary-green/80 disabled:opacity-50"
+                                                    >
+                                                        Barang Sudah Dikirim
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        disabled={actionLoading[item.orderId || item.id]}
+                                                        onClick={() => handleCancelOrder(item)}
+                                                        className="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                                                    >
+                                                        Batalkan Pesanan
+                                                    </button>
+                                                </div>
+                                            );
+                                        })()}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
