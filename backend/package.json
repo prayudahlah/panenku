@@ -6,6 +6,7 @@
     "dev": "bun --watch src/index.ts",
     "start": "bun src/index.ts",
     "build": "bun build src/index.ts --outdir=dist",
+    "db:push": "drizzle-kit push",
     "test": "bun test"
   },
   "dependencies": {

@@ -317,6 +317,7 @@ export async function cancel(userId: number, checkoutId: number): Promise<Servic
     await db.transaction(async (tx: any) => {
         await checkoutRepo.updatePaymentStatus(tx, checkout.paymentId!, PAYMENT_STATUS_CANCELLED);
         await checkoutRepo.updateCheckoutStatus(tx, checkoutId, CHECKOUT_STATUS_CANCELLED);
+        await checkoutRepo.confirmOrderItemsByCheckout(tx, checkoutId, ORDER_ITEM_STATUS_CANCELLED);
 
         const items = await checkoutRepo.findOrderItemsByCheckout(tx, checkoutId);
         for (const item of items) {
@@ -352,7 +353,7 @@ export async function confirmShipment(
 
     const sellerProfile = await checkoutRepo.findSellerProfileByUserId(userId);
     if (!sellerProfile) return { error: 'Akses ditolak', status: 403 };
-    if (sellerProfile.id !== order.sellerId) return { error: 'Akses ditolak', status: 403 };
+    if (sellerProfile.userId !== order.sellerId) return { error: 'Akses ditolak', status: 403 };
 
     if (order.checkoutStatusId !== CHECKOUT_STATUS_PAID) return { error: 'Checkout belum dibayar', status: 422 };
 
@@ -409,7 +410,7 @@ export async function sellerCancelOrder(
 
     const sellerProfile = await checkoutRepo.findSellerProfileByUserId(userId);
     if (!sellerProfile) return { error: 'Akses ditolak', status: 403 };
-    if (sellerProfile.id !== order.sellerId) return { error: 'Akses ditolak', status: 403 };
+    if (sellerProfile.userId !== order.sellerId) return { error: 'Akses ditolak', status: 403 };
 
     if (order.checkoutStatusId !== CHECKOUT_STATUS_PAID) return { error: 'Checkout belum dibayar', status: 422 };
 
@@ -424,6 +425,7 @@ export async function sellerCancelOrder(
             cancelledSubtotal += Number(item.subtotal);
         }
         await checkoutRepo.updateOrderItemsByOrderId(tx, orderId, ORDER_ITEM_STATUS_CANCELLED);
+        await checkoutRepo.updatePaymentStatus(tx, paymentRecord.paymentId!, PAYMENT_STATUS_REFUNDED);
 
         const checkoutData = await checkoutRepo.findCheckoutById(checkoutId, tx);
         if (checkoutData) {
