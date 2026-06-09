@@ -149,6 +149,16 @@ export async function checkout(userId: number, body: CheckoutInput): Promise<Ser
         );
     }
 
+    // FSD-06.2: notifikasi ke pembeli sendiri sebagai trigger konfirmasi pembayaran
+    notificationService.create(
+        userId,
+        'Pesanan Menunggu Pembayaran',
+        `Pesanan #${result.checkoutId} telah dibuat. Total: Rp ${Number(result.totalAmount).toLocaleString('id-ID')}.`,
+        'checkout_payment',
+        'checkout',
+        result.checkoutId,
+    );
+
     return { data: result };
 }
 
@@ -238,6 +248,16 @@ export async function directCheckout(userId: number, body: DirectCheckoutInput):
         result.checkoutId,
     );
 
+    // FSD-06.2: notifikasi ke pembeli sendiri
+    notificationService.create(
+        userId,
+        'Pesanan Menunggu Pembayaran',
+        `Pesanan #${result.checkoutId} telah dibuat. Total: Rp ${Number(result.totalAmount).toLocaleString('id-ID')}.`,
+        'checkout_payment',
+        'checkout',
+        result.checkoutId,
+    );
+
     return { data: { ...result, items: [] } };
 }
 
@@ -288,6 +308,7 @@ export async function cancel(userId: number, checkoutId: number): Promise<Servic
     await db.transaction(async (tx: any) => {
         await checkoutRepo.updatePaymentStatus(tx, checkout.paymentId!, PAYMENT_STATUS_CANCELLED);
         await checkoutRepo.updateCheckoutStatus(tx, checkoutId, CHECKOUT_STATUS_CANCELLED);
+        await checkoutRepo.confirmOrderItemsByCheckout(tx, checkoutId, ORDER_ITEM_STATUS_CANCELLED);
 
         const items = await checkoutRepo.findOrderItemsByCheckout(tx, checkoutId);
         for (const item of items) {
@@ -323,7 +344,7 @@ export async function confirmShipment(
 
     const sellerProfile = await checkoutRepo.findSellerProfileByUserId(userId);
     if (!sellerProfile) return { error: 'Akses ditolak', status: 403 };
-    if (sellerProfile.id !== order.sellerId) return { error: 'Akses ditolak', status: 403 };
+    if (sellerProfile.userId !== order.sellerId) return { error: 'Akses ditolak', status: 403 };
 
     if (order.checkoutStatusId !== CHECKOUT_STATUS_PAID) return { error: 'Checkout belum dibayar', status: 422 };
 
@@ -355,6 +376,22 @@ export async function confirmShipment(
     return { data: result };
 }
 
+export async function getStatus(userId: number, checkoutId: number): Promise<ServiceResult<{ checkoutId: number; statusCode: string; isAwaitingPayment: boolean }>> {
+    const checkout = await checkoutRepo.findCheckoutById(checkoutId);
+    if (!checkout) return { error: 'Checkout tidak ditemukan', status: 404 };
+    if (checkout.buyerId !== userId) return { error: 'Akses ditolak', status: 403 };
+
+    const statusRow = await checkoutRepo.findCheckoutStatus(checkout.checkoutStatusId);
+    const statusCode = statusRow?.code ?? '';
+    return {
+        data: {
+            checkoutId,
+            statusCode,
+            isAwaitingPayment: statusCode === 'awaiting_payment',
+        },
+    };
+}
+
 export async function sellerCancelOrder(
     userId: number, checkoutId: number, orderId: number
 ): Promise<ServiceResult<{ orderId: number; status: string }>> {
@@ -364,7 +401,7 @@ export async function sellerCancelOrder(
 
     const sellerProfile = await checkoutRepo.findSellerProfileByUserId(userId);
     if (!sellerProfile) return { error: 'Akses ditolak', status: 403 };
-    if (sellerProfile.id !== order.sellerId) return { error: 'Akses ditolak', status: 403 };
+    if (sellerProfile.userId !== order.sellerId) return { error: 'Akses ditolak', status: 403 };
 
     if (order.checkoutStatusId !== CHECKOUT_STATUS_PAID) return { error: 'Checkout belum dibayar', status: 422 };
 
@@ -379,6 +416,7 @@ export async function sellerCancelOrder(
             cancelledSubtotal += Number(item.subtotal);
         }
         await checkoutRepo.updateOrderItemsByOrderId(tx, orderId, ORDER_ITEM_STATUS_CANCELLED);
+        await checkoutRepo.updatePaymentStatus(tx, paymentRecord.paymentId!, PAYMENT_STATUS_REFUNDED);
 
         const checkoutData = await checkoutRepo.findCheckoutById(checkoutId, tx);
         if (checkoutData) {
