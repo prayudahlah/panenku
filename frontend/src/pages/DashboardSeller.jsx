@@ -93,7 +93,7 @@ function navigateByReference(navigate, item) {
 
     if (type === 'negotiation' && id) navigate(`/negotiations/${id}`);
     else if (type === 'contract' && id) navigate(`/contracts/${id}`);
-    else if (['order', 'checkout', 'checkout_payment'].includes(type)) navigate('/transactions');
+    else if (['order', 'checkout', 'checkout_payment'].includes(type)) navigate('/dashboard');
     else navigate('/notifications');
 }
 
@@ -110,7 +110,7 @@ function ContractCard({ contract }) {
     })();
 
     return (
-        <article className="relative overflow-hidden rounded-2xl bg-[#eeeee9] p-8 shadow-sm">
+        <article className="relative overflow-hidden rounded-2xl bg-[#eeeee9] p-8 shadow-sm cursor-pointer hover:shadow-md hover:brightness-[0.98] transition-all">
             <div className="relative z-10 max-w-2xl">
                 <h3 className="text-xl font-extrabold text-gray-900">
                     Kontrak dengan {contract.buyerName || contract.sellerName || 'Mitra Panenku'}
@@ -312,7 +312,15 @@ export default function DashboardSeller() {
                     <EmptyCard>Belum ada kemitraan aktif.</EmptyCard>
                 ) : (
                     <div className="space-y-5">
-                        {visibleContracts.map((contract) => <ContractCard key={contract.contractId || contract.id} contract={contract} />)}
+                        {visibleContracts.map((contract) => (
+                            <button
+                                key={contract.contractId || contract.id}
+                                onClick={() => navigate(`/contracts/${contract.id}`)}
+                                className="w-full text-left"
+                            >
+                                <ContractCard contract={contract} />
+                            </button>
+                        ))}
                     </div>
                 )}
             </section>
