@@ -31,6 +31,7 @@ import ContractDetail from './pages/ContractDetail';
 
 import Checkout from './pages/Checkout';
 import NotFound from './pages/NotFound';
+import SellerProfile from './pages/SellerProfile';
 
 const App = () => {
     return (
@@ -43,6 +44,7 @@ const App = () => {
                             <Route path="catalog" element={<Catalog />} />
                             <Route path="product/:id" element={<ProductDetail />} />
                             <Route path="products/:id" element={<ProductDetail />} />
+                            <Route path="sellers/:sellerId" element={<SellerProfile />} />
 
                             <Route element={<ProtectedRoute />}>
                                 <Route path="transactions" element={<Transactions />} />
