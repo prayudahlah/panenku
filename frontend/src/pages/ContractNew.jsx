@@ -1,18 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2, Loader, Handshake } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Loader, Handshake, Search, X, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { references, products, contracts } from '../services/api';
+import { references, contracts, seller } from '../services/api';
+import { formatCurrency } from '../utils/format';
 import AddressPicker from '../components/AddressPicker';
-
-const dayNames = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-
-const frequencyLabels = {
-    daily: 'Setiap Hari',
-    weekly: 'Mingguan',
-    monthly: 'Bulanan',
-    custom: 'Kustom',
-};
+import SchedulePicker, { frequencyLabels } from '../components/SchedulePicker';
 
 export default function ContractNew() {
     const { user } = useAuth();
@@ -33,21 +26,36 @@ export default function ContractNew() {
         description: '',
     });
     const [error, setError] = useState('');
+    const [fetchError, setFetchError] = useState('');
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(true);
     const [productSearch, setProductSearch] = useState({});
+    const [showDropdown, setShowDropdown] = useState({});
+    const productRefs = useRef({});
+    const errorRef = useRef(null);
 
     useEffect(() => {
         if (!user) return;
+        setFetchError('');
         Promise.all([
-            products.list({ sellerId }),
+            seller.getProductsBySeller(sellerId),
             references.getUnits(),
         ]).then(([prodJson, unitJson]) => {
             if (prodJson.success) setSellerProducts(prodJson.data);
+            else setFetchError('Gagal memuat produk penjual');
             if (unitJson.success) setUnits(unitJson.data);
+            setFetching(false);
+        }).catch(() => {
+            setFetchError('Gagal memuat data. Silakan coba lagi.');
             setFetching(false);
         });
     }, [user, sellerId]);
+
+    useEffect(() => {
+        if (error && errorRef.current) {
+            errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, [error]);
 
     const updateProduct = (index, field, value) => {
         setForm((f) => {
@@ -71,55 +79,27 @@ export default function ContractNew() {
         }));
     };
 
-    const updateSchedule = (index, field, value) => {
-        setForm((f) => {
-            const schedules = [...f.schedules];
-            schedules[index] = { ...schedules[index], [field]: value };
-            return { ...f, schedules };
-        });
-    };
 
-    const addScheduleDate = (date) => {
-        setForm((f) => ({
-            ...f,
-            schedules: [...f.schedules, { deliveryDay: '', deliveryDate: date, deliveryTime: '' }],
-        }));
-    };
 
-    const removeSchedule = (index) => {
-        setForm((f) => ({
-            ...f,
-            schedules: f.schedules.filter((_, i) => i !== index),
-        }));
-    };
-
-    const handleDayToggle = (day) => {
-        const existing = form.schedules.find((s) => s.deliveryDay === day);
-        if (existing) {
-            setForm((f) => ({
-                ...f,
-                schedules: f.schedules.filter((s) => s.deliveryDay !== day),
-            }));
-        } else {
-            setForm((f) => ({
-                ...f,
-                schedules: [...f.schedules, { deliveryDay: day, deliveryDate: '', deliveryTime: f.schedules[0]?.deliveryTime || '08:00' }],
-            }));
+    const handleProductSearch = (index, value) => {
+        setProductSearch((prev) => ({ ...prev, [index]: value }));
+        setShowDropdown((prev) => ({ ...prev, [index]: true }));
+        if (!value.trim()) {
+            updateProduct(index, 'productId', '');
         }
     };
 
-    const [customDate, setCustomDate] = useState('');
-    const [monthDay, setMonthDay] = useState('');
-    const [monthTime, setMonthTime] = useState('08:00');
+    const handleProductSelect = (index, product) => {
+        setProductSearch((prev) => ({ ...prev, [index]: product.name }));
+        setShowDropdown((prev) => ({ ...prev, [index]: false }));
+        updateProduct(index, 'productId', String(product.id));
+    };
 
-    const handleFrequencyChange = (freq) => {
-        const defaults = {
-            daily: [{ deliveryDay: '', deliveryDate: '', deliveryTime: '08:00' }],
-            weekly: [{ deliveryDay: 'Senin', deliveryDate: '', deliveryTime: '08:00' }],
-            monthly: [{ deliveryDay: '', deliveryDate: '15', deliveryTime: '08:00' }],
-            custom: [],
-        };
-        setForm((f) => ({ ...f, frequency: freq, schedules: defaults[freq] }));
+    const getFilteredProducts = (query) => {
+        if (!query) return sellerProducts;
+        return sellerProducts.filter((p) =>
+            p.name.toLowerCase().includes(query.toLowerCase())
+        );
     };
 
     const totalEstimate = useMemo(() => {
@@ -134,21 +114,20 @@ export default function ContractNew() {
 
     const scheduleSummary = useMemo(() => {
         if (!form.startDate || !form.endDate) return '-';
+        const count = form.schedules.length;
+        if (count === 0) return '-';
         if (form.frequency === 'daily') return `Setiap hari, ${form.schedules[0]?.deliveryTime || '-'}`;
         if (form.frequency === 'weekly') {
             const days = form.schedules.filter((s) => s.deliveryDay).map((s) => s.deliveryDay);
-            if (days.length === 0) return '-';
-            return `Setiap ${days.join(', ')} ${form.schedules[0]?.deliveryTime || ''}`.trim();
+            return days.length > 0 ? `${days.join(', ')}` : '-';
         }
         if (form.frequency === 'monthly') {
-            const dates = form.schedules.filter((s) => s.deliveryDate).map((s) => `Tanggal ${s.deliveryDate}`);
-            if (dates.length === 0) return '-';
-            return `${dates.join(', ')} ${form.schedules[0]?.deliveryTime || ''}`.trim();
+            const dates = form.schedules.filter((s) => s.deliveryDate).map((s) => `Tgl ${s.deliveryDate}`);
+            return dates.length > 0 ? `${dates.join(', ')}` : '-';
         }
         if (form.frequency === 'custom') {
             const dates = form.schedules.filter((s) => s.deliveryDate).map((s) => s.deliveryDate);
-            if (dates.length === 0) return '-';
-            return `${dates.length} tanggal: ${dates.join(', ')}`;
+            return dates.length > 0 ? `${dates.length} tanggal` : '-';
         }
         return '-';
     }, [form.frequency, form.schedules, form.startDate, form.endDate]);
@@ -162,6 +141,7 @@ export default function ContractNew() {
         if (new Date(form.endDate) <= new Date(form.startDate)) { setError('Tanggal berakhir harus setelah tanggal mulai'); return; }
         if (!form.schedules || form.schedules.length === 0) { setError('Isi jadwal pengiriman'); return; }
         if (form.products.length === 0 || !form.products[0]?.productId) { setError('Tambahkan minimal satu produk'); return; }
+        if (form.products.some((p) => !p.unitId)) { setError('Pilih satuan untuk setiap produk'); return; }
 
         setLoading(true);
 
@@ -172,11 +152,23 @@ export default function ContractNew() {
                 startDate: form.startDate,
                 endDate: form.endDate,
                 frequency: form.frequency,
-                schedules: form.schedules.map((s) => ({
-                    deliveryDay: s.deliveryDay || undefined,
-                    deliveryDate: s.deliveryDate || undefined,
-                    deliveryTime: s.deliveryTime || undefined,
-                })),
+                schedules: form.schedules.map((s) => {
+                    let deliveryDate = s.deliveryDate || undefined;
+                    if (form.frequency === 'monthly' && deliveryDate) {
+                        const dayNum = Number(deliveryDate);
+                        if (!Number.isNaN(dayNum) && dayNum >= 1 && dayNum <= 31) {
+                            const start = new Date(form.startDate);
+                            const date = new Date(start.getFullYear(), start.getMonth(), dayNum);
+                            if (date <= start) date.setMonth(date.getMonth() + 1);
+                            deliveryDate = date.toISOString().slice(0, 10);
+                        }
+                    }
+                    return {
+                        deliveryDay: s.deliveryDay || undefined,
+                        deliveryDate,
+                        deliveryTime: s.deliveryTime || undefined,
+                    };
+                }),
                 products: form.products
                     .filter((p) => p.productId)
                     .map((p) => ({
@@ -194,7 +186,7 @@ export default function ContractNew() {
                 return;
             }
 
-            navigate('/contracts');
+            navigate('/dashboard');
         } catch {
             setError('Terjadi kesalahan, coba lagi');
             setLoading(false);
@@ -202,7 +194,19 @@ export default function ContractNew() {
     };
 
     if (!user) return <div className="p-8 text-center text-gray-500">Silakan login.</div>;
-    if (fetching) return <div className="p-8 text-center text-gray-400">Memuat...</div>;
+    if (!sellerId) return (
+        <div className="max-w-4xl mx-auto py-16 px-4 text-center">
+            <p className="text-gray-500">Penjual tidak valid. Silakan pilih produk terlebih dahulu.</p>
+            <button onClick={() => navigate('/catalog')} className="mt-4 text-primary-green underline text-sm font-medium">Lihat katalog</button>
+        </div>
+    );
+    if (fetching) return (
+        <div className="max-w-7xl mx-auto px-4 py-6 space-y-4">
+            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
+            <div className="h-64 bg-gray-100 rounded-xl animate-pulse" />
+            <div className="h-40 bg-gray-100 rounded-xl animate-pulse" />
+        </div>
+    );
 
     return (
         <div className="min-h-screen bg-neutral-stone">
@@ -222,9 +226,16 @@ export default function ContractNew() {
                     </div>
                 </div>
 
-                {error && (
-                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm mb-4">{error}</div>
-                )}
+                <div ref={errorRef}>
+                    {fetchError && (
+                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm mb-4 flex items-center gap-2">
+                            <AlertTriangle size={15} /> {fetchError}
+                        </div>
+                    )}
+                    {error && (
+                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm mb-4">{error}</div>
+                    )}
+                </div>
 
                 <form onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 items-start">
@@ -265,169 +276,14 @@ export default function ContractNew() {
 
                             <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
                                 <h2 className="text-sm font-semibold text-gray-800 mb-3 uppercase tracking-wide">Jadwal Pengiriman</h2>
-                                <div className="mb-4">
-                                    <label className="text-xs font-medium text-gray-600">Frekuensi</label>
-                                    <select
-                                        value={form.frequency}
-                                        onChange={(e) => handleFrequencyChange(e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green mt-1"
-                                    >
-                                        {Object.entries(frequencyLabels).map(([k, v]) => (
-                                            <option key={k} value={k}>{v}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {form.frequency === 'weekly' && (
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-600 mb-2 block">Hari Pengiriman</label>
-                                        <div className="flex flex-wrap gap-2 mb-3">
-                                            {dayNames.map((day) => {
-                                                const active = form.schedules.some((s) => s.deliveryDay === day);
-                                                return (
-                                                    <button
-                                                        type="button"
-                                                        key={day}
-                                                        onClick={() => handleDayToggle(day)}
-                                                        className={`px-3 py-1.5 text-sm rounded-lg border transition ${
-                                                            active
-                                                                ? 'bg-primary-green text-white border-primary-green'
-                                                                : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
-                                                        }`}
-                                                    >
-                                                        {day}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                        <div>
-                                            <label className="text-xs font-medium text-gray-600">Waktu</label>
-                                            <input
-                                                type="time"
-                                                value={form.schedules[0]?.deliveryTime || ''}
-                                                onChange={(e) =>
-                                                    form.schedules.forEach((_, i) => updateSchedule(i, 'deliveryTime', e.target.value))
-                                                }
-                                                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green mt-1"
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-
-                                {form.frequency === 'daily' && (
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-600">Waktu Pengiriman</label>
-                                        <input
-                                            type="time"
-                                            value={form.schedules[0]?.deliveryTime || ''}
-                                            onChange={(e) => updateSchedule(0, 'deliveryTime', e.target.value)}
-                                            className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green mt-1"
-                                        />
-                                    </div>
-                                )}
-
-                                {form.frequency === 'monthly' && (
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-600 mb-2 block">Tanggal Setiap Bulan</label>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                max="31"
-                                                value={monthDay}
-                                                onChange={(e) => setMonthDay(e.target.value)}
-                                                placeholder="15"
-                                                className="w-24 border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
-                                            />
-                                            <input
-                                                type="time"
-                                                value={monthTime}
-                                                onChange={(e) => setMonthTime(e.target.value)}
-                                                className="flex-1 border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    if (monthDay && !form.schedules.some((s) => s.deliveryDate === monthDay)) {
-                                                        setForm((f) => ({
-                                                            ...f,
-                                                            schedules: [...f.schedules, { deliveryDay: '', deliveryDate: monthDay, deliveryTime: monthTime || '08:00' }],
-                                                        }));
-                                                        setMonthDay('');
-                                                        setMonthTime('08:00');
-                                                    }
-                                                }}
-                                                disabled={!monthDay}
-                                                className="px-3 py-2.5 text-sm bg-primary-green text-white rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center gap-1"
-                                            >
-                                                <Plus size={16} /> Tambah
-                                            </button>
-                                        </div>
-                                        {form.schedules.length > 0 && (
-                                            <div className="mt-3 space-y-1.5">
-                                                {form.schedules.map((s, i) => (
-                                                    <div key={i} className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
-                                                        <span>{s.deliveryDate}</span>
-                                                        <input
-                                                            type="time"
-                                                            value={s.deliveryTime || ''}
-                                                            onChange={(e) => updateSchedule(i, 'deliveryTime', e.target.value)}
-                                                            className="ml-auto border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-primary-green"
-                                                        />
-                                                        <button type="button" onClick={() => removeSchedule(i)} className="text-red-400 hover:text-red-600">
-                                                            <Trash2 size={14} />
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-
-                                {form.frequency === 'custom' && (
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-600 mb-2 block">Pilih Tanggal</label>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="date"
-                                                value={customDate}
-                                                onChange={(e) => setCustomDate(e.target.value)}
-                                                className="flex-1 border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    if (customDate && !form.schedules.some((s) => s.deliveryDate === customDate)) {
-                                                        addScheduleDate(customDate);
-                                                        setCustomDate('');
-                                                    }
-                                                }}
-                                                disabled={!customDate}
-                                                className="px-3 py-2.5 text-sm bg-primary-green text-white rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center gap-1"
-                                            >
-                                                <Plus size={16} /> Tambah
-                                            </button>
-                                        </div>
-                                        {form.schedules.length > 0 && (
-                                            <div className="mt-3 space-y-1.5">
-                                                {form.schedules.map((s, i) => (
-                                                    <div key={i} className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
-                                                        <span>{s.deliveryDate}</span>
-                                                        <input
-                                                            type="time"
-                                                            value={s.deliveryTime || ''}
-                                                            onChange={(e) => updateSchedule(i, 'deliveryTime', e.target.value)}
-                                                            className="ml-auto border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-primary-green"
-                                                        />
-                                                        <button type="button" onClick={() => removeSchedule(i)} className="text-red-400 hover:text-red-600">
-                                                            <Trash2 size={14} />
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
+                                <SchedulePicker
+                                    schedules={form.schedules}
+                                    frequency={form.frequency}
+                                    startDate={form.startDate}
+                                    endDate={form.endDate}
+                                    onSchedulesChange={(schedules) => setForm((f) => ({ ...f, schedules }))}
+                                    onFrequencyChange={(frequency) => setForm((f) => ({ ...f, frequency }))}
+                                />
                             </section>
 
                             <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
@@ -443,18 +299,49 @@ export default function ContractNew() {
                                                     </button>
                                                 )}
                                             </div>
-                                            <div>
+                                            <div className="relative">
                                                 <label className="text-xs font-medium text-gray-600">Produk</label>
-                                                <select
-                                                    value={prod.productId}
-                                                    onChange={(e) => updateProduct(i, 'productId', e.target.value)}
-                                                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green mt-1"
-                                                >
-                                                    <option value="">Pilih produk</option>
-                                                    {sellerProducts.map((p) => (
-                                                        <option key={p.id} value={p.id}>{p.name}</option>
-                                                    ))}
-                                                </select>
+                                                <div className="relative mt-1">
+                                                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                                                    <input
+                                                        ref={(el) => { productRefs.current[i] = el; }}
+                                                        value={productSearch[i] || ''}
+                                                        onChange={(e) => handleProductSearch(i, e.target.value)}
+                                                        onFocus={() => setShowDropdown((prev) => ({ ...prev, [i]: true }))}
+                                                        onBlur={() => setTimeout(() => setShowDropdown((prev) => ({ ...prev, [i]: false })), 200)}
+                                                        placeholder="Cari produk..."
+                                                        className="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
+                                                    />
+                                                    {productSearch[i] && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => { handleProductSearch(i, ''); productRefs.current[i]?.focus(); }}
+                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                                        >
+                                                            <X size={14} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                {showDropdown[i] && (
+                                                    <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto">
+                                                        {getFilteredProducts(productSearch[i] || '').length === 0 ? (
+                                                            <p className="px-3 py-2 text-sm text-gray-400">Produk tidak ditemukan</p>
+                                                        ) : getFilteredProducts(productSearch[i] || '').map((p) => {
+                                                            const selected = Number(prod.productId) === p.id;
+                                                            return (
+                                                                <button
+                                                                    key={p.id}
+                                                                    type="button"
+                                                                    onMouseDown={() => handleProductSelect(i, p)}
+                                                                    className={`w-full text-left px-3 py-2.5 text-sm transition hover:bg-green-50 flex items-center justify-between ${selected ? 'bg-green-50 font-semibold text-primary-green' : 'text-gray-700'}`}
+                                                                >
+                                                                    {p.name}
+                                                                    {selected && <span className="text-xs text-primary-green">✓</span>}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="grid grid-cols-2 gap-3">
                                                 <div>
@@ -558,7 +445,7 @@ export default function ContractNew() {
                                     <div>
                                         <p className="text-gray-500">Estimasi Total</p>
                                         <p className="text-lg font-bold text-primary-green">
-                                            Rp {totalEstimate.toLocaleString('id-ID')}
+                                            {totalEstimate > 0 ? formatCurrency(totalEstimate) : 'Rp 0'}
                                         </p>
                                         <p className="text-xs text-gray-400">per pengiriman</p>
                                     </div>
