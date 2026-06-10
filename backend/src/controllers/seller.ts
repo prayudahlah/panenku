@@ -15,6 +15,7 @@ export const sellerController = (app: any) =>
                 return { success: false, message: result.error, errorCode: result.code };
             }
             session.set('role', 'seller');
+            set.status = 201;
             return { success: true, data: result.data };
         }, { body: CreateSellerProfileRequest })
 
