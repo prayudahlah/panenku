@@ -1,32 +1,19 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Store, MapPin, Star, MessageSquare, Grid, Award } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Store, MapPin, Star, Award, Handshake } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import { formatDate } from '../utils/format';
 
 export default function SellerHeader({ sellerProfile }) {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const isCatalogPage = location.pathname.endsWith('/catalog');
-
-
+    const { user } = useAuth();
+    const isBuyer = user?.role === 'buyer';
+    const sellerId = sellerProfile.sellerId;
     const farmName = sellerProfile.farmName || "Toko Tani";
     const city = sellerProfile.city || "Lokasi tidak diketahui";
     const province = sellerProfile.province || "";
     const sellerName = sellerProfile.sellerName || "Penjual";
     const activeProductCount = sellerProfile.activeProductCount ?? 0;
     const joinedDate = sellerProfile.createdAt ? formatDate(sellerProfile.createdAt) : "-";
-
-    const handleChatClick = () => {
-        alert(`Fitur chat dengan ${farmName} akan segera hadir!`);
-    };
-
-    const handleViewCatalogClick = () => {
-        if (isCatalogPage) {
-            navigate(`/seller/${sellerProfile.sellerId}`);
-        } else {
-            navigate(`/seller/${sellerProfile.sellerId}/catalog`);
-        }
-    };
 
     return (
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm mb-6">
@@ -71,33 +58,18 @@ export default function SellerHeader({ sellerProfile }) {
                     </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex gap-2.5 w-full md:w-auto mt-2 md:mt-0 shrink-0">
-                    <button
-                        onClick={handleChatClick}
-                        className="flex-1 md:flex-none px-4 py-2.5 border border-gray-200 hover:border-gray-300 text-gray-700 font-bold rounded-xl text-sm transition-all hover:bg-gray-50 flex items-center justify-center gap-2 shadow-sm"
-                    >
-                        <MessageSquare size={16} className="text-gray-400" />
-                        Chat Seller
-                    </button>
+                {isBuyer && sellerId && (
+                    <div className="flex gap-2.5 w-full md:w-auto mt-2 md:mt-0 shrink-0">
+                        <Link
+                            to={`/contracts/new?sellerId=${sellerId}&sellerName=${encodeURIComponent(farmName)}`}
+                            className="flex-1 md:flex-none px-3 py-2 text-sm border border-primary-green text-primary-green font-semibold rounded-xl hover:bg-green-50 transition flex items-center justify-center gap-1.5"
+                        >
+                            <Handshake size={14} />
+                            Ajukan Kemitraan
+                        </Link>
+                    </div>
+                )}
 
-                    <button
-                        onClick={handleViewCatalogClick}
-                        className="flex-1 md:flex-none px-4 py-2.5 bg-primary-green hover:bg-primary-green-500 text-white font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 active:translate-y-0"
-                    >
-                        {isCatalogPage ? (
-                            <>
-                                <Store size={16} />
-                                Lihat Profil Toko
-                            </>
-                        ) : (
-                            <>
-                                <Grid size={16} />
-                                Lihat Semua Produk
-                            </>
-                        )}
-                    </button>
-                </div>
             </div>
         </div>
     );
