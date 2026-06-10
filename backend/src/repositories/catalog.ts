@@ -97,6 +97,7 @@ export async function list({
     const conditions: (SQL<unknown> | undefined)[] = [
         isNull(products.deletedAt),
         sql`${products.stockQuantity} > 0`,
+        eq(sellerProfiles.status, 'active'),
     ];
 
     if (search) {
@@ -187,6 +188,7 @@ export async function listBySeller({
         isNull(products.deletedAt),
         sql`${products.stockQuantity} > 0`,
         eq(products.sellerId, sellerId),
+        eq(sellerProfiles.status, 'active'),
     ];
 
     if (search) {

@@ -174,9 +174,20 @@ export async function findProductById(productId: number) {
             sellerId: products.sellerId,
             name: products.name,
             pricePerUnit: products.pricePerUnit,
+            stockQuantity: products.stockQuantity,
+            minOrderQty: products.minOrderQty,
         })
         .from(products)
         .where(and(eq(products.id, productId), isNull(products.deletedAt)))
+        .limit(1);
+    return result[0] || null;
+}
+
+export async function findUnitById(unitId: number) {
+    const result = await db
+        .select({ id: units.id, name: units.name })
+        .from(units)
+        .where(eq(units.id, unitId))
         .limit(1);
     return result[0] || null;
 }

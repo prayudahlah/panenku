@@ -1,7 +1,7 @@
 import { db } from '../db';
 import { checkoutRepo } from '../repositories';
 import * as notificationService from './notification';
-import type { CheckoutInput, CheckoutResponse, CheckoutItemDetail, DirectCheckoutInput } from '../dtos/checkout';
+import type { CheckoutInput, CheckoutResponse, CheckoutItemDetail, DirectCheckoutInput, CheckoutListItem } from '../dtos/checkout';
 
 type ServiceResult<T> = { data?: T; error?: string; status?: number; errorCode?: string };
 
@@ -444,4 +444,39 @@ export async function sellerCancelOrder(
     );
 
     return { data: { orderId, status: 'cancelled' } };
+}
+
+export async function listCheckouts(userId: number, role: string): Promise<ServiceResult<CheckoutListItem[]>> {
+    if (role === 'seller') {
+        const ordersList = await checkoutRepo.findCheckoutIdsBySeller(userId);
+        if (ordersList.length === 0) return { data: [] };
+        const checkoutIds = ordersList.map((o) => o.checkoutId);
+        const checkoutsList = await checkoutRepo.findCheckoutsByIds(checkoutIds);
+        const counts = await checkoutRepo.findCheckoutOrderCountsByCheckoutIds(checkoutIds);
+        const countMap = new Map(counts.map((c) => [c.checkoutId, c]));
+        const data: CheckoutListItem[] = checkoutsList.map((ch) => ({
+            id: ch.id,
+            totalAmount: ch.totalAmount,
+            statusCode: ch.statusCode,
+            createdAt: ch.createdAt,
+            orderCount: countMap.get(ch.id)?.orderCount ?? 0,
+            itemCount: countMap.get(ch.id)?.itemCount ?? 0,
+        }));
+        return { data };
+    }
+
+    const checkoutsList = await checkoutRepo.findCheckoutsByBuyer(userId);
+    if (checkoutsList.length === 0) return { data: [] };
+    const checkoutIds = checkoutsList.map((ch) => ch.id);
+    const counts = await checkoutRepo.findCheckoutOrderCountsByCheckoutIds(checkoutIds);
+    const countMap = new Map(counts.map((c) => [c.checkoutId, c]));
+    const data: CheckoutListItem[] = checkoutsList.map((ch) => ({
+        id: ch.id,
+        totalAmount: ch.totalAmount,
+        statusCode: ch.statusCode,
+        createdAt: ch.createdAt,
+        orderCount: countMap.get(ch.id)?.orderCount ?? 0,
+        itemCount: countMap.get(ch.id)?.itemCount ?? 0,
+    }));
+    return { data };
 }

@@ -53,3 +53,12 @@ export type DirectCheckoutInput = {
     provinceId: number;
     cityId: number;
 };
+
+export type CheckoutListItem = {
+    id: number;
+    totalAmount: string;
+    statusCode: string | null;
+    createdAt: Date | null;
+    orderCount: number;
+    itemCount: number;
+};
