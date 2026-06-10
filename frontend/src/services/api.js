@@ -65,6 +65,7 @@ export const seller = {
   register: (data) => fetchApi('/sellers/register', { method: 'POST', body: JSON.stringify(data) }),
   getMyProfile: () => fetchApi('/sellers/profiles/me'),
   getCatalog: (params = {}) => fetchApi(`/sellers/catalog${buildQuery(params)}`),
+  getProductsBySeller: (sellerId, params = {}) => fetchApi(`/sellers/${sellerId}/products${buildQuery(params)}`),
 };
 
 export const admin = {
@@ -100,6 +101,7 @@ export const contracts = {
   list: () => fetchApi('/contracts'),
   getById: (id) => fetchApi(`/contracts/${id}`),
   respond: (id, data) => fetchApi(`/contracts/${id}/respond`, { method: 'PATCH', body: JSON.stringify(data) }),
+  cancel: (id) => fetchApi(`/contracts/${id}/cancel`, { method: 'PATCH' }),
 };
 
 export const userAddresses = {
@@ -123,6 +125,7 @@ export const cart = {
 };
 
 export const checkout = {
+  list: (params) => fetchApi(`/checkouts${buildQuery(params)}`),
   direct: (data) => fetchApi('/checkouts/direct', { method: 'POST', body: JSON.stringify(data) }),
   create: (data) => fetchApi('/checkouts', { method: 'POST', body: JSON.stringify(data) }),
   pay: (id) => fetchApi(`/checkouts/${id}/pay`, { method: 'PUT' }),
