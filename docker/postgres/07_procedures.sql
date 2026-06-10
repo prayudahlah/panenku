@@ -128,7 +128,7 @@ BEGIN
         LEFT JOIN master.seller_profiles sp ON sp.user_id = c.seller_id
         LEFT JOIN reference.contract_statuses cs ON cs.id = c.contract_status_id
         WHERE c.buyer_id = p_user_id
-          AND cs.code = 'active'
+          AND cs.code IN ('active', 'pending')
         ORDER BY c.created_at DESC
         LIMIT 5
     ) data_row;
@@ -299,7 +299,7 @@ BEGIN
         LEFT JOIN master.users u ON u.id = c.buyer_id
         LEFT JOIN reference.contract_statuses cs ON cs.id = c.contract_status_id
         WHERE c.seller_id = p_user_id
-          AND cs.code = 'active'
+          AND cs.code IN ('active', 'pending')
         ORDER BY c.created_at DESC
         LIMIT 5
     ) data_row;
