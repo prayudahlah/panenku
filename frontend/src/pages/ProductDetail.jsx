@@ -58,8 +58,8 @@ export default function ProductDetail() {
 
     const isOwner = user && product && user.id === product.sellerId;
     const isBuyer = user?.role === 'buyer';
-    const canAct = isBuyer && !isOwner;
-    const canNego = canAct && product?.isNegotiable;
+    const canAct = !isOwner;
+    const canNego = isBuyer && !isOwner && product?.isNegotiable;
 
     const handleAddToCart = async () => {
         if (!canAct || !product) return;
