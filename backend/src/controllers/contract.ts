@@ -50,4 +50,18 @@ export const contractController = (app: any) =>
             }
 
             return { success: true, data: result.data };
-        }, { body: RespondContractRequest });
+        }, { body: RespondContractRequest })
+
+        .patch('/:id/cancel', async ({ params: { id }, session, set }: any) => {
+            const userId = session.get('userId');
+            if (!userId) { set.status = 401; return { success: false, message: 'Belum login', errorCode: 'ERR-LOG-01' }; }
+            if (session.get('role') !== 'buyer') { set.status = 403; return { success: false, message: 'Hanya pembeli yang dapat membatalkan kontrak' }; }
+
+            const result = await contractService.cancel(userId, Number(id));
+            if (result.error) {
+                set.status = result.status || 400;
+                return { success: false, message: result.error, ...(result.errorCode ? { errorCode: result.errorCode } : {}) };
+            }
+
+            return { success: true, data: result.data };
+        });

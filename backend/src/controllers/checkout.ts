@@ -45,6 +45,14 @@ export const checkoutController = (app: any) =>
             return { success: true, message: 'Checkout berhasil', data: result.data };
         }, { body: CheckoutRequest })
 
+        .get('/', async ({ session, set }: any) => {
+            const userId = session.get('userId');
+            if (!userId) { set.status = 401; return { success: false, message: 'Belum login', errorCode: 'ERR-LOG-01' }; }
+            const result = await checkoutService.listCheckouts(userId, session.get('role'));
+            if (result.error) { set.status = result.status || 400; return { success: false, message: result.error }; }
+            return { success: true, data: result.data };
+        })
+
         .put('/:id/pay', async ({ params: { id }, session, set }: any) => {
             const userId = session.get('userId');
             if (!userId) {

@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { eq, and, isNull, inArray, sql } from 'drizzle-orm';
+import { eq, and, isNull, inArray, sql, desc } from 'drizzle-orm';
 import { carts, cartItems, products, sellerProfiles, units, checkouts, orders, orderItems, payments, shipments, checkoutStatuses } from '../db/schema';
 
 type DBLike = typeof db;
@@ -283,4 +283,61 @@ export async function findProductForCheckout(productId: number) {
         .where(eq(products.id, productId))
         .limit(1);
     return result[0] || null;
+}
+
+export async function findCheckoutsByBuyer(buyerId: number) {
+    const result = await db
+        .select({
+            id: checkouts.id,
+            totalAmount: checkouts.totalAmount,
+            checkoutStatusId: checkouts.checkoutStatusId,
+            statusCode: checkoutStatuses.code,
+            createdAt: checkouts.createdAt,
+        })
+        .from(checkouts)
+        .leftJoin(checkoutStatuses, eq(checkouts.checkoutStatusId, checkoutStatuses.id))
+        .where(eq(checkouts.buyerId, buyerId))
+        .orderBy(desc(checkouts.createdAt));
+    return result;
+}
+
+export async function findCheckoutIdsBySeller(sellerId: number) {
+    const result = await db
+        .select({ checkoutId: orders.checkoutId })
+        .from(orders)
+        .where(eq(orders.sellerId, sellerId))
+        .groupBy(orders.checkoutId);
+    return result;
+}
+
+export async function findCheckoutsByIds(ids: number[]) {
+    if (ids.length === 0) return [];
+    const result = await db
+        .select({
+            id: checkouts.id,
+            totalAmount: checkouts.totalAmount,
+            checkoutStatusId: checkouts.checkoutStatusId,
+            statusCode: checkoutStatuses.code,
+            createdAt: checkouts.createdAt,
+        })
+        .from(checkouts)
+        .leftJoin(checkoutStatuses, eq(checkouts.checkoutStatusId, checkoutStatuses.id))
+        .where(inArray(checkouts.id, ids))
+        .orderBy(desc(checkouts.createdAt));
+    return result;
+}
+
+export async function findCheckoutOrderCountsByCheckoutIds(checkoutIds: number[]) {
+    if (checkoutIds.length === 0) return [];
+    const result = await db
+        .select({
+            checkoutId: orders.checkoutId,
+            orderCount: sql<number>`count(DISTINCT ${orders.id})::int`,
+            itemCount: sql<number>`count(DISTINCT ${orderItems.id})::int`,
+        })
+        .from(orders)
+        .leftJoin(orderItems, eq(orderItems.orderId, orders.id))
+        .where(inArray(orders.checkoutId, checkoutIds))
+        .groupBy(orders.checkoutId);
+    return result;
 }
