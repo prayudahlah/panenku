@@ -258,7 +258,7 @@ function TransactionHistory({ transactions, showAll, onToggle }) {
 
 function NegotiationCard({ negotiation }) {
   return (
-    <article className="min-h-36 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:border-secondary-brown/25 hover:shadow-md">
+    <article className="min-h-36 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:border-secondary-brown/25 hover:shadow-md cursor-pointer">
       <div className="flex items-center gap-4">
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
           <Box size={20} />
@@ -305,7 +305,7 @@ function ContractCard({ contract }) {
   })();
 
   return (
-    <article className="relative overflow-hidden rounded-2xl bg-[#eeeee8] p-7 shadow-sm">
+    <article className="relative overflow-hidden rounded-2xl bg-[#eeeee8] p-7 shadow-sm cursor-pointer hover:shadow-md hover:brightness-[0.98] transition-all">
       <div className="relative z-10">
         <h3 className="text-[19px] font-bold leading-snug tracking-[-0.01em] text-slate-900">
           {contract?.title ||
@@ -338,6 +338,16 @@ function ContractCard({ contract }) {
           </div>
         </div>
       </div>
+
+      {contract.contractStatus && (
+        <span className={`absolute top-4 right-4 px-2.5 py-1 rounded-full text-xs font-semibold ${
+          contract.contractStatus === 'active'
+            ? 'bg-green-100 text-green-700'
+            : 'bg-amber-100 text-amber-700'
+        }`}>
+          {contract.contractStatus === 'active' ? 'Aktif' : 'Menunggu'}
+        </span>
+      )}
 
       <Handshake
         size={78}
@@ -522,10 +532,13 @@ const DashboardBuyer = () => {
               {negotiations.length > 0 ? (
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                   {negotiations.map((item, index) => (
-                    <NegotiationCard
+                    <button
                       key={item.id || item.negotiationId || index}
-                      negotiation={item}
-                    />
+                      onClick={() => navigate(`/negotiations/${item.id || item.negotiationId}`)}
+                      className="w-full text-left"
+                    >
+                      <NegotiationCard negotiation={item} />
+                    </button>
                   ))}
                 </div>
               ) : (
@@ -536,25 +549,29 @@ const DashboardBuyer = () => {
             <section>
               <SectionTitle
                 icon={Handshake}
-                title="Kemitraan Aktif"
+                title="Kemitraan"
                 actionText={
                   data.activeContracts.length > 2 ? 'Lihat Semua' : undefined
                 }
                 expanded={showAllContracts}
                 onAction={() => setShowAllContracts((value) => !value)}
               />
+              <p className="text-xs text-gray-400 -mt-2 mb-3">Kemitraan aktif dan pengajuan yang menunggu persetujuan penjual</p>
 
               {contracts.length > 0 ? (
                 <div className="space-y-4">
                   {contracts.map((contract, index) => (
-                    <ContractCard
+                    <button
                       key={contract.id || contract.contractId || index}
-                      contract={contract}
-                    />
+                      onClick={() => navigate(`/contracts/${contract.id}`)}
+                      className="w-full text-left"
+                    >
+                      <ContractCard contract={contract} />
+                    </button>
                   ))}
                 </div>
               ) : (
-                <EmptyState message="Belum ada kemitraan aktif." />
+                <EmptyState message="Belum ada kemitraan." />
               )}
             </section>
           </section>
