@@ -18,14 +18,13 @@ const menus = {
     buyer: [
         { label: 'Dashboard Transaksi', icon: LayoutDashboard, path: '/dashboard' },
         { label: 'Negosiasi', icon: MessageCircle, path: '/negotiations' },
-        { label: 'Transaksi Saya', icon: Package, path: '/transactions' },
         { label: 'Keranjang', icon: ShoppingCart, path: '/cart' },
         { label: 'Daftar Jadi Penjual', icon: UserPlus, path: '/shop/new' },
     ],
     seller: [
         { label: 'Dashboard Penjualan', icon: LayoutDashboard, path: '/shop/dashboard' },
+        { label: 'Dashboard Transaksi', icon: Package, path: '/dashboard' },
         { label: 'Negosiasi', icon: MessageCircle, path: '/negotiations' },
-        { label: 'Transaksi Saya', icon: Package, path: '/transactions' },
         { label: 'Keranjang', icon: ShoppingCart, path: '/cart' },
         { label: 'Toko Saya', icon: Store, path: '/shop' },
         { label: 'Produk Saya', icon: Wheat, path: '/shop/products' },

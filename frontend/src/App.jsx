@@ -30,6 +30,7 @@ import ContractNew from './pages/ContractNew';
 import ContractDetail from './pages/ContractDetail';
 
 import Checkout from './pages/Checkout';
+import NotFound from './pages/NotFound';
 
 const App = () => {
     return (
@@ -54,7 +55,7 @@ const App = () => {
                                 <Route path="contracts/new" element={<ContractNew />} />
                                 <Route path="contracts/:id" element={<ContractDetail />} />
 
-                                <Route element={<RoleGuard roles={['buyer']} />}>
+                                <Route element={<RoleGuard roles={['buyer', 'seller']} />}>
                                     <Route path="dashboard" element={<DashboardBuyer />} />
                                 </Route>
 
@@ -85,6 +86,7 @@ const App = () => {
                         <Route path="/register" element={<Register />} />
                         <Route path="/forgot-password" element={<ForgotPassword />} />
                         <Route path="/reset-password" element={<ResetPassword />} />
+                        <Route path="*" element={<NotFound />} />
                     </Routes>
                 </BrowserRouter>
             </NotificationProvider>

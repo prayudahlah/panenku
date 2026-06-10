@@ -5,9 +5,10 @@ import {
     Wallet, QrCode, Building2, CheckCircle2, Loader, AlertTriangle, MapPin,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { cart as cartApi, checkout as checkoutApi, references } from '../services/api';
+import { cart as cartApi, checkout as checkoutApi, userAddresses } from '../services/api';
 import { formatNumber } from '../utils/format';
 import productPlaceholder from '../assets/product_placeholder.webp';
+import AddressPicker from '../components/AddressPicker';
 
 // ── konstanta ──────────────────────────────────────────────────────────────────
 
@@ -65,12 +66,8 @@ export default function Checkout() {
     const [submitting, setSubmitting]   = useState(false);
     const [error, setError]             = useState(null);
 
-    const [shippingAddress, setShippingAddress] = useState('');
-    const [provinceId, setProvinceId]           = useState('');
-    const [cityId, setCityId]                   = useState('');
-    const [provinces, setProvinces]             = useState([]);
-    const [cities, setCities]                   = useState([]);
-    const [loadingAddress, setLoadingAddress]   = useState(true);
+    const [addressId, setAddressId] = useState(null);
+    const [addressesList, setAddressesList] = useState([]);
     const [paymentMethodId, setPaymentMethodId] = useState(4);
     const [courierName, setCourierName]         = useState('');
 
@@ -87,22 +84,14 @@ export default function Checkout() {
             .finally(() => setLoading(false));
     }, [user]);
 
-    // ── fetch provinces & cities ──────────────────────────────────────────────
+    // ── fetch saved addresses ─────────────────────────────────────────────────
 
     useEffect(() => {
         if (!user) return;
-        references.getProvinces().then((json) => {
-            if (json.success) setProvinces(json.data || []);
+        userAddresses.list().then((json) => {
+            if (json.success) setAddressesList(json.data || []);
         });
-        references.getAllCities().then((json) => {
-            if (json.success) setCities(json.data || []);
-        }).finally(() => setLoadingAddress(false));
     }, [user]);
-
-    const filteredCities = useMemo(
-        () => (provinceId ? cities.filter((c) => c.provinceId === Number(provinceId)) : []),
-        [provinceId, cities],
-    );
 
     // ── grouped per seller ─────────────────────────────────────────────────────
 
@@ -134,9 +123,14 @@ export default function Checkout() {
     // ── submit ─────────────────────────────────────────────────────────────────
 
     const handleSubmit = async () => {
-        if (!shippingAddress.trim() || shippingAddress.trim().length < 5) { setError('Alamat pengiriman wajib diisi minimal 5 karakter'); return; }
-        if (!provinceId) { setError('Pilih provinsi tujuan pengiriman'); return; }
-        if (!cityId) { setError('Pilih kota tujuan pengiriman'); return; }
+        if (!addressId) { setError('Pilih alamat pengiriman'); return; }
+        let addr = addressesList.find((a) => a.id === addressId);
+        if (!addr) {
+            const json = await userAddresses.list();
+            if (json.success) setAddressesList(json.data || []);
+            addr = (json.data || []).find((a) => a.id === addressId);
+        }
+        if (!addr) { setError('Alamat tidak valid'); return; }
         if (!cartData?.items?.length) { setError('Keranjang belanja kosong'); return; }
 
         setError(null);
@@ -144,11 +138,11 @@ export default function Checkout() {
 
         try {
             const json = await checkoutApi.create({
-                shippingAddress: shippingAddress.trim(),
+                shippingAddress: addr.address,
                 courierName: courierName.trim() || null,
                 paymentMethodId,
-                provinceId: Number(provinceId),
-                cityId: Number(cityId),
+                provinceId: Number(addr.provinceId),
+                cityId: Number(addr.cityId),
             });
 
             if (!json.success) {
@@ -157,7 +151,7 @@ export default function Checkout() {
                 return;
             }
 
-            navigate('/transactions', { state: { checkoutId: json.data?.checkoutId, fromCheckout: true } });
+            navigate('/dashboard', { state: { checkoutId: json.data?.checkoutId, fromCheckout: true } });
         } catch {
             setError('Terjadi kesalahan jaringan');
             setSubmitting(false);
@@ -235,49 +229,20 @@ export default function Checkout() {
 
                         {/* Alamat Pengiriman */}
                         <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-2">
-                                    <MapPin size={15} className="text-primary-green" />
-                                    <span className="font-semibold text-gray-800 text-sm">Alamat Pengiriman</span>
-                                </div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <MapPin size={15} className="text-primary-green" />
+                                <span className="font-semibold text-gray-800 text-sm">Alamat Pengiriman</span>
                             </div>
-                            <div className="grid grid-cols-2 gap-3 mb-3">
-                                <div>
-                                    <label className="text-xs font-medium text-gray-600">Provinsi</label>
-                                    <select
-                                        value={provinceId}
-                                        onChange={(e) => { setProvinceId(e.target.value); setCityId(''); }}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green mt-1"
-                                    >
-                                        <option value="">{loadingAddress ? 'Memuat...' : 'Pilih provinsi'}</option>
-                                        {provinces.map((p) => (
-                                            <option key={p.id} value={p.id}>{p.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-xs font-medium text-gray-600">Kota</label>
-                                    <select
-                                        value={cityId}
-                                        onChange={(e) => setCityId(e.target.value)}
-                                        disabled={!provinceId}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green mt-1 disabled:bg-gray-100"
-                                    >
-                                        <option value="">Pilih kota</option>
-                                        {filteredCities.map((c) => (
-                                            <option key={c.id} value={c.id}>{c.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                            <textarea
-                                value={shippingAddress}
-                                onChange={(e) => setShippingAddress(e.target.value)}
-                                placeholder="Jalan, gang, kode pos — alamat lengkap tujuan pengiriman"
-                                rows={3}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-green"
+                            <AddressPicker
+                                value={addressId}
+                                onChange={setAddressId}
+                                disabled={submitting}
                             />
-                            <p className="text-xs text-gray-400 mt-1.5">Alamat pengiriman minimal 5 karakter</p>
+                            {addressId && addressesList.find((a) => a.id === addressId) && (
+                                <p className="text-xs text-gray-500 mt-2">
+                                    {addressesList.find((a) => a.id === addressId).address}
+                                </p>
+                            )}
                         </section>
 
                         {/* Ringkasan Pesanan */}
@@ -427,7 +392,7 @@ export default function Checkout() {
                             {/* CTA */}
                             <button
                                 onClick={handleSubmit}
-                                disabled={submitting || !shippingAddress.trim() || shippingAddress.trim().length < 5 || !provinceId || !cityId}
+                                disabled={submitting || !addressId}
                                 className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-sm
                                     bg-[#7de87a] text-[#1c3b18] hover:brightness-110 active:scale-[0.98] transition-all
                                     disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:brightness-100"
@@ -439,9 +404,9 @@ export default function Checkout() {
                                 {submitting ? 'Memproses…' : 'Konfirmasi & Bayar Sekarang'}
                             </button>
 
-                            {(!shippingAddress.trim() || shippingAddress.trim().length < 5 || !provinceId || !cityId) && (
+                            {!addressId && (
                                 <p className="text-xs text-center text-yellow-400/70">
-                                    Isi provinsi, kota, dan alamat pengiriman untuk melanjutkan
+                                    Pilih alamat pengiriman untuk melanjutkan
                                 </p>
                             )}
                         </div>
