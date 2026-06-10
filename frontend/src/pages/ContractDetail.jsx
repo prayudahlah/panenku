@@ -43,7 +43,9 @@ export default function ContractDetail() {
 
     const handleRespond = async (action) => {
         setResponding(true);
-        const json = await contracts.respond(id, { action });
+        const json = action === 'cancelled'
+            ? await contracts.cancel(id)
+            : await contracts.respond(id, { action });
         setResponding(false);
         setShowConfirm(null);
         if (json.success) {
@@ -76,6 +78,7 @@ export default function ContractDetail() {
     const isSeller = user?.role === 'seller';
     const isBuyer = user?.role === 'buyer';
     const canRespond = isSeller && contract.contractStatusId === 1;
+    const canCancel = isBuyer && contract.contractStatusId === 1;
 
     const status = STATUS_MAP[contract.contractStatusId] || { label: 'Unknown', class: 'bg-gray-100 text-gray-600' };
 
@@ -218,25 +221,38 @@ export default function ContractDetail() {
                         )}
                     </div>
 
-                    {canRespond && (
+                    {(canRespond || canCancel) && (
                         <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
-                            <h2 className="text-sm font-semibold text-gray-800">Tanggapan Anda</h2>
-                            <div className="flex gap-2">
+                            <h2 className="text-sm font-semibold text-gray-800">
+                                {canRespond ? 'Tanggapan Anda' : 'Aksi'}
+                            </h2>
+                            {canRespond && (
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setShowConfirm('accepted')}
+                                        disabled={responding}
+                                        className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition disabled:opacity-50"
+                                    >
+                                        <Check size={16} /> Terima
+                                    </button>
+                                    <button
+                                        onClick={() => setShowConfirm('rejected')}
+                                        disabled={responding}
+                                        className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition disabled:opacity-50"
+                                    >
+                                        <X size={16} /> Tolak
+                                    </button>
+                                </div>
+                            )}
+                            {canCancel && (
                                 <button
-                                    onClick={() => setShowConfirm('accepted')}
+                                    onClick={() => setShowConfirm('cancelled')}
                                     disabled={responding}
-                                    className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition disabled:opacity-50"
+                                    className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 border border-red-300 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50 transition disabled:opacity-50"
                                 >
-                                    <Check size={16} /> Terima
+                                    <X size={16} /> Batalkan Pengajuan
                                 </button>
-                                <button
-                                    onClick={() => setShowConfirm('rejected')}
-                                    disabled={responding}
-                                    className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition disabled:opacity-50"
-                                >
-                                    <X size={16} /> Tolak
-                                </button>
-                            </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -245,16 +261,22 @@ export default function ContractDetail() {
             {showConfirm && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
                     <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center space-y-4">
-                        <div className={`mx-auto w-12 h-12 rounded-full flex items-center justify-center ${showConfirm === 'accepted' ? 'bg-green-100' : 'bg-red-100'}`}>
-                            {showConfirm === 'accepted' ? <Check size={24} className="text-green-600" /> : <X size={24} className="text-red-500" />}
+                        <div className={`mx-auto w-12 h-12 rounded-full flex items-center justify-center ${
+                            showConfirm === 'accepted' ? 'bg-green-100' : showConfirm === 'cancelled' ? 'bg-gray-100' : 'bg-red-100'
+                        }`}>
+                            {showConfirm === 'accepted'
+                                ? <Check size={24} className="text-green-600" />
+                                : <X size={24} className="text-red-500" />}
                         </div>
                         <h3 className="text-lg font-bold text-gray-800">
-                            {showConfirm === 'accepted' ? 'Terima Kemitraan?' : 'Tolak Kemitraan?'}
+                            {showConfirm === 'accepted' ? 'Terima Kemitraan?' : showConfirm === 'cancelled' ? 'Batalkan Pengajuan?' : 'Tolak Kemitraan?'}
                         </h3>
                         <p className="text-sm text-gray-500">
                             {showConfirm === 'accepted'
                                 ? 'Kontrak akan aktif dan kamu berkomitmen untuk memenuhi pengiriman sesuai jadwal.'
-                                : 'Kemitraan ini akan ditolak dan pembeli akan mendapat notifikasi.'}
+                                : showConfirm === 'cancelled'
+                                    ? 'Pengajuan kemitraan akan dibatalkan dan penjual akan mendapat notifikasi.'
+                                    : 'Kemitraan ini akan ditolak dan pembeli akan mendapat notifikasi.'}
                         </p>
                         <div className="flex gap-2 pt-2">
                             <button
@@ -267,10 +289,12 @@ export default function ContractDetail() {
                             <button
                                 onClick={() => handleRespond(showConfirm)}
                                 disabled={responding}
-                                className={`flex-1 px-4 py-2.5 text-sm text-white rounded-lg font-medium transition disabled:opacity-50 flex items-center justify-center gap-1 ${showConfirm === 'accepted' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-500 hover:bg-red-600'}`}
+                                className={`flex-1 px-4 py-2.5 text-sm text-white rounded-lg font-medium transition disabled:opacity-50 flex items-center justify-center gap-1 ${
+                                    showConfirm === 'accepted' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-500 hover:bg-red-600'
+                                }`}
                             >
                                 {responding && <Loader size={14} className="animate-spin" />}
-                                {showConfirm === 'accepted' ? 'Ya, Terima' : 'Ya, Tolak'}
+                                {showConfirm === 'accepted' ? 'Ya, Terima' : showConfirm === 'cancelled' ? 'Ya, Batalkan' : 'Ya, Tolak'}
                             </button>
                         </div>
                     </div>
