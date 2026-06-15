@@ -3,8 +3,16 @@ param(
     [Parameter(Position=1)][string]$Service = "",
     [Parameter(Position=2)][string]$Action = "up",
     [switch]$Build,
-    [switch]$Volumes
+    [switch]$Volumes,
+    [Parameter(ValueFromRemainingArguments = $true)]$Remaining
 )
+
+if ($Remaining) {
+    foreach ($r in $Remaining) {
+        if ($r -eq '--build')   { $Build = $true }
+        if ($r -eq '--volumes') { $Volumes = $true }
+    }
+}
 
 $ComposeDir = [System.IO.Path]::Combine($PSScriptRoot, "..", "compose")
 $BuildFlag = if ($Build) { "--build" } else { "" }
