@@ -61,22 +61,22 @@ switch ($Mode) {
 switch ($Action) {
     "up" {
         $DetachFlag = if ($WatchFlag) { "" } else { "-d" }
-        $cmd = "docker compose -f $ComposeFile --env-file $EnvFile up $DetachFlag $BuildFlag $WatchFlag"
+        $cmd = "docker compose -f `"$ComposeFile`" --env-file `"$EnvFile`" up $DetachFlag $BuildFlag $WatchFlag"
         Write-Host "→ $cmd"
         Invoke-Expression $cmd
     }
     "down" {
-        $cmd = "docker compose -f $ComposeFile --env-file $EnvFile down $VolumesFlag"
+        $cmd = "docker compose -f `"$ComposeFile`" --env-file `"$EnvFile`" down $VolumesFlag"
         Write-Host "→ $cmd"
         Invoke-Expression $cmd
     }
     "ps" {
-        $cmd = "docker compose -f $ComposeFile --env-file $EnvFile ps"
+        $cmd = "docker compose -f `"$ComposeFile`" --env-file `"$EnvFile`" ps"
         Write-Host "→ $cmd"
         Invoke-Expression $cmd
     }
     "logs" {
-        $cmd = "docker compose -f $ComposeFile --env-file $EnvFile logs -f"
+        $cmd = "docker compose -f `"$ComposeFile`" --env-file `"$EnvFile`" logs -f"
         Write-Host "→ $cmd"
         Invoke-Expression $cmd
     }
