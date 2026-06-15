@@ -51,9 +51,6 @@ switch ($Mode) {
             default { Write-Host "Error: unknown service '$Service'"; Show-Usage }
         }
 
-        if ($Action -eq "up" -and $Service -eq "be") {
-            $WatchFlag = "--watch"
-        }
     }
     default { Show-Usage }
 }

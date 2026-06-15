@@ -63,10 +63,8 @@ case "$MODE" in
             *)     echo "Error: unknown service '$SERVICE'"; usage ;;
         esac
 
-        if [ "$ACTION" = "up" ] && [ "$SERVICE" = "be" ]; then
-            watch_flag="--watch"
-        fi
         ;;
+
     *)
         usage
         ;;
