@@ -1,7 +1,7 @@
 param(
     [Parameter(Position=0)][string]$Mode,
-    [Parameter(Position=1)][string]$Action = "up",
-    [Parameter(Position=2)][string]$Service = "",
+    [Parameter(Position=1)][string]$Service = "",
+    [Parameter(Position=2)][string]$Action = "up",
     [switch]$Build,
     [switch]$Volumes
 )
@@ -27,6 +27,7 @@ $WatchFlag = ""
 
 switch ($Mode) {
     "dev" {
+        if ($Service) { $Action = $Service; $Service = "" }
         $EnvFile = [System.IO.Path]::Combine($PSScriptRoot, "..", ".env.local")
         $ComposeFile = [System.IO.Path]::Combine($ComposeDir, "compose.yml")
         if ($Action -eq "up") { $WatchFlag = "--watch" }
