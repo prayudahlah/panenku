@@ -28,7 +28,7 @@ done
 set -- "${args[@]}"
 
 MODE="$1"
-ACTION="${2:-up}"
+ACTION=""
 
 build_flag=""
 $needs_build && build_flag="--build"
@@ -39,6 +39,7 @@ $needs_volumes && volumes_flag="-v"
 watch_flag=""
 case "$MODE" in
     dev)
+        ACTION="${2:-up}"
         ENV_FILE="$(dirname "$0")/../.env.local"
         COMPOSE_FILE="$COMPOSE_DIR/compose.yml"
         if [ "$ACTION" = "up" ]; then
@@ -51,7 +52,8 @@ case "$MODE" in
             usage
         fi
         SERVICE="$2"
-        shift
+        ACTION="${3:-up}"
+        shift 2
         ENV_FILE="$(dirname "$0")/../.env.distributed"
 
         case "$SERVICE" in
