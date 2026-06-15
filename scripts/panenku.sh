@@ -7,7 +7,7 @@ ENV_FILE=""
 usage() {
     echo "Usage:"
     echo "  $0 dev [up|down|down -v|ps|logs] [--build]"
-    echo "  $0 distributed <db|be|fe|proxy> [up|down|down -v|ps|logs] [--build]"
+    echo "  $0 distributed <web|db|be> [up|down|down -v|ps|logs] [--build]"
     exit 1
 }
 
@@ -47,7 +47,7 @@ case "$MODE" in
         ;;
     distributed)
         if [ -z "$2" ]; then
-            echo "Error: specify service (db|be|fe|proxy)"
+            echo "Error: specify service (web|db|be)"
             usage
         fi
         SERVICE="$2"
@@ -55,14 +55,13 @@ case "$MODE" in
         ENV_FILE="$(dirname "$0")/../.env.distributed"
 
         case "$SERVICE" in
+            web)   COMPOSE_FILE="$COMPOSE_DIR/compose.proxy.yml" ;;
             db)    COMPOSE_FILE="$COMPOSE_DIR/compose.db.yml" ;;
             be)    COMPOSE_FILE="$COMPOSE_DIR/compose.backend.yml" ;;
-            fe)    COMPOSE_FILE="$COMPOSE_DIR/compose.frontend.yml" ;;
-            proxy) COMPOSE_FILE="$COMPOSE_DIR/compose.proxy.yml" ;;
             *)     echo "Error: unknown service '$SERVICE'"; usage ;;
         esac
 
-        if [ "$ACTION" = "up" ] && { [ "$SERVICE" = "be" ] || [ "$SERVICE" = "fe" ]; }; then
+        if [ "$ACTION" = "up" ] && [ "$SERVICE" = "be" ]; then
             watch_flag="--watch"
         fi
         ;;

@@ -14,7 +14,7 @@ function Show-Usage {
     Write-Host @"
 Usage:
   .\panenku.ps1 dev [up|down|down -v|ps|logs] [-Build]
-  .\panenku.ps1 distributed <db|be|fe|proxy> [up|down|down -v|ps|logs] [-Build]
+  .\panenku.ps1 distributed <web|db|be> [up|down|down -v|ps|logs] [-Build]
 "@
     exit 1
 }
@@ -32,18 +32,17 @@ switch ($Mode) {
         if ($Action -eq "up") { $WatchFlag = "--watch" }
     }
     "distributed" {
-        if (-not $Service) { Write-Host "Error: specify service (db|be|fe|proxy)"; Show-Usage }
+        if (-not $Service) { Write-Host "Error: specify service (web|db|be)"; Show-Usage }
         $EnvFile = [System.IO.Path]::Combine($PSScriptRoot, "..", ".env.distributed")
 
         switch ($Service) {
+            "web"   { $ComposeFile = [System.IO.Path]::Combine($ComposeDir, "compose.proxy.yml") }
             "db"    { $ComposeFile = [System.IO.Path]::Combine($ComposeDir, "compose.db.yml") }
             "be"    { $ComposeFile = [System.IO.Path]::Combine($ComposeDir, "compose.backend.yml") }
-            "fe"    { $ComposeFile = [System.IO.Path]::Combine($ComposeDir, "compose.frontend.yml") }
-            "proxy" { $ComposeFile = [System.IO.Path]::Combine($ComposeDir, "compose.proxy.yml") }
             default { Write-Host "Error: unknown service '$Service'"; Show-Usage }
         }
 
-        if ($Action -eq "up" -and ($Service -eq "be" -or $Service -eq "fe")) {
+        if ($Action -eq "up" -and $Service -eq "be") {
             $WatchFlag = "--watch"
         }
     }
