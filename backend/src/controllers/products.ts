@@ -29,7 +29,7 @@ export const productsController = (app: any) =>
             }
 
             const result = await catalogService.list({
-                search: query.search,
+                search: query.q,
                 categoryId: query.categoryId ? Number(query.categoryId) : undefined,
                 minPrice: query.minPrice ? Number(query.minPrice) : undefined,
                 maxPrice: query.maxPrice ? Number(query.maxPrice) : undefined,

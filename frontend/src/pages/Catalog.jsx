@@ -36,10 +36,12 @@ export default function Catalog() {
     const maxPrice = searchParams.get('maxPrice') || '';
     const sort = searchParams.get('sort') || 'createdAt_desc';
     const page = Number(searchParams.get('page')) || 1;
+    const isNegotiable = searchParams.get('isNegotiable') || '';
 
     const [searchInput, setSearchInput] = useState(q);
     const [minInput, setMinInput] = useState(minPrice);
     const [maxInput, setMaxInput] = useState(maxPrice);
+    const [negoInput, setNegoInput] = useState(isNegotiable);
 
     useEffect(() => {
         setSearchInput(q);
@@ -77,6 +79,7 @@ export default function Catalog() {
         if (categoryId) params.categoryId = categoryId;
         if (minPrice) params.minPrice = minPrice;
         if (maxPrice) params.maxPrice = maxPrice;
+        if (isNegotiable) params.isNegotiable = isNegotiable;
 
         setLoading(true);
         products.list(params).then((json) => {
@@ -86,7 +89,7 @@ export default function Catalog() {
             }
             setLoading(false);
         });
-    }, [q, categoryId, minPrice, maxPrice, sort, page]);
+    }, [q, categoryId, minPrice, maxPrice, isNegotiable, sort, page]);
 
     useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
@@ -96,10 +99,11 @@ export default function Catalog() {
         if (categoryId && updates.categoryId !== null && !('categoryId' in updates)) params.set('categoryId', categoryId);
         if (minPrice && updates.minPrice !== null && !('minPrice' in updates)) params.set('minPrice', minPrice);
         if (maxPrice && updates.maxPrice !== null && !('maxPrice' in updates)) params.set('maxPrice', maxPrice);
+        if (isNegotiable && updates.isNegotiable !== null && !('isNegotiable' in updates)) params.set('isNegotiable', isNegotiable);
         if (sort && sort !== 'createdAt_desc' && !('sort' in updates)) params.set('sort', sort);
         Object.entries(updates).forEach(([k, v]) => { if (v !== null && v !== undefined && v !== '') params.set(k, String(v)); });
         setSearchParams(params);
-    }, [q, categoryId, minPrice, maxPrice, sort, setSearchParams]);
+    }, [q, categoryId, minPrice, maxPrice, isNegotiable, sort, setSearchParams]);
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -129,7 +133,8 @@ export default function Catalog() {
     const resetFilters = () => {
         setMinInput('');
         setMaxInput('');
-        navigateWithParams({ categoryId: null, minPrice: null, maxPrice: null, page: 1 });
+        setNegoInput('');
+        navigateWithParams({ categoryId: null, minPrice: null, maxPrice: null, isNegotiable: null, page: 1 });
     };
 
     const totalPages = Math.ceil(meta.total / meta.limit);
@@ -198,6 +203,40 @@ export default function Catalog() {
                                     className="w-full px-3 py-1.5 text-sm bg-primary-green text-white rounded-lg hover:opacity-90"
                                 >
                                     Terapkan
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="border-t pt-4">
+                            <h3 className="text-sm font-semibold text-gray-900 mb-2">Bisa Negosiasi Harga?</h3>
+                            <div className="flex bg-gray-100 p-1 rounded-lg">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const next = negoInput === 'true' ? '' : 'true';
+                                        setNegoInput(next);
+                                        navigateWithParams({ isNegotiable: next || null, page: 1 });
+                                    }}
+                                    className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all ${negoInput === 'true'
+                                        ? 'bg-primary-green text-white shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-900'
+                                    }`}
+                                >
+                                    Ya
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const next = negoInput === 'false' ? '' : 'false';
+                                        setNegoInput(next);
+                                        navigateWithParams({ isNegotiable: next || null, page: 1 });
+                                    }}
+                                    className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all ${negoInput === 'false'
+                                        ? 'bg-primary-green text-white shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-900'
+                                    }`}
+                                >
+                                    Tidak
                                 </button>
                             </div>
                         </div>
