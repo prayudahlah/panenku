@@ -8,4 +8,5 @@ services:
     ports: ["0.0.0.0:${BACKEND_PORT}:3000"]
     dns:
       - 100.100.100.100
+      - 8.8.8.8
     restart: unless-stopped
