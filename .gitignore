@@ -12,3 +12,4 @@ docker/nginx/ssl/
 test-results/
 playwright-report/
 .idea
+backup/

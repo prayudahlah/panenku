@@ -88,6 +88,14 @@ case "$ACTION" in
         echo "→ $cmd"
         eval "$cmd"
         ;;
+    restart)
+        cmd="docker compose -f $COMPOSE_FILE --env-file $ENV_FILE down"
+        echo "→ $cmd"
+        eval "$cmd"
+        cmd="docker compose -f $COMPOSE_FILE --env-file $ENV_FILE up -d"
+        echo "→ $cmd"
+        eval "$cmd"
+        ;;
     logs)
         cmd="docker compose -f $COMPOSE_FILE --env-file $ENV_FILE logs -f"
         echo "→ $cmd"

@@ -72,6 +72,14 @@ switch ($Action) {
         Write-Host "→ $cmd"
         Invoke-Expression $cmd
     }
+    "restart" {
+        $cmd = "docker compose -f `"$ComposeFile`" --env-file `"$EnvFile`" down"
+        Write-Host "→ $cmd"
+        Invoke-Expression $cmd
+        $cmd = "docker compose -f `"$ComposeFile`" --env-file `"$EnvFile`" up -d"
+        Write-Host "→ $cmd"
+        Invoke-Expression $cmd
+    }
     "logs" {
         $cmd = "docker compose -f `"$ComposeFile`" --env-file `"$EnvFile`" logs -f"
         Write-Host "→ $cmd"
