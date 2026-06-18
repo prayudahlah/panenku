@@ -4,6 +4,7 @@ import { negotiations } from '../db/schema';
 import { negotiationRepo } from '../repositories';
 import * as notificationService from './notification';
 import * as auditService from './audit';
+import * as cartService from './cart';
 import type { CreateNegotiationInput, SellerRespondInput, BuyerRespondInput } from '../dtos/negotiation';
 
 type ServiceResult<T> = { data?: T; error?: string; status?: number; errorCode?: string };
@@ -156,6 +157,15 @@ export async function sellerRespond(userId: number, negotiationId: number, body:
     if (body.action === 'accept') {
         notificationService.create(nego.buyerId, 'Penawaran diterima', 'Penjual menyetujui penawaran Anda', 'negotiation', 'negotiation', negotiationId);
         await auditService.log({ userId, action: 'negotiation.accepted', entityType: 'negotiation', entityId: negotiationId, oldData: { status: 'ongoing' }, newData: { status: 'accepted' } });
+        try {
+            await cartService.addItem(nego.buyerId, {
+                productId: nego.productId,
+                quantity: Number(nego.agreedQuantityOffer),
+                unitId: nego.agreedUnitId,
+            });
+        } catch (cartErr) {
+            console.error('[negotiation.sellerRespond] Auto-add to cart failed:', cartErr);
+        }
     } else if (body.action === 'reject') {
         notificationService.create(nego.buyerId, 'Penawaran ditolak', 'Penjual menolak penawaran Anda', 'negotiation', 'negotiation', negotiationId);
         await auditService.log({ userId, action: 'negotiation.rejected', entityType: 'negotiation', entityId: negotiationId, oldData: { status: 'ongoing' }, newData: { status: 'rejected' } });
@@ -266,6 +276,15 @@ export async function buyerRespond(userId: number, negotiationId: number, body: 
     } else {
         notificationService.create(nego.sellerId, 'Negosiasi disetujui', 'Pembeli menyetujui penawaran Anda', 'negotiation', 'negotiation', negotiationId);
         await auditService.log({ userId, action: 'negotiation.accepted', entityType: 'negotiation', entityId: negotiationId, oldData: { status: 'ongoing' }, newData: { status: 'accepted' } });
+        try {
+            await cartService.addItem(nego.buyerId, {
+                productId: nego.productId,
+                quantity: Number(nego.agreedQuantityOffer),
+                unitId: nego.agreedUnitId,
+            });
+        } catch (cartErr) {
+            console.error('[negotiation.buyerRespond] Auto-add to cart failed:', cartErr);
+        }
     }
 
     const resultStatus = isCounter ? 'ongoing' : 'accepted';

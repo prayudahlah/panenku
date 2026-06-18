@@ -479,25 +479,29 @@ export async function softDeleteSellerProduct({
     const oldData = await findSellerProductById(sellerId, productId);
     if (!oldData) return null;
 
-    const result = await db
-        .update(products)
-        .set({ deletedAt: new Date() })
-        .where(and(eq(products.id, productId), eq(products.sellerId, sellerId), isNull(products.deletedAt)))
-        .returning();
+    const deletedProduct = await db.transaction(async (tx: any) => {
+        const result = await tx
+            .update(products)
+            .set({ deletedAt: new Date() })
+            .where(and(eq(products.id, productId), eq(products.sellerId, sellerId), isNull(products.deletedAt)))
+            .returning();
 
-    const deletedProduct = result[0] || null;
+        const dp = result[0] || null;
 
-    if (deletedProduct) {
-        await db.insert(auditLogs).values({
-            userId: actorId,
-            action: 'PRODUCT_SOFT_DELETE',
-            entityType: 'product',
-            entityId: productId,
-            oldData,
-            newData: deletedProduct,
-            ipAddress,
-        });
-    }
+        if (dp) {
+            await tx.insert(auditLogs).values({
+                userId: actorId,
+                action: 'PRODUCT_SOFT_DELETE',
+                entityType: 'product',
+                entityId: productId,
+                oldData,
+                newData: dp,
+                ipAddress,
+            });
+        }
+
+        return dp;
+    });
 
     return deletedProduct;
 }

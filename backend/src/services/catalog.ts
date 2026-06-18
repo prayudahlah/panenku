@@ -249,6 +249,7 @@ export const deleteSellerProduct = async ({
     } catch (err: any) {
         const timeout = getTimeoutResult(err, 'catalog.deleteSellerProduct');
         if (timeout) return timeout;
+        console.error('[catalog.deleteSellerProduct]', err);
         return { status: 500, code: 'ERR-DEL-06', error: 'Terjadi kesalahan database saat soft delete' };
     }
 };
