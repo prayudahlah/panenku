@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { eq, and, isNull, inArray, sql, desc } from 'drizzle-orm';
-import { carts, cartItems, products, sellerProfiles, units, checkouts, orders, orderItems, payments, shipments, checkoutStatuses } from '../db/schema';
+import { carts, cartItems, products, sellerProfiles, units, checkouts, orders, orderItems, payments, shipments, checkoutStatuses, negotiations } from '../db/schema';
 
 type DBLike = typeof db;
 
@@ -27,6 +27,21 @@ export async function findCartWithDetails(userId: number) {
         .leftJoin(sellerProfiles, eq(products.sellerId, sellerProfiles.userId))
         .where(and(eq(carts.userId, userId), isNull(products.deletedAt)));
     return result;
+}
+
+export async function findAcceptedNegotiationsByBuyer(buyerId: number) {
+    return await db
+        .select({
+            productId: negotiations.productId,
+            sellerId: negotiations.sellerId,
+            agreedPriceOffer: negotiations.agreedPriceOffer,
+            negotiationId: negotiations.id,
+        })
+        .from(negotiations)
+        .where(and(
+            eq(negotiations.buyerId, buyerId),
+            eq(negotiations.status, 'accepted'),
+        ));
 }
 
 export async function createCheckout(tx: DBLike, data: {
@@ -95,6 +110,7 @@ export async function createOrderItem(tx: DBLike, data: {
     pricePerUnit: string;
     discount: string;
     subtotal: string;
+    negotiationId?: number;
 }) {
     const result = await tx
         .insert(orderItems)

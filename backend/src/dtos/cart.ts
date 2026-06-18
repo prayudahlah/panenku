@@ -49,4 +49,5 @@ export type CartViewItem = {
     stockQuantity: string;
     minOrderQty: string;
     isNegotiable: boolean;
+    negotiatedPrice?: string;
 };

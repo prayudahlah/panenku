@@ -53,10 +53,15 @@ export async function checkout(userId: number, body: CheckoutInput): Promise<Ser
         }
     }
 
+    const acceptedNegos = await checkoutRepo.findAcceptedNegotiationsByBuyer(userId);
+    const negoMap = new Map(acceptedNegos.map(n => [`${n.productId}_${n.sellerId}`, n]));
+
     const result = await db.transaction(async (tx: any) => {
         let totalAmount = 0;
         for (const item of items) {
-            totalAmount += Number(item.quantity) * Number(item.pricePerUnit);
+            const nego = negoMap.get(`${item.productId}_${item.sellerId}`);
+            const effectivePrice = nego ? Number(nego.agreedPriceOffer) : Number(item.pricePerUnit);
+            totalAmount += Number(item.quantity) * effectivePrice;
         }
 
         const checkoutRec = await checkoutRepo.createCheckout(tx, {
@@ -85,7 +90,9 @@ export async function checkout(userId: number, body: CheckoutInput): Promise<Ser
 
             let sellerSubtotal = 0;
             for (const item of sellerItems) {
-                sellerSubtotal += Number(item.quantity) * Number(item.pricePerUnit);
+                const nego = negoMap.get(`${item.productId}_${item.sellerId}`);
+                const effectivePrice = nego ? Number(nego.agreedPriceOffer) : Number(item.pricePerUnit);
+                sellerSubtotal += Number(item.quantity) * effectivePrice;
             }
 
             const orderNumber = generateOrderNumber(checkoutRec.id, sellerId);
@@ -98,16 +105,19 @@ export async function checkout(userId: number, body: CheckoutInput): Promise<Ser
             });
 
             for (const item of sellerItems) {
-                const itemSubtotal = Number(item.quantity) * Number(item.pricePerUnit);
+                const nego = negoMap.get(`${item.productId}_${item.sellerId}`);
+                const effectivePrice = nego ? Number(nego.agreedPriceOffer) : Number(item.pricePerUnit);
+                const itemSubtotal = Number(item.quantity) * effectivePrice;
                 await checkoutRepo.createOrderItem(tx, {
                     orderId: orderRec.id,
                     productId: item.productId,
                     orderItemStatusId: ORDER_ITEM_STATUS_PENDING,
                     quantity: String(item.quantity),
                     unitId: item.unitId,
-                    pricePerUnit: String(item.pricePerUnit),
+                    pricePerUnit: String(effectivePrice),
                     discount: '0',
                     subtotal: String(itemSubtotal),
+                    negotiationId: nego?.negotiationId || undefined,
                 });
                 await checkoutRepo.deductProductStock(tx, item.productId, Number(item.quantity));
             }
@@ -124,14 +134,18 @@ export async function checkout(userId: number, body: CheckoutInput): Promise<Ser
         await checkoutRepo.updateCheckoutPaymentId(tx, checkoutRec.id, payment.id);
         await checkoutRepo.clearCartItems(tx, userId);
 
-        const itemDetails: CheckoutItemDetail[] = items.map((item) => ({
-            productId: item.productId,
-            productName: item.productName || 'Unknown',
-            quantity: Number(item.quantity),
-            unitName: item.unitName || '',
-            pricePerUnit: String(item.pricePerUnit),
-            subtotal: String(Number(item.quantity) * Number(item.pricePerUnit)),
-        }));
+        const itemDetails: CheckoutItemDetail[] = items.map((item) => {
+            const nego = negoMap.get(`${item.productId}_${item.sellerId}`);
+            const effectivePrice = nego ? Number(nego.agreedPriceOffer) : Number(item.pricePerUnit);
+            return {
+                productId: item.productId,
+                productName: item.productName || 'Unknown',
+                quantity: Number(item.quantity),
+                unitName: item.unitName || '',
+                pricePerUnit: String(effectivePrice),
+                subtotal: String(Number(item.quantity) * effectivePrice),
+            };
+        });
 
         return { checkoutId: checkoutRec.id, totalAmount: String(totalAmount), orderCount, items: itemDetails };
     });
@@ -188,9 +202,12 @@ export async function directCheckout(userId: number, body: DirectCheckoutInput):
         sellerStatus: product.sellerStatus,
     }];
 
-    const result = await db.transaction(async (tx: any) => {
-        const totalAmount = qty * Number(product.pricePerUnit);
+    const acceptedNegos = await checkoutRepo.findAcceptedNegotiationsByBuyer(userId);
+    const nego = acceptedNegos.find(n => n.productId === product.productId && n.sellerId === product.sellerId);
+    const effectivePrice = nego ? Number(nego.agreedPriceOffer) : Number(product.pricePerUnit);
+    const totalAmount = qty * effectivePrice;
 
+    const result = await db.transaction(async (tx: any) => {
         const checkoutRec = await checkoutRepo.createCheckout(tx, {
             buyerId: userId,
             totalAmount: String(totalAmount),
@@ -221,9 +238,10 @@ export async function directCheckout(userId: number, body: DirectCheckoutInput):
             orderItemStatusId: ORDER_ITEM_STATUS_PENDING,
             quantity: String(qty),
             unitId: body.unitId,
-            pricePerUnit: product.pricePerUnit,
+            pricePerUnit: String(effectivePrice),
             discount: '0',
             subtotal: String(totalAmount),
+            negotiationId: nego?.negotiationId || undefined,
         });
 
         await checkoutRepo.deductProductStock(tx, product.productId, qty);

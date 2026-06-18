@@ -58,7 +58,7 @@ export default function Cart() {
         setCartItems((prev) =>
             prev.map((item) =>
                 item.cartItemId === itemId
-                    ? { ...item, quantity: newQty, subtotal: newQty * Number(item.pricePerUnit) }
+                    ? { ...item, quantity: newQty, subtotal: newQty * Number(item.negotiatedPrice || item.pricePerUnit) }
                     : item
             )
         );
@@ -222,7 +222,13 @@ export default function Cart() {
                                         <div>
                                             <span className="text-xs text-gray-400 uppercase font-semibold block tracking-wider">Harga</span>
                                             <p className={`font-bold mt-1 ${item.isAvailable ? 'text-gray-800' : 'text-gray-400'}`}>
-                                                {item.isAvailable ? <>Rp {formatNumber(item.pricePerUnit)} <span className="text-xs text-gray-400 font-normal">/ {item.unitName}</span></> : '—'}
+                                                {item.isAvailable ? (
+                                                    item.negotiatedPrice ? (
+                                                        <>Rp {formatNumber(item.negotiatedPrice)} <span className="text-xs text-primary-green font-semibold">(hasil nego)</span> <span className="text-xs text-gray-400 font-normal">/ {item.unitName}</span></>
+                                                    ) : (
+                                                        <>Rp {formatNumber(item.pricePerUnit)} <span className="text-xs text-gray-400 font-normal">/ {item.unitName}</span></>
+                                                    )
+                                                ) : '—'}
                                             </p>
                                         </div>
 

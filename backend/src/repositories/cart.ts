@@ -1,6 +1,6 @@
 import { db } from '../db';
-import { eq, and, isNull, asc } from 'drizzle-orm';
-import { carts, cartItems, products, sellerProfiles, units } from '../db/schema';
+import { eq, and, isNull, asc, sql } from 'drizzle-orm';
+import { carts, cartItems, products, sellerProfiles, units, negotiations } from '../db/schema';
 import { cities, provinces } from '../db/schema/reference';
 
 type DBLike = typeof db;
@@ -121,6 +121,7 @@ export async function findCartWithItems(userId: number) {
             stockQuantity: products.stockQuantity,
             minOrderQty: products.minOrderQty,
             isNegotiable: products.isNegotiable,
+            negotiatedPrice: negotiations.agreedPriceOffer,
             sellerId: products.sellerId,
             farmName: sellerProfiles.farmName,
             address: sellerProfiles.address,
@@ -134,6 +135,11 @@ export async function findCartWithItems(userId: number) {
         .leftJoin(sellerProfiles, eq(products.sellerId, sellerProfiles.userId))
         .leftJoin(cities, eq(sellerProfiles.cityId, cities.id))
         .leftJoin(provinces, eq(sellerProfiles.provinceId, provinces.id))
+        .leftJoin(negotiations, and(
+            eq(negotiations.productId, cartItems.productId),
+            eq(negotiations.buyerId, userId),
+            eq(negotiations.status, 'accepted'),
+        ))
         .where(eq(carts.userId, userId))
         .orderBy(asc(cartItems.addedAt));
     return result;

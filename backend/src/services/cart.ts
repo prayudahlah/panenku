@@ -88,7 +88,7 @@ export async function viewCart(userId: number): Promise<ServiceResult<CartViewRe
 
         const items: CartViewItem[] = rows.map((row) => {
             const isAvailable = !row.productDeletedAt;
-            const unitPrice = isAvailable ? Number(row.pricePerUnit) : 0;
+            const unitPrice = isAvailable ? Number(row.negotiatedPrice || row.pricePerUnit) : 0;
             const qty = Number(row.quantity);
             const subtotal = qty * unitPrice;
             totalAmount += subtotal;
@@ -101,7 +101,7 @@ export async function viewCart(userId: number): Promise<ServiceResult<CartViewRe
                 quantity: qty,
                 unitId: row.unitId,
                 unitName: row.unitName!,
-                pricePerUnit: isAvailable ? row.pricePerUnit! : '0',
+                pricePerUnit: isAvailable ? String(row.negotiatedPrice || row.pricePerUnit!) : '0',
                 subtotal,
                 sellerId: Number(row.sellerId),
                 farmName: row.farmName ?? '',
@@ -111,6 +111,7 @@ export async function viewCart(userId: number): Promise<ServiceResult<CartViewRe
                 stockQuantity: row.stockQuantity ?? '0',
                 minOrderQty: row.minOrderQty ?? '1',
                 isNegotiable: row.isNegotiable ?? false,
+                negotiatedPrice: row.negotiatedPrice ?? undefined,
             };
         });
 
