@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { cart as cartApi } from '../services/api';
 import { formatNumber } from '../utils/format';
-import { Trash2, Minus, Plus, Loader, Handshake, AlertTriangle, ShoppingBag } from 'lucide-react';
+import { Trash2, Minus, Plus, Loader, Handshake, AlertTriangle, ShoppingBag, Lock } from 'lucide-react';
 import productPlaceholder from '../assets/product_placeholder.webp';
 import NegotiationModal from '../components/NegotiationModal';
 
@@ -224,7 +224,7 @@ export default function Cart() {
                                             <p className={`font-bold mt-1 ${item.isAvailable ? 'text-gray-800' : 'text-gray-400'}`}>
                                                 {item.isAvailable ? (
                                                     item.negotiatedPrice ? (
-                                                        <>Rp {formatNumber(item.negotiatedPrice)} <span className="text-xs text-primary-green font-semibold">(hasil nego)</span> <span className="text-xs text-gray-400 font-normal">/ {item.unitName}</span></>
+                                                        <span className="flex items-center gap-1">Rp {formatNumber(item.negotiatedPrice)} <Lock size={11} className="text-primary-green" /> <span className="text-xs text-primary-green font-semibold">(hasil nego)</span> <span className="text-xs text-gray-400 font-normal">/ {item.unitName}</span></span>
                                                     ) : (
                                                         <>Rp {formatNumber(item.pricePerUnit)} <span className="text-xs text-gray-400 font-normal">/ {item.unitName}</span></>
                                                     )
@@ -234,39 +234,52 @@ export default function Cart() {
 
                                         <div>
                                             <span className="text-xs text-gray-400 uppercase font-semibold block tracking-wider">Kuantitas</span>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <button
-                                                    onClick={() => handleQuantityChange(item.cartItemId, item.quantity, item.stockQuantity, item.minOrderQty, false)}
-                                                    disabled={!item.isAvailable || item.quantity <= Number(item.minOrderQty)}
-                                                    className="w-7 h-7 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                                                >
-                                                    <Minus size={14} />
-                                                </button>
-                                                <span className="font-bold text-gray-800 text-center min-w-[24px]">
-                                                    {item.quantity}
-                                                </span>
-                                                <button
-                                                    onClick={() => handleQuantityChange(item.cartItemId, item.quantity, item.stockQuantity, item.minOrderQty, true)}
-                                                    disabled={!item.isAvailable || item.quantity >= Number(item.stockQuantity)}
-                                                    className="w-7 h-7 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                                                >
-                                                    <Plus size={14} />
-                                                </button>
-                                            </div>
+                                            {item.negotiatedPrice ? (
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className="font-bold text-gray-800">{item.quantity}</span>
+                                                    <span className="text-[10px] bg-primary-green/10 text-primary-green font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                                                        <Lock size={10} /> Terkunci
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <button
+                                                        onClick={() => handleQuantityChange(item.cartItemId, item.quantity, item.stockQuantity, item.minOrderQty, false)}
+                                                        disabled={!item.isAvailable || item.quantity <= Number(item.minOrderQty)}
+                                                        className="w-7 h-7 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                                                    >
+                                                        <Minus size={14} />
+                                                    </button>
+                                                    <span className="font-bold text-gray-800 text-center min-w-[24px]">
+                                                        {item.quantity}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => handleQuantityChange(item.cartItemId, item.quantity, item.stockQuantity, item.minOrderQty, true)}
+                                                        disabled={!item.isAvailable || item.quantity >= Number(item.stockQuantity)}
+                                                        className="w-7 h-7 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                                                    >
+                                                        <Plus size={14} />
+                                                    </button>
+                                                </div>
+                                            )}
                                             <span className="text-xs text-gray-400 block mt-0.5">{item.unitName}</span>
                                         </div>
 
                                         <div>
-                                            <span className="text-xs text-gray-400 uppercase font-semibold block tracking-wider">Dapat Nego?</span>
+                                            <span className="text-xs text-gray-400 uppercase font-semibold block tracking-wider">Status Nego</span>
                                             <div className="mt-1">
                                                 {item.isAvailable ? (
-                                                    item.isNegotiable ? (
+                                                    item.negotiatedPrice ? (
+                                                        <span className="inline-block bg-green-50 text-green-700 px-2 py-0.5 rounded text-xs font-bold uppercase flex items-center gap-1">
+                                                            <Lock size={10} /> Terkunci
+                                                        </span>
+                                                    ) : item.isNegotiable ? (
                                                         <span className="inline-block bg-primary-green-100/50 text-primary-green px-2 py-0.5 rounded text-xs font-bold uppercase">
-                                                            Yes
+                                                            Bisa nego
                                                         </span>
                                                     ) : (
                                                         <span className="inline-block bg-red-50 text-red-600 px-2 py-0.5 rounded text-xs font-bold uppercase">
-                                                            No
+                                                            Fixed
                                                         </span>
                                                     )
                                                 ) : (
@@ -286,7 +299,7 @@ export default function Cart() {
                                     </div>
 
                                     {/* Nego Action */}
-                                    {item.isAvailable && item.isNegotiable && (
+                                    {item.isAvailable && item.isNegotiable && !item.negotiatedPrice && (
                                         <div className="flex justify-end pt-2">
                                             <button
                                                 onClick={() => handleOpenNego(item)}

@@ -89,7 +89,7 @@ export async function viewCart(userId: number): Promise<ServiceResult<CartViewRe
         const items: CartViewItem[] = rows.map((row) => {
             const isAvailable = !row.productDeletedAt;
             const unitPrice = isAvailable ? Number(row.negotiatedPrice || row.pricePerUnit) : 0;
-            const qty = Number(row.quantity);
+            const qty = isAvailable && row.negotiatedPrice ? Number(row.negotiatedQuantity || row.quantity) : Number(row.quantity);
             const subtotal = qty * unitPrice;
             totalAmount += subtotal;
 
@@ -112,6 +112,7 @@ export async function viewCart(userId: number): Promise<ServiceResult<CartViewRe
                 minOrderQty: row.minOrderQty ?? '1',
                 isNegotiable: row.isNegotiable ?? false,
                 negotiatedPrice: row.negotiatedPrice ?? undefined,
+                negotiatedQuantity: row.negotiatedQuantity ?? undefined,
             };
         });
 

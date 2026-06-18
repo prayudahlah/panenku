@@ -35,6 +35,7 @@ export async function findAcceptedNegotiationsByBuyer(buyerId: number) {
             productId: negotiations.productId,
             sellerId: negotiations.sellerId,
             agreedPriceOffer: negotiations.agreedPriceOffer,
+            agreedQuantityOffer: negotiations.agreedQuantityOffer,
             negotiationId: negotiations.id,
         })
         .from(negotiations)
@@ -231,6 +232,10 @@ export async function updateOrderShipmentId(tx: DBLike, orderId: number, shipmen
 
 export async function updateOrderItemsByOrderId(tx: DBLike, orderId: number, statusId: number) {
     await tx.update(orderItems).set({ orderItemStatusId: statusId }).where(eq(orderItems.orderId, orderId));
+}
+
+export async function updateShipmentDelivered(tx: DBLike, shipmentId: number, deliveredAt: Date) {
+    await tx.update(shipments).set({ shipmentStatusId: 5, deliveredAt }).where(eq(shipments.id, shipmentId));
 }
 
 export async function deductProductStock(tx: DBLike, productId: number, quantity: number) {

@@ -54,12 +54,21 @@ BEGIN
             cs.code AS "checkoutStatus",
             ss.code AS "shipmentStatus",
             s.shipping_address AS "shippingAddress",
+            ois.order_item_status_id AS "orderItemStatusId",
+            ois_ref.code AS "orderItemStatus",
             o.created_at AS "createdAt"
         FROM "transaction".checkouts c
         INNER JOIN "transaction".orders o ON o.checkout_id = c.id
         LEFT JOIN reference.checkout_statuses cs ON cs.id = c.checkout_status_id
         LEFT JOIN "transaction".shipments s ON s.id = o.shipment_id
         LEFT JOIN reference.shipment_statuses ss ON ss.id = s.shipment_status_id
+        LEFT JOIN LATERAL (
+            SELECT oi.order_item_status_id
+            FROM "transaction".order_items oi
+            WHERE oi.order_id = o.id
+            LIMIT 1
+        ) ois ON true
+        LEFT JOIN reference.order_item_statuses ois_ref ON ois_ref.id = ois.order_item_status_id
         WHERE c.buyer_id = p_user_id
           AND cs.code IN ('awaiting_payment', 'paid')
         ORDER BY o.created_at DESC
@@ -78,6 +87,8 @@ BEGIN
             cs.code AS "checkoutStatus",
             ps.code AS "paymentStatus",
             ss.code AS "shipmentStatus",
+            ois.order_item_status_id AS "orderItemStatusId",
+            ois_ref.code AS "orderItemStatus",
             o.created_at AS "createdAt"
         FROM "transaction".checkouts c
         INNER JOIN "transaction".orders o ON o.checkout_id = c.id
@@ -86,6 +97,13 @@ BEGIN
         LEFT JOIN reference.payment_statuses ps ON ps.id = p.payment_status_id
         LEFT JOIN "transaction".shipments s ON s.id = o.shipment_id
         LEFT JOIN reference.shipment_statuses ss ON ss.id = s.shipment_status_id
+        LEFT JOIN LATERAL (
+            SELECT oi.order_item_status_id
+            FROM "transaction".order_items oi
+            WHERE oi.order_id = o.id
+            LIMIT 1
+        ) ois ON true
+        LEFT JOIN reference.order_item_statuses ois_ref ON ois_ref.id = ois.order_item_status_id
         WHERE c.buyer_id = p_user_id
         ORDER BY o.created_at DESC
         LIMIT 5

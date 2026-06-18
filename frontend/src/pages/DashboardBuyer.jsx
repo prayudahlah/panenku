@@ -7,11 +7,12 @@ import {
   ChevronRight,
   Handshake,
   History,
+  Loader,
   Package,
   RefreshCcw,
   Repeat2,
 } from 'lucide-react';
-import { dashboard } from '../services/api';
+import { checkout, dashboard } from '../services/api';
 import { formatCurrency, formatDate } from '../utils/format';
 
 const emptyDashboard = {
@@ -129,7 +130,13 @@ function getOrderBadgeStyle(order) {
   return 'bg-gray-100 text-gray-500';
 }
 
-function OrderCard({ order }) {
+function OrderCard({ order, onReceive, receiving }) {
+  const isShipped = order.shipmentStatus === 'shipped' || order.shipmentStatus === 'picked_up';
+  const isDelivered = order.orderItemStatus === 'delivered';
+  const isAwaitingPayment = order.checkoutStatus === 'awaiting_payment';
+  const isPaid = order.checkoutStatus === 'paid';
+  const isLoading = receiving;
+
   return (
     <article className="min-h-36 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:border-primary-green/25 hover:shadow-md">
       <div className="flex items-start justify-between gap-4">
@@ -151,6 +158,20 @@ function OrderCard({ order }) {
           order.deliveryLocation ||
           'Alamat pengiriman belum tersedia.'}
       </p>
+
+      {isShipped && isPaid && !isDelivered && (
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            disabled={isLoading}
+            onClick={() => onReceive?.(order.checkoutId, order.orderId)}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary-green px-4 py-2 text-xs font-bold text-white hover:bg-primary-green/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? <Loader size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+            Terima
+          </button>
+        </div>
+      )}
     </article>
   );
 }
@@ -369,6 +390,25 @@ const DashboardBuyer = () => {
   const [showAllNegotiations, setShowAllNegotiations] = useState(false);
   const [showAllContracts, setShowAllContracts] = useState(false);
   const [showAllTransactions, setShowAllTransactions] = useState(false);
+  const [receiving, setReceiving] = useState(null);
+
+  const handleReceiveOrder = async (checkoutId, orderId) => {
+    const key = `${checkoutId}_${orderId}`;
+    if (!confirm('Terima pesanan ini? Pastikan barang sudah sesuai.')) return;
+    setReceiving(key);
+    try {
+      const res = await checkout.receiveOrder(checkoutId, orderId);
+      if (!res.success) {
+        alert(res.message || 'Gagal menerima pesanan');
+      }
+      loadDashboard();
+    } catch {
+      alert('Terjadi kesalahan jaringan');
+      loadDashboard();
+    } finally {
+      setReceiving(null);
+    }
+  };
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -484,6 +524,8 @@ const DashboardBuyer = () => {
                     <OrderCard
                       key={order.orderId || order.id || index}
                       order={order}
+                      onReceive={handleReceiveOrder}
+                      receiving={receiving === `${order.checkoutId}_${order.orderId}`}
                     />
                   ))}
                 </div>

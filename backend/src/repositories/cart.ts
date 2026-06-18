@@ -122,6 +122,7 @@ export async function findCartWithItems(userId: number) {
             minOrderQty: products.minOrderQty,
             isNegotiable: products.isNegotiable,
             negotiatedPrice: negotiations.agreedPriceOffer,
+            negotiatedQuantity: negotiations.agreedQuantityOffer,
             sellerId: products.sellerId,
             farmName: sellerProfiles.farmName,
             address: sellerProfiles.address,

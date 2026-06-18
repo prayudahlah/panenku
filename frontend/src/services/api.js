@@ -135,6 +135,7 @@ export const checkout = {
   getStatus: (id) => fetchApi(`/checkouts/${id}/status`),
   shipOrder: (checkoutId, orderId) => fetchApi(`/checkouts/${checkoutId}/orders/${orderId}/ship`, { method: 'PUT' }),
   cancelOrder: (checkoutId, orderId) => fetchApi(`/checkouts/${checkoutId}/orders/${orderId}/cancel`, { method: 'PUT' }),
+  receiveOrder: (checkoutId, orderId) => fetchApi(`/checkouts/${checkoutId}/orders/${orderId}/receive`, { method: 'PUT' }),
 };
 
 export const dashboard = {

@@ -56,6 +56,13 @@ export async function checkout(userId: number, body: CheckoutInput): Promise<Ser
     const acceptedNegos = await checkoutRepo.findAcceptedNegotiationsByBuyer(userId);
     const negoMap = new Map(acceptedNegos.map(n => [`${n.productId}_${n.sellerId}`, n]));
 
+    for (const item of items) {
+        const nego = negoMap.get(`${item.productId}_${item.sellerId}`);
+        if (nego) {
+            item.quantity = String(nego.agreedQuantityOffer);
+        }
+    }
+
     const result = await db.transaction(async (tx: any) => {
         let totalAmount = 0;
         for (const item of items) {
@@ -359,7 +366,8 @@ export async function cancel(userId: number, checkoutId: number): Promise<Servic
 
 const SHIPMENT_STATUS_PICKED_UP = 2;
 const ORDER_ITEM_STATUS_SHIPPED = 4;
-const ORDER_ITEM_STATUS_CANCELLED = 5;
+const ORDER_ITEM_STATUS_DELIVERED = 5;
+const ORDER_ITEM_STATUS_CANCELLED = 6;
 const PAYMENT_STATUS_REFUNDED = 9;
 
 export async function confirmShipment(
@@ -462,6 +470,33 @@ export async function sellerCancelOrder(
     );
 
     return { data: { orderId, status: 'cancelled' } };
+}
+
+export async function confirmReceived(
+    userId: number, checkoutId: number, orderId: number
+): Promise<ServiceResult<{ orderId: number; status: string }>> {
+    const order = await checkoutRepo.findOrderWithShipment(orderId);
+    if (!order) return { error: 'Pesanan tidak ditemukan', status: 404 };
+    if (order.checkoutId !== checkoutId) return { error: 'Pesanan tidak ditemukan', status: 404 };
+    if (order.buyerId !== userId) return { error: 'Akses ditolak', status: 403 };
+    if (order.checkoutStatusId !== CHECKOUT_STATUS_PAID) return { error: 'Checkout belum dibayar', status: 422 };
+    if (order.shipmentStatusId !== SHIPMENT_STATUS_PICKED_UP) return { error: 'Pesanan belum dikirim', status: 422 };
+
+    await db.transaction(async (tx: any) => {
+        await checkoutRepo.updateOrderItemsByOrderId(tx, orderId, ORDER_ITEM_STATUS_DELIVERED);
+        await checkoutRepo.updateShipmentDelivered(tx, order.shipmentId!, new Date());
+    });
+
+    notificationService.create(
+        order.sellerId,
+        'Pesanan Diterima',
+        `Pesanan #${checkoutId} telah diterima oleh pembeli`,
+        'checkout',
+        'checkout',
+        checkoutId,
+    );
+
+    return { data: { orderId, status: 'delivered' } };
 }
 
 export async function listCheckouts(userId: number, role: string): Promise<ServiceResult<CheckoutListItem[]>> {
