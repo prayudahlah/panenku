@@ -10,6 +10,6 @@ export const auditLogs = audit.table('audit_logs', {
     entityId: bigint('entity_id', { mode: 'number' }),
     oldData: jsonb('old_data'),
     newData: jsonb('new_data'),
-    ipAddress: varchar('ip_address', { length: 45 }),
+    ipAddress: varchar('ip_address', { length: 255 }),
     createdAt: timestamp('created_at').defaultNow(),
 });

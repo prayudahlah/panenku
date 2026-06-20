@@ -91,7 +91,7 @@ export const productsController = (app: any) =>
                 actorId: Number(userId),
                 actorRole: session.get('role'),
                 productId: Number(id),
-                ipAddress: request?.headers?.get('x-forwarded-for') || request?.headers?.get('x-real-ip') || undefined,
+                ipAddress: (request?.headers?.get('x-forwarded-for')?.split(',')[0]?.trim() || request?.headers?.get('x-real-ip') || 'unknown')?.substring(0, 45),
             });
             if (result.error) return serviceError(result, set);
             return { success: true, message: 'Produk berhasil dihapus dari katalog', data: result.data };
